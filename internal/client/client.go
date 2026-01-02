@@ -127,7 +127,37 @@ func (c *Client) Get(ctx context.Context, path string, query url.Values) (*Respo
 }
 
 // Post 发送POST请求
-func (c *Client) Post(ctx context.Context, path string, body interface{}) (*Response, error) {
+func (c *Client) Post(ctx context.Context, path string, body any) (*Response, error) {
 	req := NewRequest(MethodPost, path).SetBody(body)
 	return c.Do(ctx, req)
+}
+
+// DoAndUnmarshal 执行请求并自动解析响应到指定类型
+func DoAndUnmarshal[T any](c *Client, ctx context.Context, req *Request) (*T, error) {
+	resp, err := c.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	var result T
+	if err := resp.Unmarshal(&result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+// GetAndUnmarshal 发送GET请求并自动解析响应
+func GetAndUnmarshal[T any](c *Client, ctx context.Context, path string, query url.Values) (*T, error) {
+	req := NewRequest(MethodGet, path)
+	if query != nil {
+		req.Query = query
+	}
+	return DoAndUnmarshal[T](c, ctx, req)
+}
+
+// PostAndUnmarshal 发送POST请求并自动解析响应
+func PostAndUnmarshal[T any](c *Client, ctx context.Context, path string, body any) (*T, error) {
+	req := NewRequest(MethodPost, path).SetBody(body)
+	return DoAndUnmarshal[T](c, ctx, req)
 }

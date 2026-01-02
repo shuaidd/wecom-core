@@ -5,19 +5,15 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/shuaidd/wecom-core/internal/client"
 	"github.com/shuaidd/wecom-core/types/contact"
 )
 
 // CreateDepartment 创建部门
 // 文档: https://developer.work.weixin.qq.com/document/path/90205
 func (s *Service) CreateDepartment(ctx context.Context, req *contact.CreateDepartmentRequest) (int, error) {
-	resp, err := s.client.Post(ctx, "/cgi-bin/department/create", req)
+	result, err := client.PostAndUnmarshal[contact.CreateDepartmentResponse](s.client, ctx, "/cgi-bin/department/create", req)
 	if err != nil {
-		return 0, err
-	}
-
-	var result contact.CreateDepartmentResponse
-	if err := resp.Unmarshal(&result); err != nil {
 		return 0, err
 	}
 
@@ -27,7 +23,7 @@ func (s *Service) CreateDepartment(ctx context.Context, req *contact.CreateDepar
 // UpdateDepartment 更新部门
 // 文档: https://developer.work.weixin.qq.com/document/path/90206
 func (s *Service) UpdateDepartment(ctx context.Context, req *contact.UpdateDepartmentRequest) error {
-	_, err := s.client.Post(ctx, "/cgi-bin/department/update", req)
+	_, err := client.PostAndUnmarshal[contact.UpdateDepartmentResponse](s.client, ctx, "/cgi-bin/department/update", req)
 	return err
 }
 
@@ -37,7 +33,7 @@ func (s *Service) DeleteDepartment(ctx context.Context, id int) error {
 	query := url.Values{}
 	query.Set("id", fmt.Sprintf("%d", id))
 
-	_, err := s.client.Get(ctx, "/cgi-bin/department/delete", query)
+	_, err := client.GetAndUnmarshal[contact.DeleteDepartmentResponse](s.client, ctx, "/cgi-bin/department/delete", query)
 	return err
 }
 
@@ -50,13 +46,8 @@ func (s *Service) ListDepartments(ctx context.Context, id int) ([]contact.Depart
 		query.Set("id", fmt.Sprintf("%d", id))
 	}
 
-	resp, err := s.client.Get(ctx, "/cgi-bin/department/list", query)
+	result, err := client.GetAndUnmarshal[contact.ListDepartmentsResponse](s.client, ctx, "/cgi-bin/department/list", query)
 	if err != nil {
-		return nil, err
-	}
-
-	var result contact.ListDepartmentsResponse
-	if err := resp.Unmarshal(&result); err != nil {
 		return nil, err
 	}
 
@@ -69,13 +60,8 @@ func (s *Service) GetDepartment(ctx context.Context, id int) (*contact.Departmen
 	query := url.Values{}
 	query.Set("id", fmt.Sprintf("%d", id))
 
-	resp, err := s.client.Get(ctx, "/cgi-bin/department/get", query)
+	result, err := client.GetAndUnmarshal[contact.GetDepartmentResponse](s.client, ctx, "/cgi-bin/department/get", query)
 	if err != nil {
-		return nil, err
-	}
-
-	var result contact.GetDepartmentResponse
-	if err := resp.Unmarshal(&result); err != nil {
 		return nil, err
 	}
 

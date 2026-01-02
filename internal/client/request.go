@@ -29,7 +29,7 @@ type Request struct {
 	// Query 查询参数
 	Query url.Values
 	// Body 请求体
-	Body interface{}
+	Body any
 }
 
 // NewRequest 创建新请求
@@ -48,7 +48,7 @@ func (r *Request) AddQuery(key, value string) *Request {
 }
 
 // SetBody 设置请求体
-func (r *Request) SetBody(body interface{}) *Request {
+func (r *Request) SetBody(body any) *Request {
 	r.Body = body
 	return r
 }

@@ -54,7 +54,7 @@ func ParseResponse(httpResp *http.Response) (*Response, error) {
 }
 
 // Unmarshal 将响应体解析到目标对象
-func (r *Response) Unmarshal(v interface{}) error {
+func (r *Response) Unmarshal(v any) error {
 	if err := json.Unmarshal(r.Body, v); err != nil {
 		return fmt.Errorf("failed to unmarshal response body: %w", err)
 	}

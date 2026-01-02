@@ -5,23 +5,14 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/shuaidd/wecom-core/internal/client"
 	"github.com/shuaidd/wecom-core/types/contact"
 )
 
 // CreateUser 创建成员
 // 文档: https://developer.work.weixin.qq.com/document/path/90195
 func (s *Service) CreateUser(ctx context.Context, req *contact.CreateUserRequest) (*contact.CreateUserResponse, error) {
-	resp, err := s.client.Post(ctx, "/cgi-bin/user/create", req)
-	if err != nil {
-		return nil, err
-	}
-
-	var result contact.CreateUserResponse
-	if err := resp.Unmarshal(&result); err != nil {
-		return nil, err
-	}
-
-	return &result, nil
+	return client.PostAndUnmarshal[contact.CreateUserResponse](s.client, ctx, "/cgi-bin/user/create", req)
 }
 
 // GetUser 读取成员
@@ -30,13 +21,8 @@ func (s *Service) GetUser(ctx context.Context, userID string) (*contact.User, er
 	query := url.Values{}
 	query.Set("userid", userID)
 
-	resp, err := s.client.Get(ctx, "/cgi-bin/user/get", query)
+	result, err := client.GetAndUnmarshal[contact.GetUserResponse](s.client, ctx, "/cgi-bin/user/get", query)
 	if err != nil {
-		return nil, err
-	}
-
-	var result contact.GetUserResponse
-	if err := resp.Unmarshal(&result); err != nil {
 		return nil, err
 	}
 
@@ -46,7 +32,7 @@ func (s *Service) GetUser(ctx context.Context, userID string) (*contact.User, er
 // UpdateUser 更新成员
 // 文档: https://developer.work.weixin.qq.com/document/path/90197
 func (s *Service) UpdateUser(ctx context.Context, req *contact.UpdateUserRequest) error {
-	_, err := s.client.Post(ctx, "/cgi-bin/user/update", req)
+	_, err := client.PostAndUnmarshal[contact.UpdateUserResponse](s.client, ctx, "/cgi-bin/user/update", req)
 	return err
 }
 
@@ -56,7 +42,7 @@ func (s *Service) DeleteUser(ctx context.Context, userID string) error {
 	query := url.Values{}
 	query.Set("userid", userID)
 
-	_, err := s.client.Get(ctx, "/cgi-bin/user/delete", query)
+	_, err := client.GetAndUnmarshal[contact.DeleteUserResponse](s.client, ctx, "/cgi-bin/user/delete", query)
 	return err
 }
 
@@ -71,13 +57,8 @@ func (s *Service) ListUsers(ctx context.Context, departmentID int, fetchChild bo
 		query.Set("fetch_child", "0")
 	}
 
-	resp, err := s.client.Get(ctx, "/cgi-bin/user/simplelist", query)
+	result, err := client.GetAndUnmarshal[contact.ListUsersResponse](s.client, ctx, "/cgi-bin/user/simplelist", query)
 	if err != nil {
-		return nil, err
-	}
-
-	var result contact.ListUsersResponse
-	if err := resp.Unmarshal(&result); err != nil {
 		return nil, err
 	}
 
@@ -95,13 +76,8 @@ func (s *Service) ListUsersDetail(ctx context.Context, departmentID int, fetchCh
 		query.Set("fetch_child", "0")
 	}
 
-	resp, err := s.client.Get(ctx, "/cgi-bin/user/list", query)
+	result, err := client.GetAndUnmarshal[contact.ListUsersDetailResponse](s.client, ctx, "/cgi-bin/user/list", query)
 	if err != nil {
-		return nil, err
-	}
-
-	var result contact.ListUsersDetailResponse
-	if err := resp.Unmarshal(&result); err != nil {
 		return nil, err
 	}
 
