@@ -57,3 +57,16 @@ type ListDepartmentsResponse struct {
 	common.Response
 	Department []Department `json:"department"`
 }
+
+// SimpleDepartment 简化的部门信息
+type SimpleDepartment struct {
+	ID       int `json:"id"`
+	ParentID int `json:"parentid"`
+	Order    int `json:"order"`
+}
+
+// ListSimpleDepartmentsResponse 获取子部门ID列表响应
+type ListSimpleDepartmentsResponse struct {
+	common.Response
+	DepartmentID []SimpleDepartment `json:"department_id"`
+}

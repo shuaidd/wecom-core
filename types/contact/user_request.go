@@ -144,3 +144,63 @@ type ListUsersDetailResponse struct {
 	UserList []User `json:"userlist"`
 }
 
+// AuthSuccessResponse 二次验证响应
+type AuthSuccessResponse struct {
+	common.Response
+}
+
+// ConvertToOpenIDRequest userid转openid请求
+type ConvertToOpenIDRequest struct {
+	UserID string `json:"userid"`
+}
+
+// ConvertToOpenIDResponse userid转openid响应
+type ConvertToOpenIDResponse struct {
+	common.Response
+	OpenID string `json:"openid"`
+}
+
+// ConvertToUserIDRequest openid转userid请求
+type ConvertToUserIDRequest struct {
+	OpenID string `json:"openid"`
+}
+
+// ConvertToUserIDResponse openid转userid响应
+type ConvertToUserIDResponse struct {
+	common.Response
+	UserID string `json:"userid"`
+}
+
+// GetUserIDByEmailRequest 邮箱获取userid请求
+type GetUserIDByEmailRequest struct {
+	Email     string `json:"email"`
+	EmailType int    `json:"email_type,omitempty"`
+}
+
+// GetUserIDByEmailResponse 邮箱获取userid响应
+type GetUserIDByEmailResponse struct {
+	common.Response
+	UserID string `json:"userid"`
+}
+
+// GetUserIDByMobileRequest 手机号获取userid请求
+type GetUserIDByMobileRequest struct {
+	Mobile string `json:"mobile"`
+}
+
+// GetUserIDByMobileResponse 手机号获取userid响应
+type GetUserIDByMobileResponse struct {
+	common.Response
+	UserID string `json:"userid"`
+}
+
+// BatchDeleteUsersRequest 批量删除成员请求
+type BatchDeleteUsersRequest struct {
+	UserIDList []string `json:"useridlist"`
+}
+
+// BatchDeleteUsersResponse 批量删除成员响应
+type BatchDeleteUsersResponse struct {
+	common.Response
+}
+

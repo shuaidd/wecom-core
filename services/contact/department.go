@@ -67,3 +67,19 @@ func (s *Service) GetDepartment(ctx context.Context, id int) (*contact.Departmen
 
 	return &result.Department, nil
 }
+
+// ListSimpleDepartments 获取子部门ID列表
+// 文档: https://developer.work.weixin.qq.com/document/path/95350
+func (s *Service) ListSimpleDepartments(ctx context.Context, id int) ([]contact.SimpleDepartment, error) {
+	query := url.Values{}
+	if id > 0 {
+		query.Set("id", fmt.Sprintf("%d", id))
+	}
+
+	result, err := client.GetAndUnmarshal[contact.ListSimpleDepartmentsResponse](s.client, ctx, "/cgi-bin/department/simplelist", query)
+	if err != nil {
+		return nil, err
+	}
+
+	return result.DepartmentID, nil
+}

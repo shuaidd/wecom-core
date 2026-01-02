@@ -8,14 +8,17 @@ import (
 	"github.com/shuaidd/wecom-core/internal/client"
 	"github.com/shuaidd/wecom-core/internal/retry"
 	"github.com/shuaidd/wecom-core/services/contact"
+	"github.com/shuaidd/wecom-core/services/ip"
 )
 
 // Client 企业微信SDK客户端
 type Client struct {
 	// Contact 通讯录服务
 	Contact *contact.Service
+	// IP IP相关服务
+	IP *ip.Service
 
-	// 内部组件（不对外暴露）
+	// 内部组件(不对外暴露)
 	config       *config.Config
 	tokenManager *auth.TokenManager
 	httpClient   *client.Client
@@ -67,6 +70,7 @@ func New(opts ...config.Option) (*Client, error) {
 		tokenManager: tokenManager,
 		httpClient:   httpClient,
 		Contact:      contact.NewService(httpClient),
+		IP:           ip.NewService(httpClient),
 	}
 
 	return c, nil

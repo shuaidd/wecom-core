@@ -89,3 +89,85 @@ func (s *Service) ListUsersDetail(ctx context.Context, departmentID int, fetchCh
 func (s *Service) ListUserIDs(ctx context.Context, req *contact.ListUserIDsRequest) (*contact.ListUserIDsResponse, error) {
 	return client.PostAndUnmarshal[contact.ListUserIDsResponse](s.client, ctx, "/cgi-bin/user/list_id", req)
 }
+
+// AuthSuccess 二次验证
+// 文档: https://developer.work.weixin.qq.com/document/path/90203
+func (s *Service) AuthSuccess(ctx context.Context, userID string) error {
+	query := url.Values{}
+	query.Set("userid", userID)
+
+	_, err := client.GetAndUnmarshal[contact.AuthSuccessResponse](s.client, ctx, "/cgi-bin/user/authsucc", query)
+	return err
+}
+
+// ConvertToOpenID userid转openid
+// 文档: https://developer.work.weixin.qq.com/document/path/90202
+func (s *Service) ConvertToOpenID(ctx context.Context, userID string) (string, error) {
+	req := &contact.ConvertToOpenIDRequest{
+		UserID: userID,
+	}
+
+	result, err := client.PostAndUnmarshal[contact.ConvertToOpenIDResponse](s.client, ctx, "/cgi-bin/user/convert_to_openid", req)
+	if err != nil {
+		return "", err
+	}
+
+	return result.OpenID, nil
+}
+
+// ConvertToUserID openid转userid
+// 文档: https://developer.work.weixin.qq.com/document/path/90202
+func (s *Service) ConvertToUserID(ctx context.Context, openID string) (string, error) {
+	req := &contact.ConvertToUserIDRequest{
+		OpenID: openID,
+	}
+
+	result, err := client.PostAndUnmarshal[contact.ConvertToUserIDResponse](s.client, ctx, "/cgi-bin/user/convert_to_userid", req)
+	if err != nil {
+		return "", err
+	}
+
+	return result.UserID, nil
+}
+
+// GetUserIDByEmail 通过邮箱获取userid
+// 文档: https://developer.work.weixin.qq.com/document/path/95895
+func (s *Service) GetUserIDByEmail(ctx context.Context, email string, emailType int) (string, error) {
+	req := &contact.GetUserIDByEmailRequest{
+		Email:     email,
+		EmailType: emailType,
+	}
+
+	result, err := client.PostAndUnmarshal[contact.GetUserIDByEmailResponse](s.client, ctx, "/cgi-bin/user/get_userid_by_email", req)
+	if err != nil {
+		return "", err
+	}
+
+	return result.UserID, nil
+}
+
+// GetUserIDByMobile 通过手机号获取userid
+// 文档: https://developer.work.weixin.qq.com/document/path/95402
+func (s *Service) GetUserIDByMobile(ctx context.Context, mobile string) (string, error) {
+	req := &contact.GetUserIDByMobileRequest{
+		Mobile: mobile,
+	}
+
+	result, err := client.PostAndUnmarshal[contact.GetUserIDByMobileResponse](s.client, ctx, "/cgi-bin/user/getuserid", req)
+	if err != nil {
+		return "", err
+	}
+
+	return result.UserID, nil
+}
+
+// BatchDeleteUsers 批量删除成员
+// 文档: https://developer.work.weixin.qq.com/document/path/90199
+func (s *Service) BatchDeleteUsers(ctx context.Context, userIDList []string) error {
+	req := &contact.BatchDeleteUsersRequest{
+		UserIDList: userIDList,
+	}
+
+	_, err := client.PostAndUnmarshal[contact.BatchDeleteUsersResponse](s.client, ctx, "/cgi-bin/user/batchdelete", req)
+	return err
+}
