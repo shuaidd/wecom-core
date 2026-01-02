@@ -35,6 +35,9 @@ type Config struct {
 
 	// Cache Token缓存，默认为内存缓存
 	Cache cache.Cache
+
+	// 是否开启debug模式
+	Debug bool
 }
 
 // New 创建配置对象

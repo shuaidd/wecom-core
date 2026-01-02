@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -12,6 +13,30 @@ import (
 	"github.com/shuaidd/wecom-core/internal/retry"
 	"github.com/shuaidd/wecom-core/pkg/logger"
 )
+
+// contextKey 用于在 context 中存储值的类型
+type contextKey string
+
+const (
+	// traceIDKey TraceId 的 context key
+	traceIDKey contextKey = "trace_id"
+)
+
+// WithTraceID 将 TraceId 添加到 context
+func WithTraceID(ctx context.Context, traceID string) context.Context {
+	return context.WithValue(ctx, traceIDKey, traceID)
+}
+
+// getTraceID 从 context 中获取 TraceId
+func getTraceID(ctx context.Context) string {
+	if ctx == nil {
+		return ""
+	}
+	if traceID, ok := ctx.Value(traceIDKey).(string); ok {
+		return traceID
+	}
+	return ""
+}
 
 // Client HTTP客户端
 type Client struct {
@@ -25,6 +50,8 @@ type Client struct {
 	tokenManager *auth.TokenManager
 	// retryExecutor 重试执行器
 	retryExecutor *retry.Executor
+	// debug 是否打印请求和响应详情
+	debug bool
 }
 
 // New 创建HTTP客户端
@@ -37,7 +64,14 @@ func New(baseURL string, timeout time.Duration, log logger.Logger, tm *auth.Toke
 		logger:        log,
 		tokenManager:  tm,
 		retryExecutor: re,
+		debug:         false,
 	}
+}
+
+// SetDebug 设置是否打印请求和响应详情
+func (c *Client) SetDebug(debug bool) *Client {
+	c.debug = debug
+	return c
 }
 
 // Do 执行HTTP请求（带自动 token 和重试）
@@ -63,17 +97,22 @@ func (c *Client) Do(ctx context.Context, req *Request) (*Response, error) {
 
 		// 4. 记录请求日志
 		startTime := time.Now()
-		c.logger.Debug("API Request",
+		c.logger.Debug("API Request", withTraceID(ctx,
 			logger.F("method", httpReq.Method),
-			logger.F("url", httpReq.URL.String()))
+			logger.F("url", httpReq.URL.String()))...)
+
+		// 4.1. Debug模式：打印请求详情
+		if c.debug {
+			c.logRequestDetails(ctx, httpReq, req.Body)
+		}
 
 		// 5. 发送请求
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {
 			duration := time.Since(startTime)
-			c.logger.Error("Request failed",
+			c.logger.Error("Request failed", withTraceID(ctx,
 				logger.F("error", err),
-				logger.F("duration", duration))
+				logger.F("duration", duration))...)
 			return fmt.Errorf("http request failed: %w", err)
 		}
 		defer httpResp.Body.Close()
@@ -82,20 +121,25 @@ func (c *Client) Do(ctx context.Context, req *Request) (*Response, error) {
 		resp, err = ParseResponse(httpResp)
 		duration := time.Since(startTime)
 
+		// 6.1. Debug模式：打印响应详情
+		if c.debug {
+			c.logResponseDetails(ctx, httpResp.StatusCode, resp)
+		}
+
 		if err != nil {
-			c.logger.Error("Request failed",
+			c.logger.Error("Request failed", withTraceID(ctx,
 				logger.F("url", httpReq.URL.String()),
 				logger.F("errcode", resp.ErrCode),
 				logger.F("errmsg", resp.ErrMsg),
-				logger.F("duration", duration))
+				logger.F("duration", duration))...)
 
 			// 7. Token 失效，刷新后重试
 			if errors.IsTokenExpired(err) {
-				c.logger.Warn("Token expired, refreshing",
-					logger.F("errcode", resp.ErrCode))
+				c.logger.Warn("Token expired, refreshing", withTraceID(ctx,
+					logger.F("errcode", resp.ErrCode))...)
 				if refreshErr := c.tokenManager.RefreshToken(ctx); refreshErr != nil {
-					c.logger.Error("Failed to refresh token",
-						logger.F("error", refreshErr))
+					c.logger.Error("Failed to refresh token", withTraceID(ctx,
+						logger.F("error", refreshErr))...)
 				}
 			}
 
@@ -103,9 +147,9 @@ func (c *Client) Do(ctx context.Context, req *Request) (*Response, error) {
 		}
 
 		// 8. 记录成功日志
-		c.logger.Info("API Request successful",
+		c.logger.Info("API Request successful", withTraceID(ctx,
 			logger.F("url", httpReq.URL.String()),
-			logger.F("duration", duration))
+			logger.F("duration", duration))...)
 
 		return nil
 	})
@@ -160,4 +204,55 @@ func GetAndUnmarshal[T any](c *Client, ctx context.Context, path string, query u
 func PostAndUnmarshal[T any](c *Client, ctx context.Context, path string, body any) (*T, error) {
 	req := NewRequest(MethodPost, path).SetBody(body)
 	return DoAndUnmarshal[T](c, ctx, req)
+}
+
+// logRequestDetails 打印请求详情
+func (c *Client) logRequestDetails(ctx context.Context, httpReq *http.Request, body any) {
+	c.logger.Info("==> Request Details", withTraceID(ctx,
+		logger.F("method", httpReq.Method),
+		logger.F("url", httpReq.URL.String()))...)
+
+	if body != nil {
+		bodyJSON, err := json.MarshalIndent(body, "", "  ")
+		if err != nil {
+			c.logger.Warn("Failed to marshal request body", withTraceID(ctx,
+				logger.F("error", err))...)
+		} else {
+			c.logger.Info("Request Body", withTraceID(ctx,
+				logger.F("body", string(bodyJSON)))...)
+		}
+	}
+}
+
+// logResponseDetails 打印响应详情
+func (c *Client) logResponseDetails(ctx context.Context, statusCode int, resp *Response) {
+	c.logger.Info("<== Response Details", withTraceID(ctx,
+		logger.F("status_code", statusCode),
+		logger.F("errcode", resp.ErrCode),
+		logger.F("errmsg", resp.ErrMsg))...)
+
+	if len(resp.Body) > 0 {
+		var prettyJSON map[string]any
+		if err := json.Unmarshal(resp.Body, &prettyJSON); err == nil {
+			bodyJSON, _ := json.MarshalIndent(prettyJSON, "", "  ")
+			c.logger.Info("Response Body", withTraceID(ctx,
+				logger.F("body", string(bodyJSON)))...)
+		} else {
+			c.logger.Info("Response Body", withTraceID(ctx,
+				logger.F("body", string(resp.Body)))...)
+		}
+	}
+}
+
+// withTraceID 为日志字段添加 TraceId
+func withTraceID(ctx context.Context, fields ...logger.Field) []logger.Field {
+	traceID := getTraceID(ctx)
+	if traceID == "" {
+		return fields
+	}
+	// 将 TraceId 添加到字段列表的开头
+	result := make([]logger.Field, 0, len(fields)+1)
+	result = append(result, logger.F("trace_id", traceID))
+	result = append(result, fields...)
+	return result
 }

@@ -73,6 +73,10 @@ func (tm *TokenManager) GetToken(ctx context.Context) (string, error) {
 		return token, nil
 	}
 
+	// if true {
+	// 	return "eqDikpYTc_jxtEmVZGbfeXrqpMArfyuMZR6TDYXjaVhu_gUx9fl9q8cxUqMUz2bhzyvj-QbRFgLhzEqcpm0XHa2lNs2fch_PZBbbEQ37OYq6ZPQ49gX68PHrkNYRe6JKyXc7yhHxKO2CGSMjPCh3adr5c-qJR4nRX9RP4TbfdPEkll-o9dIArQKUbhg2_UczB4DFrHYtaxcGo3Cih_Wiqg",nil
+	// }
+
 	// 2. 加锁刷新（防止并发重复获取）
 	tm.refreshLock.Lock()
 	defer tm.refreshLock.Unlock()

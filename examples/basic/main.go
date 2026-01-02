@@ -13,18 +13,18 @@ import (
 func main() {
 	// 创建企业微信客户端
 	client, err := wecom.New(
-		config.WithCorpID("your_corp_id"),
-		config.WithCorpSecret("your_corp_secret"),
+		config.WithCorpID("wwd8b4a0d94c30bcb7"),
+		config.WithCorpSecret("c024lT7BImnNiBawyKheY5NhbtuzH0vxS2y3e_fAR-s"),
+		config.WithDebug(true),
 		config.WithLogger(logger.NewStdLogger()),
 	)
 	if err != nil {
 		log.Fatalf("Failed to create wecom client: %v", err)
 	}
 
-	ctx := context.Background()
-
+	ctx := wecom.WithTraceID(context.Background(), "sss")
 	// 读取成员信息
-	user, err := client.Contact.GetUser(ctx, "zhangsan")
+	user, err := client.Contact.GetUser(ctx, "ddshuai")
 	if err != nil {
 		log.Fatalf("Failed to get user: %v", err)
 	}

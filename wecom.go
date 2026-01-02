@@ -1,6 +1,8 @@
 package wecom
 
 import (
+	"context"
+
 	"github.com/shuaidd/wecom-core/config"
 	"github.com/shuaidd/wecom-core/internal/auth"
 	"github.com/shuaidd/wecom-core/internal/client"
@@ -55,6 +57,10 @@ func New(opts ...config.Option) (*Client, error) {
 		retryExecutor,
 	)
 
+	if cfg.Debug {
+		httpClient.SetDebug(true)
+	}
+
 	// 6. 创建服务客户端
 	c := &Client{
 		config:       cfg,
@@ -64,4 +70,9 @@ func New(opts ...config.Option) (*Client, error) {
 	}
 
 	return c, nil
+}
+
+// WithTraceID 将 TraceId 添加到 context
+func WithTraceID(ctx context.Context, traceID string) context.Context {
+	return client.WithTraceID(ctx, traceID)
 }

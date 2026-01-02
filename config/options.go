@@ -66,3 +66,10 @@ func WithCache(cache cache.Cache) Option {
 		c.Cache = cache
 	}
 }
+
+// WithDebug 设置debug模式
+func WithDebug(debug bool) Option {
+	return func(c *Config) {
+		c.Debug = debug
+	}
+}
