@@ -83,3 +83,9 @@ func (s *Service) ListUsersDetail(ctx context.Context, departmentID int, fetchCh
 
 	return result.UserList, nil
 }
+
+// ListUserIDs 获取成员ID列表
+// 文档: https://developer.work.weixin.qq.com/document/path/96067
+func (s *Service) ListUserIDs(ctx context.Context, req *contact.ListUserIDsRequest) (*contact.ListUserIDsResponse, error) {
+	return client.PostAndUnmarshal[contact.ListUserIDsResponse](s.client, ctx, "/cgi-bin/user/list_id", req)
+}

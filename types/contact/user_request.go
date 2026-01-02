@@ -143,3 +143,4 @@ type ListUsersDetailResponse struct {
 	common.Response
 	UserList []User `json:"userlist"`
 }
+
