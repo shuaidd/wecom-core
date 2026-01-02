@@ -11,6 +11,7 @@ import (
 	"github.com/shuaidd/wecom-core/services/ip"
 	"github.com/shuaidd/wecom-core/services/oauth"
 	"github.com/shuaidd/wecom-core/services/qrcode"
+	"github.com/shuaidd/wecom-core/services/updown"
 )
 
 // Client 企业微信SDK客户端
@@ -23,6 +24,8 @@ type Client struct {
 	QRCode *qrcode.Service
 	// OAuth 身份验证服务
 	OAuth *oauth.Service
+	// UpDown 上下游服务
+	UpDown *updown.Service
 
 	// 内部组件(不对外暴露)
 	config       *config.Config
@@ -79,6 +82,7 @@ func New(opts ...config.Option) (*Client, error) {
 		IP:           ip.NewService(httpClient),
 		QRCode:       qrcode.NewService(httpClient),
 		OAuth:        oauth.NewService(httpClient),
+		UpDown:       updown.NewService(httpClient),
 	}
 
 	return c, nil
