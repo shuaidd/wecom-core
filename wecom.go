@@ -9,6 +9,7 @@ import (
 	"github.com/shuaidd/wecom-core/internal/retry"
 	"github.com/shuaidd/wecom-core/services/contact"
 	"github.com/shuaidd/wecom-core/services/ip"
+	"github.com/shuaidd/wecom-core/services/qrcode"
 )
 
 // Client 企业微信SDK客户端
@@ -17,6 +18,8 @@ type Client struct {
 	Contact *contact.Service
 	// IP IP相关服务
 	IP *ip.Service
+	// QRCode 企业二维码服务
+	QRCode *qrcode.Service
 
 	// 内部组件(不对外暴露)
 	config       *config.Config
@@ -71,6 +74,7 @@ func New(opts ...config.Option) (*Client, error) {
 		httpClient:   httpClient,
 		Contact:      contact.NewService(httpClient),
 		IP:           ip.NewService(httpClient),
+		QRCode:       qrcode.NewService(httpClient),
 	}
 
 	return c, nil
