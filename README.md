@@ -454,6 +454,248 @@ err = client.ExternalContact.EditStrategy(ctx, &externalcontact.EditStrategyRequ
 err = client.ExternalContact.DeleteStrategy(ctx, strategyID)
 ```
 
+#### 消息推送
+
+```go
+// 创建企业群发
+msgResp, err := client.ExternalContact.AddMsgTemplate(ctx, &externalcontact.AddMsgTemplateRequest{
+    ChatType: "single",  // single-发送给客户, group-发送给客户群
+    ExternalUserID: []string{"external_userid_1", "external_userid_2"},
+    Sender: "zhangsan",
+    Text: &externalcontact.TextContent{
+        Content: "文本消息内容",
+    },
+    Attachments: []externalcontact.Attachment{
+        {
+            MsgType: "image",
+            Image: &externalcontact.ImageAttachment{
+                MediaID: "MEDIA_ID",
+            },
+        },
+    },
+})
+
+// 获取群发记录列表
+msgList, err := client.ExternalContact.GetGroupMsgListV2(ctx, &externalcontact.GetGroupMsgListV2Request{
+    ChatType:  "single",
+    StartTime: 1605171726,
+    EndTime:   1605172726,
+    Limit:     50,
+})
+
+// 获取群发成员发送任务列表
+taskList, err := client.ExternalContact.GetGroupMsgTask(ctx, &externalcontact.GetGroupMsgTaskRequest{
+    MsgID: msgResp.MsgID,
+    Limit: 100,
+})
+
+// 获取企业群发成员执行结果
+sendResult, err := client.ExternalContact.GetGroupMsgSendResult(ctx, &externalcontact.GetGroupMsgSendResultRequest{
+    MsgID:  msgResp.MsgID,
+    UserID: "zhangsan",
+    Limit:  100,
+})
+
+// 发送新客户欢迎语
+err = client.ExternalContact.SendWelcomeMsg(ctx, &externalcontact.SendWelcomeMsgRequest{
+    WelcomeCode: "CALLBACK_CODE",  // 来自添加外部联系人事件
+    Text: &externalcontact.TextContent{
+        Content: "你好，欢迎添加我为好友！",
+    },
+    Attachments: []externalcontact.Attachment{
+        {
+            MsgType: "link",
+            Link: &externalcontact.LinkAttachment{
+                Title: "产品介绍",
+                URL:   "https://example.com",
+            },
+        },
+    },
+})
+
+// 停止企业群发
+err = client.ExternalContact.CancelGroupMsgSend(ctx, &externalcontact.CancelGroupMsgSendRequest{
+    MsgID: msgResp.MsgID,
+})
+
+// 提醒成员群发
+err = client.ExternalContact.RemindGroupMsgSend(ctx, &externalcontact.RemindGroupMsgSendRequest{
+    MsgID: msgResp.MsgID,
+})
+
+// 添加入群欢迎语素材
+templateResp, err := client.ExternalContact.AddGroupWelcomeTemplate(ctx, &externalcontact.AddGroupWelcomeTemplateRequest{
+    Text: &externalcontact.TextContent{
+        Content: "亲爱的%NICKNAME%用户，你好",
+    },
+    Image: &externalcontact.ImageAttachment{
+        MediaID: "MEDIA_ID",
+    },
+})
+
+// 编辑入群欢迎语素材
+err = client.ExternalContact.EditGroupWelcomeTemplate(ctx, &externalcontact.EditGroupWelcomeTemplateRequest{
+    TemplateID: templateResp.TemplateID,
+    Text: &externalcontact.TextContent{
+        Content: "更新后的欢迎语",
+    },
+})
+
+// 获取入群欢迎语素材
+template, err := client.ExternalContact.GetGroupWelcomeTemplate(ctx, &externalcontact.GetGroupWelcomeTemplateRequest{
+    TemplateID: templateResp.TemplateID,
+})
+
+// 删除入群欢迎语素材
+err = client.ExternalContact.DelGroupWelcomeTemplate(ctx, &externalcontact.DelGroupWelcomeTemplateRequest{
+    TemplateID: templateResp.TemplateID,
+})
+```
+
+#### 在职继承
+
+```go
+// 分配在职成员的客户
+transferResp, err := client.ExternalContact.OnJobTransferCustomer(ctx, &externalcontact.OnJobTransferCustomerRequest{
+    HandoverUserID: "zhangsan",  // 原跟进成员
+    TakeoverUserID: "lisi",      // 接替成员
+    ExternalUserID: []string{"external_userid_1", "external_userid_2"},
+    TransferSuccessMsg: "您好，您的服务已升级，后续将由我的同事李四接替我的工作，继续为您服务。",
+})
+
+// 分配在职成员的客户群
+groupTransferResp, err := client.ExternalContact.OnJobTransferGroupChat(ctx, &externalcontact.OnJobTransferGroupChatRequest{
+    ChatIDList: []string{"chat_id_1", "chat_id_2"},
+    NewOwner:   "lisi",  // 新群主
+})
+
+// 查询客户接替状态
+resultResp, err := client.ExternalContact.GetTransferResult(ctx, &externalcontact.TransferResultRequest{
+    HandoverUserID: "zhangsan",
+    TakeoverUserID: "lisi",
+})
+
+// 遍历接替结果
+for _, customer := range resultResp.Customer {
+    switch customer.Status {
+    case 1:
+        fmt.Printf("客户 %s 接替完毕\n", customer.ExternalUserID)
+    case 2:
+        fmt.Printf("客户 %s 等待接替\n", customer.ExternalUserID)
+    case 3:
+        fmt.Printf("客户 %s 拒绝接替\n", customer.ExternalUserID)
+    case 4:
+        fmt.Printf("客户 %s 接替成员客户达到上限\n", customer.ExternalUserID)
+    }
+}
+```
+
+#### 商品图册管理
+
+```go
+// 创建商品图册
+productResp, err := client.ExternalContact.AddProductAlbum(ctx, &externalcontact.AddProductAlbumRequest{
+    Description: "世界上最好的商品",
+    Price:       30000,  // 单位为分
+    ProductSN:   "SN123456",
+    Attachments: []externalcontact.ProductAttachment{
+        {
+            Type: "image",
+            Image: &externalcontact.ImageAttachment{
+                MediaID: "MEDIA_ID",
+            },
+        },
+    },
+})
+
+// 获取商品图册
+product, err := client.ExternalContact.GetProductAlbum(ctx, &externalcontact.GetProductAlbumRequest{
+    ProductID: productResp.ProductID,
+})
+
+// 获取商品图册列表
+productList, err := client.ExternalContact.GetProductAlbumList(ctx, &externalcontact.GetProductAlbumListRequest{
+    Limit: 50,
+})
+
+// 编辑商品图册
+err = client.ExternalContact.UpdateProductAlbum(ctx, &externalcontact.UpdateProductAlbumRequest{
+    ProductID:   productResp.ProductID,
+    Description: "更新后的商品描述",
+    Price:       35000,
+})
+
+// 删除商品图册
+err = client.ExternalContact.DeleteProductAlbum(ctx, &externalcontact.DeleteProductAlbumRequest{
+    ProductID: productResp.ProductID,
+})
+```
+
+#### 聊天敏感词管理
+
+```go
+// 新建敏感词规则
+ruleResp, err := client.ExternalContact.AddInterceptRule(ctx, &externalcontact.AddInterceptRuleRequest{
+    RuleName: "敏感词规则1",
+    WordList: []string{"敏感词1", "敏感词2"},
+    SemanticsList: []int{1, 2, 3},  // 1：手机号、2：邮箱地址、3：红包
+    InterceptType: 1,  // 1:警告并拦截发送；2:仅发警告
+    ApplicableRange: &externalcontact.ApplicableRange{
+        UserList:       []string{"zhangsan"},
+        DepartmentList: []int{2, 3},
+    },
+})
+
+// 获取敏感词规则列表
+ruleList, err := client.ExternalContact.GetInterceptRuleList(ctx)
+
+// 获取敏感词规则详情
+ruleDetail, err := client.ExternalContact.GetInterceptRule(ctx, &externalcontact.GetInterceptRuleRequest{
+    RuleID: ruleResp.RuleID,
+})
+
+// 修改敏感词规则
+err = client.ExternalContact.UpdateInterceptRule(ctx, &externalcontact.UpdateInterceptRuleRequest{
+    RuleID:   ruleResp.RuleID,
+    RuleName: "更新后的规则名称",
+    WordList: []string{"敏感词1", "敏感词2", "敏感词3"},
+})
+
+// 删除敏感词规则
+err = client.ExternalContact.DelInterceptRule(ctx, &externalcontact.DelInterceptRuleRequest{
+    RuleID: ruleResp.RuleID,
+})
+```
+
+#### 获取已服务的外部联系人
+
+```go
+// 获取已服务的外部联系人
+contactListResp, err := client.ExternalContact.GetContactList(ctx, &externalcontact.GetContactListRequest{
+    Limit: 1000,
+})
+
+// 遍历结果
+for _, info := range contactListResp.InfoList {
+    if info.IsCustomer {
+        fmt.Printf("客户: %s, 添加人: %s\n", info.ExternalUserID, info.FollowUserID)
+    } else {
+        fmt.Printf("其他外部联系人: %s, 添加人: %s\n", info.Name, info.FollowUserID)
+    }
+}
+
+// 处理分页
+if contactListResp.NextCursor != "" {
+    // 获取下一页
+    nextPageResp, err := client.ExternalContact.GetContactList(ctx, &externalcontact.GetContactListRequest{
+        Cursor: contactListResp.NextCursor,
+        Limit:  1000,
+    })
+    _ = nextPageResp
+    _ = err
+}
+```
+
 ### 消息管理
 
 ```go
@@ -613,8 +855,13 @@ wecom-core/
     - ✅ 联系我与客户入群方式（「联系我」配置、客户群进群方式管理）
     - ✅ 企业服务人员管理（获取配置了客户联系功能的成员列表）
     - ✅ 统计管理（群聊数据统计、联系客户统计）
-    - ⏳ 在职继承/离职继承（规划中）
-    - ⏳ 消息推送（规划中）
+    - ✅ 消息推送（创建企业群发、获取群发记录、发送新客户欢迎语、入群欢迎语素材管理）
+    - ✅ 在职继承（分配在职成员的客户、分配在职成员的客户群、查询客户接替状态）
+    - ✅ 商品图册管理（创建、获取、列表、编辑、删除）
+    - ✅ 聊天敏感词管理（新建、获取列表、获取详情、修改、删除）
+    - ✅ 获取已服务的外部联系人
+    - ⏳ 离职继承（部分完成）
+    - ⏳ 上传附件资源（需要文件上传功能支持，待实现）
 
 - ⏳ **阶段三：更多业务模块**（规划中）
   - 应用管理
