@@ -205,6 +205,127 @@ err = client.ExternalContact.DeleteCorpTag(ctx, &externalcontact.DeleteCorpTagRe
 })
 ```
 
+#### 客户群管理
+
+```go
+// 获取客户群列表
+groups, err := client.ExternalContact.ListGroupChat(ctx, &externalcontact.ListGroupChatRequest{
+    StatusFilter: 0,
+    OwnerFilter: &externalcontact.OwnerFilter{
+        UserIDList: []string{"zhangsan"},
+    },
+    Limit: 100,
+})
+
+// 获取客户群详情
+groupDetail, err := client.ExternalContact.GetGroupChat(ctx, &externalcontact.GetGroupChatRequest{
+    ChatID:   "wrOgQhDgAAMYQiS5ol9G7gK9JVAAAA",
+    NeedName: 1,
+})
+
+// 客户群opengid转换
+chatID, err := client.ExternalContact.OpenGIDToChatID(ctx, &externalcontact.OpenGIDToChatIDRequest{
+    OpenGID: "oAAAAAAA",
+})
+```
+
+#### 客户朋友圈
+
+```go
+// 创建发表任务
+taskResp, err := client.ExternalContact.AddMomentTask(ctx, &externalcontact.AddMomentTaskRequest{
+    Text: &externalcontact.MomentText{
+        Content: "分享产品动态",
+    },
+    Attachments: []externalcontact.MomentAttachment{
+        {
+            MsgType: "image",
+            Image: &externalcontact.MomentImage{
+                MediaID: "MEDIA_ID",
+            },
+        },
+    },
+    VisibleRange: &externalcontact.VisibleRange{
+        SenderList: &externalcontact.SenderList{
+            UserList: []string{"zhangsan", "lisi"},
+        },
+    },
+})
+
+// 获取任务创建结果
+result, err := client.ExternalContact.GetMomentTaskResult(ctx, taskResp.JobID)
+
+// 获取企业全部的发表列表
+moments, err := client.ExternalContact.GetMomentList(ctx, &externalcontact.GetMomentListRequest{
+    StartTime:  1605000000,
+    EndTime:    1605172726,
+    FilterType: 0,
+    Limit:      20,
+})
+
+// 获取客户朋友圈企业发表的列表
+tasks, err := client.ExternalContact.GetMomentTask(ctx, &externalcontact.GetMomentTaskRequest{
+    MomentID: "moment_id",
+    Limit:    100,
+})
+
+// 获取客户朋友圈发表时选择的可见范围
+customers, err := client.ExternalContact.GetMomentCustomerList(ctx, &externalcontact.GetMomentCustomerListRequest{
+    MomentID: "moment_id",
+    UserID:   "zhangsan",
+    Limit:    100,
+})
+
+// 获取客户朋友圈发表后的可见客户列表
+sendResult, err := client.ExternalContact.GetMomentSendResult(ctx, &externalcontact.GetMomentSendResultRequest{
+    MomentID: "moment_id",
+    UserID:   "zhangsan",
+    Limit:    100,
+})
+
+// 获取客户朋友圈的互动数据
+comments, err := client.ExternalContact.GetMomentComments(ctx, &externalcontact.GetMomentCommentsRequest{
+    MomentID: "moment_id",
+    UserID:   "zhangsan",
+})
+
+// 停止发表企业朋友圈
+err = client.ExternalContact.CancelMomentTask(ctx, &externalcontact.CancelMomentTaskRequest{
+    MomentID: "moment_id",
+})
+
+// 获取朋友圈规则组列表
+strategies, err := client.ExternalContact.ListMomentStrategy(ctx, &externalcontact.ListMomentStrategyRequest{
+    Limit: 100,
+})
+
+// 创建朋友圈规则组
+createResp, err := client.ExternalContact.CreateMomentStrategy(ctx, &externalcontact.CreateMomentStrategyRequest{
+    StrategyName: "销售团队朋友圈",
+    AdminList:    []string{"zhangsan", "lisi"},
+    Range: []externalcontact.MomentStrategyRange{
+        {Type: 1, UserID: "zhangsan"},
+        {Type: 2, PartyID: 1},
+    },
+})
+
+// 获取朋友圈规则组详情
+strategyDetail, err := client.ExternalContact.GetMomentStrategy(ctx, &externalcontact.GetMomentStrategyRequest{
+    StrategyID: strategyID,
+})
+
+// 编辑朋友圈规则组
+err = client.ExternalContact.EditMomentStrategy(ctx, &externalcontact.EditMomentStrategyRequest{
+    StrategyID:   strategyID,
+    StrategyName: "销售一组朋友圈",
+})
+
+// 删除朋友圈规则组
+err = client.ExternalContact.DeleteMomentStrategy(ctx, &externalcontact.DeleteMomentStrategyRequest{
+    StrategyID: strategyID,
+})
+```
+
 #### 客户联系规则组管理
 
 ```go
@@ -390,7 +511,8 @@ wecom-core/
     - ✅ 客户标签管理（企业标签、规则组标签、客户打标）
     - ✅ 客户联系规则组管理（规则组CRUD、管理范围）
     - ✅ 获客助手（获客链接、额度管理、使用统计）
-    - ⏳ 客户群管理（规划中）
+    - ✅ 客户群管理（获取群列表、获取群详情、opengid转换）
+    - ✅ 客户朋友圈（发表任务、获取列表、互动数据、规则组管理）
     - ⏳ 在职继承/离职继承（规划中）
     - ⏳ 消息推送（规划中）
 
