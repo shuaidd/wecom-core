@@ -12,6 +12,7 @@ import (
 	"github.com/shuaidd/wecom-core/services/ip"
 	"github.com/shuaidd/wecom-core/services/oauth"
 	"github.com/shuaidd/wecom-core/services/qrcode"
+	"github.com/shuaidd/wecom-core/services/security"
 	"github.com/shuaidd/wecom-core/services/updown"
 )
 
@@ -29,6 +30,8 @@ type Client struct {
 	UpDown *updown.Service
 	// CorpGroup 企业互联服务
 	CorpGroup *corpgroup.Service
+	// Security 安全管理服务
+	Security *security.Service
 
 	// 内部组件(不对外暴露)
 	config       *config.Config
@@ -87,6 +90,7 @@ func New(opts ...config.Option) (*Client, error) {
 		OAuth:        oauth.NewService(httpClient),
 		UpDown:       updown.NewService(httpClient),
 		CorpGroup:    corpgroup.NewService(httpClient),
+		Security:     security.NewService(httpClient),
 	}
 
 	return c, nil
