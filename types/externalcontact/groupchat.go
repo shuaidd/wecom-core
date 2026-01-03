@@ -79,3 +79,21 @@ type OpenGIDToChatIDRequest struct {
 type OpenGIDToChatIDResponse struct {
 	ChatID string `json:"chat_id"`
 }
+
+// TransferGroupChatRequest 分配离职成员的客户群请求
+type TransferGroupChatRequest struct {
+	ChatIDList []string `json:"chat_id_list"`
+	NewOwner   string   `json:"new_owner"`
+}
+
+// FailedChat 转群失败条目
+type FailedChat struct {
+	ChatID  string `json:"chat_id"`
+	ErrCode int    `json:"errcode"`
+	ErrMsg  string `json:"errmsg"`
+}
+
+// TransferGroupChatResponse 分配离职成员的客户群响应
+type TransferGroupChatResponse struct {
+	FailedChatList []FailedChat `json:"failed_chat_list,omitempty"`
+}

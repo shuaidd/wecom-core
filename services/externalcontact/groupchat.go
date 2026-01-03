@@ -28,3 +28,9 @@ func (s *Service) GetGroupChat(ctx context.Context, req *externalcontact.GetGrou
 func (s *Service) OpenGIDToChatID(ctx context.Context, req *externalcontact.OpenGIDToChatIDRequest) (*externalcontact.OpenGIDToChatIDResponse, error) {
 	return client.PostAndUnmarshal[externalcontact.OpenGIDToChatIDResponse](s.client, ctx, "/cgi-bin/externalcontact/opengid_to_chatid", req)
 }
+
+// TransferGroupChat 分配离职成员的客户群给新群主
+// 文档: https://developer.work.weixin.qq.com/document/path/93323
+func (s *Service) TransferGroupChat(ctx context.Context, req *externalcontact.TransferGroupChatRequest) (*externalcontact.TransferGroupChatResponse, error) {
+	return client.PostAndUnmarshal[externalcontact.TransferGroupChatResponse](s.client, ctx, "/cgi-bin/externalcontact/groupchat/transfer", req)
+}
