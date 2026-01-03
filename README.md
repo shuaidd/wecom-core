@@ -144,6 +144,110 @@ err = client.Contact.DeleteDepartment(ctx, deptID)
 departments, err := client.Contact.ListDepartments(ctx, 1)
 ```
 
+### 外部联系人管理
+
+#### 客户管理
+
+```go
+// 获取客户列表
+contacts, err := client.ExternalContact.ListExternalContact(ctx, "zhangsan")
+
+// 获取客户详情
+detail, err := client.ExternalContact.GetExternalContact(ctx, "external_userid")
+
+// 修改客户备注信息
+err = client.ExternalContact.UpdateRemark(ctx, &externalcontact.UpdateRemarkRequest{
+    UserID:         "zhangsan",
+    ExternalUserID: "external_userid",
+    Remark:         "重要客户",
+    Description:    "产品负责人",
+    RemarkCompany:  "某某科技公司",
+})
+
+// 批量获取客户详情
+batchResp, err := client.ExternalContact.BatchGetByUser(ctx, &externalcontact.BatchGetByUserRequest{
+    UserIDList: []string{"zhangsan", "lisi"},
+    Limit:      100,
+})
+```
+
+#### 客户标签管理
+
+```go
+// 获取企业标签库
+tags, err := client.ExternalContact.GetCorpTagList(ctx, &externalcontact.GetCorpTagListRequest{})
+
+// 添加企业客户标签
+addResp, err := client.ExternalContact.AddCorpTag(ctx, &externalcontact.AddCorpTagRequest{
+    GroupName: "客户类型",
+    Tag: []externalcontact.AddCorpTagItem{
+        {Name: "VIP客户", Order: 1},
+        {Name: "潜在客户", Order: 2},
+    },
+})
+
+// 为客户打标签
+err = client.ExternalContact.MarkTag(ctx, &externalcontact.MarkTagRequest{
+    UserID:         "zhangsan",
+    ExternalUserID: "external_userid",
+    AddTag:         []string{"tag_id_1", "tag_id_2"},
+})
+
+// 编辑企业客户标签
+err = client.ExternalContact.EditCorpTag(ctx, &externalcontact.EditCorpTagRequest{
+    ID:   "tag_id",
+    Name: "核心客户",
+})
+
+// 删除企业客户标签
+err = client.ExternalContact.DeleteCorpTag(ctx, &externalcontact.DeleteCorpTagRequest{
+    TagID: []string{"tag_id_1", "tag_id_2"},
+})
+```
+
+#### 客户联系规则组管理
+
+```go
+// 获取规则组列表
+strategies, err := client.ExternalContact.ListStrategy(ctx, &externalcontact.ListStrategyRequest{
+    Limit: 100,
+})
+
+// 创建规则组
+createResp, err := client.ExternalContact.CreateStrategy(ctx, &externalcontact.CreateStrategyRequest{
+    StrategyName: "销售团队",
+    AdminList:    []string{"zhangsan", "lisi"},
+    Range: []externalcontact.StrategyRange{
+        {Type: 1, UserID: "zhangsan"},
+        {Type: 2, PartyID: 1},
+    },
+})
+
+// 获取规则组详情
+strategy, err := client.ExternalContact.GetStrategy(ctx, strategyID)
+
+// 编辑规则组
+err = client.ExternalContact.EditStrategy(ctx, &externalcontact.EditStrategyRequest{
+    StrategyID:   strategyID,
+    StrategyName: "销售一组",
+})
+
+// 删除规则组
+err = client.ExternalContact.DeleteStrategy(ctx, strategyID)
+```
+
+### 消息管理
+
+```go
+// 发送应用消息（敬请期待更多示例）
+```
+
+### 身份验证
+
+```go
+// OAuth 登录验证（敬请期待更多示例）
+```
+
 ## 核心特性详解
 
 ### 自动 Token 管理
@@ -266,15 +370,37 @@ wecom-core/
 
 详见 [开发计划.md](./开发计划.md)
 
-- ✅ 阶段一：基础框架（已完成）
-- ✅ 阶段二：认证与重试（已完成）
-- ✅ 阶段三：通讯录模块（已完成）
-- ⏳ 阶段四：其他业务模块（进行中）
-  - 消息推送
-  - 身份验证
-  - 客户联系
+- ✅ **阶段一：基础框架**（已完成）
+  - 统一 HTTP 客户端
+  - Token 自动管理
+  - 智能重试机制
+  - 错误处理
+
+- ✅ **阶段二：核心业务模块**（已完成）
+  - ✅ 通讯录管理 (Contact)
+  - ✅ 身份验证 (OAuth)
+  - ✅ 企业二维码 (QRCode)
+  - ✅ IP 管理 (IP)
+  - ✅ 上下游服务 (UpDown)
+  - ✅ 企业互联 (CorpGroup)
+  - ✅ 安全管理 (Security)
+  - ✅ 消息管理 (Message)
+  - ✅ 外部联系人 (ExternalContact)
+    - ✅ 客户管理（获取客户列表、获取客户详情、修改备注、批量获取）
+    - ✅ 客户标签管理（企业标签、规则组标签、客户打标）
+    - ✅ 客户联系规则组管理（规则组CRUD、管理范围）
+    - ✅ 获客助手（获客链接、额度管理、使用统计）
+    - ⏳ 客户群管理（规划中）
+    - ⏳ 在职继承/离职继承（规划中）
+    - ⏳ 消息推送（规划中）
+
+- ⏳ **阶段三：更多业务模块**（规划中）
   - 应用管理
-  - 等 30+ 个模块
+  - 素材管理
+  - OA 审批
+  - 会议管理
+  - 日程管理
+  - 等 20+ 个模块
 
 ## 示例
 
