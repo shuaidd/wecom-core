@@ -461,3 +461,200 @@ type CardSelect struct {
 	// SelectedID 默认选定的id
 	SelectedID string `json:"selected_id,omitempty"`
 }
+
+// SendSchoolNoticeRequest 发送学校通知请求
+type SendSchoolNoticeRequest struct {
+	// RecvScope 指定发送对象，0表示发送给家长，1表示发送给学生，2表示发送给家长和学生，默认为0
+	RecvScope *int `json:"recv_scope,omitempty"`
+	// ToParentUserID 家校通讯录家长列表（最多支持1000个）
+	ToParentUserID []string `json:"to_parent_userid,omitempty"`
+	// ToStudentUserID 家校通讯录学生列表（最多支持1000个）
+	ToStudentUserID []string `json:"to_student_userid,omitempty"`
+	// ToParty 家校通讯录部门列表（最多支持100个）
+	ToParty []string `json:"to_party,omitempty"`
+	// ToAll 1表示发送给所有人，0表示不发送给所有人，默认为0
+	ToAll *int `json:"toall,omitempty"`
+	// MsgType 消息类型
+	MsgType MessageType `json:"msgtype"`
+	// AgentID 企业应用的id
+	AgentID int `json:"agentid"`
+	// EnableIDTrans 表示是否开启id转译，0表示否，1表示是，默认0
+	EnableIDTrans *int `json:"enable_id_trans,omitempty"`
+	// EnableDuplicateCheck 表示是否开启重复消息检查，0表示否，1表示是，默认0
+	EnableDuplicateCheck *int `json:"enable_duplicate_check,omitempty"`
+	// DuplicateCheckInterval 表示是否重复消息检查的时间间隔，默认1800s，最大不超过4小时
+	DuplicateCheckInterval *int `json:"duplicate_check_interval,omitempty"`
+
+	// 各种消息类型的具体内容
+	Text     *TextMessage     `json:"text,omitempty"`
+	Image    *MediaMessage    `json:"image,omitempty"`
+	Voice    *MediaMessage    `json:"voice,omitempty"`
+	Video    *VideoMessage    `json:"video,omitempty"`
+	File     *MediaMessage    `json:"file,omitempty"`
+	News     *NewsMessage     `json:"news,omitempty"`
+	MPNews   *SchoolMPNews    `json:"mpnews,omitempty"`
+	MiniProgram *SchoolMiniProgram `json:"miniprogram,omitempty"`
+}
+
+// SchoolMPNews 学校通知的图文消息（mpnews）
+type SchoolMPNews struct {
+	// Articles 图文消息，一个图文消息支持1到8条图文
+	Articles []SchoolMPNewsArticle `json:"articles"`
+}
+
+// SchoolMPNewsArticle 学校通知的图文消息文章（mpnews）
+type SchoolMPNewsArticle struct {
+	// Title 标题
+	Title string `json:"title"`
+	// ThumbMediaID 图文消息缩略图的media_id
+	ThumbMediaID string `json:"thumb_media_id"`
+	// Author 图文消息的作者
+	Author string `json:"author,omitempty"`
+	// ContentSourceURL 图文消息点击"阅读原文"之后的页面链接
+	ContentSourceURL string `json:"content_source_url,omitempty"`
+	// Content 图文消息的内容，支持html标签，不超过666K个字节
+	Content string `json:"content"`
+	// Digest 图文消息的描述
+	Digest string `json:"digest,omitempty"`
+}
+
+// SchoolMiniProgram 学校通知的小程序消息
+type SchoolMiniProgram struct {
+	// AppID 小程序appid
+	AppID string `json:"appid"`
+	// Title 小程序消息标题
+	Title string `json:"title,omitempty"`
+	// ThumbMediaID 小程序消息封面的mediaid
+	ThumbMediaID string `json:"thumb_media_id"`
+	// PagePath 点击消息卡片后进入的小程序页面路径
+	PagePath string `json:"pagepath"`
+}
+
+// SendSchoolNoticeResponse 发送学校通知响应
+type SendSchoolNoticeResponse struct {
+	common.Response
+	// InvalidParentUserID 不合法的家长userid
+	InvalidParentUserID []string `json:"invalid_parent_userid,omitempty"`
+	// InvalidStudentUserID 不合法的学生userid
+	InvalidStudentUserID []string `json:"invalid_student_userid,omitempty"`
+	// InvalidParty 不合法的部门id
+	InvalidParty []string `json:"invalid_party,omitempty"`
+}
+
+// UpdateTemplateCardRequest 更新模板卡片消息请求
+type UpdateTemplateCardRequest struct {
+	// UserIDs 企业的成员ID列表（最多支持1000个）
+	UserIDs []string `json:"userids,omitempty"`
+	// PartyIDs 企业的部门ID列表（最多支持100个）
+	PartyIDs []int `json:"partyids,omitempty"`
+	// TagIDs 企业的标签ID列表（最多支持100个）
+	TagIDs []int `json:"tagids,omitempty"`
+	// AtAll 更新整个任务接收人员
+	AtAll *int `json:"atall,omitempty"`
+	// AgentID 应用的agentid
+	AgentID int `json:"agentid"`
+	// ResponseCode 更新卡片所需要消费的code
+	ResponseCode string `json:"response_code"`
+	// EnableIDTrans 表示是否开启id转译，0表示否，1表示是，默认0
+	EnableIDTrans *int `json:"enable_id_trans,omitempty"`
+	// Button 更新按钮为不可点击状态
+	Button *UpdateButton `json:"button,omitempty"`
+	// TemplateCard 更新为新的卡片
+	TemplateCard *TemplateCardMessage `json:"template_card,omitempty"`
+}
+
+// UpdateButton 更新按钮
+type UpdateButton struct {
+	// ReplaceName 需要更新的按钮的文案
+	ReplaceName string `json:"replace_name"`
+}
+
+// UpdateTemplateCardResponse 更新模板卡片消息响应
+type UpdateTemplateCardResponse struct {
+	common.Response
+	// InvalidUser 不合法的userid
+	InvalidUser []string `json:"invaliduser,omitempty"`
+}
+
+// AppChatSendRequest 应用推送消息请求
+type AppChatSendRequest struct {
+	// ChatID 群聊id
+	ChatID string `json:"chatid"`
+	// MsgType 消息类型
+	MsgType MessageType `json:"msgtype"`
+	// Safe 表示是否是保密消息，0表示否，1表示是，默认0
+	Safe *int `json:"safe,omitempty"`
+
+	// 各种消息类型的具体内容
+	Text     *TextMessage     `json:"text,omitempty"`
+	Image    *MediaMessage    `json:"image,omitempty"`
+	Voice    *MediaMessage    `json:"voice,omitempty"`
+	Video    *VideoMessage    `json:"video,omitempty"`
+	File     *MediaMessage    `json:"file,omitempty"`
+	TextCard *TextCardMessage `json:"textcard,omitempty"`
+	News     *NewsMessage     `json:"news,omitempty"`
+	MPNews   *MPNewsMessage   `json:"mpnews,omitempty"`
+	Markdown *MarkdownMessage `json:"markdown,omitempty"`
+}
+
+// GetAppChatRequest 获取群聊会话请求
+type GetAppChatRequest struct {
+	// ChatID 群聊id
+	ChatID string `json:"chatid"`
+}
+
+// GetAppChatResponse 获取群聊会话响应
+type GetAppChatResponse struct {
+	common.Response
+	// ChatInfo 群聊信息
+	ChatInfo *AppChatInfo `json:"chat_info,omitempty"`
+}
+
+// AppChatInfo 群聊信息
+type AppChatInfo struct {
+	// ChatID 群聊唯一标志
+	ChatID string `json:"chatid"`
+	// Name 群聊名
+	Name string `json:"name"`
+	// Owner 群主id
+	Owner string `json:"owner"`
+	// UserList 群成员id列表
+	UserList []string `json:"userlist"`
+	// ChatType 群聊类型，0表示普通群聊，1表示课程群聊
+	ChatType int `json:"chat_type"`
+}
+
+// UpdateAppChatRequest 修改群聊会话请求
+type UpdateAppChatRequest struct {
+	// ChatID 群聊id
+	ChatID string `json:"chatid"`
+	// Name 新的群聊名
+	Name string `json:"name,omitempty"`
+	// Owner 新群主的id
+	Owner string `json:"owner,omitempty"`
+	// AddUserList 添加成员的id列表
+	AddUserList []string `json:"add_user_list,omitempty"`
+	// DelUserList 踢出成员的id列表
+	DelUserList []string `json:"del_user_list,omitempty"`
+}
+
+// ListSmartsheetGroupChatRequest 获取群聊列表请求
+type ListSmartsheetGroupChatRequest struct {
+	// DocID 智能表格ID
+	DocID string `json:"docid"`
+	// Cursor 用于分页查询的游标
+	Cursor string `json:"cursor,omitempty"`
+	// Limit 每次请求返回的数据上限，默认100，最大200
+	Limit int `json:"limit,omitempty"`
+}
+
+// ListSmartsheetGroupChatResponse 获取群聊列表响应
+type ListSmartsheetGroupChatResponse struct {
+	common.Response
+	// HasMore 是否还有更多数据
+	HasMore bool `json:"has_more"`
+	// NextCursor 下一次请求的cursor值
+	NextCursor string `json:"next_cursor,omitempty"`
+	// ChatIDList 符合条件的群聊chatid列表
+	ChatIDList []string `json:"chat_id_list"`
+}
