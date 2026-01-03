@@ -229,6 +229,103 @@ chatID, err := client.ExternalContact.OpenGIDToChatID(ctx, &externalcontact.Open
 })
 ```
 
+#### 联系我与客户入群方式
+
+```go
+// 配置客户联系「联系我」方式
+contactWayResp, err := client.ExternalContact.AddContactWay(ctx, &externalcontact.AddContactWayRequest{
+    Type:       1,  // 1-单人, 2-多人
+    Scene:      2,  // 1-在小程序中联系, 2-通过二维码联系
+    SkipVerify: true,
+    State:      "channel_001",
+    User:       []string{"zhangsan"},
+    Remark:     "市场推广活动",
+})
+
+// 获取企业已配置的「联系我」方式
+contactWay, err := client.ExternalContact.GetContactWay(ctx, "config_id")
+
+// 获取企业已配置的「联系我」列表
+contactWayList, err := client.ExternalContact.ListContactWay(ctx, &externalcontact.ListContactWayRequest{
+    Limit: 100,
+})
+
+// 更新企业已配置的「联系我」方式
+err = client.ExternalContact.UpdateContactWay(ctx, &externalcontact.UpdateContactWayRequest{
+    ConfigID: "config_id",
+    Remark:   "更新后的备注",
+})
+
+// 删除企业已配置的「联系我」方式
+err = client.ExternalContact.DeleteContactWay(ctx, "config_id")
+
+// 结束临时会话
+err = client.ExternalContact.CloseTempChat(ctx, "zhangsan", "external_userid")
+
+// 配置客户群进群方式
+joinWayResp, err := client.ExternalContact.AddJoinWay(ctx, &externalcontact.AddJoinWayRequest{
+    Scene:          2,  // 1-群的小程序插件, 2-群的二维码插件
+    Remark:         "产品交流群",
+    AutoCreateRoom: 1,
+    RoomBaseName:   "产品交流群",
+    RoomBaseID:     1,
+    ChatIDList:     []string{"wrOgQhDgAAMYQiS5ol9G7gK9JVAAAA"},
+    State:          "channel_group_001",
+})
+
+// 获取客户群进群方式配置
+joinWay, err := client.ExternalContact.GetJoinWay(ctx, "config_id")
+
+// 更新客户群进群方式配置
+err = client.ExternalContact.UpdateJoinWay(ctx, &externalcontact.UpdateJoinWayRequest{
+    ConfigID: "config_id",
+    Scene:    2,
+    Remark:   "更新后的备注",
+    ChatIDList: []string{"wrOgQhDgAAMYQiS5ol9G7gK9JVAAAA"},
+})
+
+// 删除客户群进群方式配置
+err = client.ExternalContact.DeleteJoinWay(ctx, "config_id")
+```
+
+#### 企业服务人员管理
+
+```go
+// 获取配置了客户联系功能的成员列表
+followUsers, err := client.ExternalContact.GetFollowUserList(ctx)
+fmt.Printf("配置了客户联系功能的成员: %v\n", followUsers.FollowUser)
+```
+
+#### 统计管理
+
+```go
+// 获取群聊数据统计（按群主聚合）
+groupChatStats, err := client.ExternalContact.GetGroupChatStatistic(ctx, &externalcontact.GroupChatStatisticRequest{
+    DayBeginTime: 1600272000,
+    DayEndTime:   1600444800,
+    OwnerFilter: &externalcontact.OwnerFilter{
+        UserIDList: []string{"zhangsan"},
+    },
+    Limit: 100,
+})
+
+// 获取群聊数据统计（按自然日聚合）
+groupChatStatsByDay, err := client.ExternalContact.GetGroupChatStatisticGroupByDay(ctx, &externalcontact.GroupChatStatisticGroupByDayRequest{
+    DayBeginTime: 1600272000,
+    DayEndTime:   1600358400,
+    OwnerFilter: &externalcontact.OwnerFilter{
+        UserIDList: []string{"zhangsan"},
+    },
+})
+
+// 获取联系客户统计数据
+behaviorData, err := client.ExternalContact.GetUserBehaviorData(ctx, &externalcontact.GetUserBehaviorDataRequest{
+    UserID:    []string{"zhangsan", "lisi"},
+    StartTime: 1536508800,
+    EndTime:   1536595200,
+})
+```
+
 #### 客户朋友圈
 
 ```go
@@ -513,6 +610,9 @@ wecom-core/
     - ✅ 获客助手（获客链接、额度管理、使用统计）
     - ✅ 客户群管理（获取群列表、获取群详情、opengid转换）
     - ✅ 客户朋友圈（发表任务、获取列表、互动数据、规则组管理）
+    - ✅ 联系我与客户入群方式（「联系我」配置、客户群进群方式管理）
+    - ✅ 企业服务人员管理（获取配置了客户联系功能的成员列表）
+    - ✅ 统计管理（群聊数据统计、联系客户统计）
     - ⏳ 在职继承/离职继承（规划中）
     - ⏳ 消息推送（规划中）
 

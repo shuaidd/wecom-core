@@ -34,3 +34,41 @@ func (s *Service) OpenGIDToChatID(ctx context.Context, req *externalcontact.Open
 func (s *Service) TransferGroupChat(ctx context.Context, req *externalcontact.TransferGroupChatRequest) (*externalcontact.TransferGroupChatResponse, error) {
 	return client.PostAndUnmarshal[externalcontact.TransferGroupChatResponse](s.client, ctx, "/cgi-bin/externalcontact/groupchat/transfer", req)
 }
+
+// AddJoinWay 配置客户群进群方式
+// 企业可调用此接口来生成并配置「加入群聊」的二维码或者小程序按钮，客户通过扫描二维码或点击小程序上的按钮，即可加入特定的客户群
+// 文档: https://developer.work.weixin.qq.com/document/path/92229
+func (s *Service) AddJoinWay(ctx context.Context, req *externalcontact.AddJoinWayRequest) (*externalcontact.AddJoinWayResponse, error) {
+	return client.PostAndUnmarshal[externalcontact.AddJoinWayResponse](s.client, ctx, "/cgi-bin/externalcontact/groupchat/add_join_way", req)
+}
+
+// GetJoinWay 获取客户群进群方式配置
+// 获取企业配置的群二维码或小程序按钮
+// 文档: https://developer.work.weixin.qq.com/document/path/92229
+func (s *Service) GetJoinWay(ctx context.Context, configID string) (*externalcontact.GetJoinWayResponse, error) {
+	req := &externalcontact.GetJoinWayRequest{
+		ConfigID: configID,
+	}
+	return client.PostAndUnmarshal[externalcontact.GetJoinWayResponse](s.client, ctx, "/cgi-bin/externalcontact/groupchat/get_join_way", req)
+}
+
+// UpdateJoinWay 更新客户群进群方式配置
+// 更新进群方式配置信息。注意：使用覆盖的方式更新
+// 文档: https://developer.work.weixin.qq.com/document/path/92229
+func (s *Service) UpdateJoinWay(ctx context.Context, req *externalcontact.UpdateJoinWayRequest) error {
+	type response struct{}
+	_, err := client.PostAndUnmarshal[response](s.client, ctx, "/cgi-bin/externalcontact/groupchat/update_join_way", req)
+	return err
+}
+
+// DeleteJoinWay 删除客户群进群方式配置
+// 删除一个进群方式配置
+// 文档: https://developer.work.weixin.qq.com/document/path/92229
+func (s *Service) DeleteJoinWay(ctx context.Context, configID string) error {
+	req := &externalcontact.DeleteJoinWayRequest{
+		ConfigID: configID,
+	}
+	type response struct{}
+	_, err := client.PostAndUnmarshal[response](s.client, ctx, "/cgi-bin/externalcontact/groupchat/del_join_way", req)
+	return err
+}
