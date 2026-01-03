@@ -9,6 +9,7 @@ import (
 	"github.com/shuaidd/wecom-core/internal/retry"
 	"github.com/shuaidd/wecom-core/services/contact"
 	"github.com/shuaidd/wecom-core/services/corpgroup"
+	"github.com/shuaidd/wecom-core/services/externalcontact"
 	"github.com/shuaidd/wecom-core/services/ip"
 	"github.com/shuaidd/wecom-core/services/message"
 	"github.com/shuaidd/wecom-core/services/oauth"
@@ -35,6 +36,8 @@ type Client struct {
 	Security *security.Service
 	// Message 消息服务
 	Message *message.Service
+	// ExternalContact 外部联系人服务
+	ExternalContact *externalcontact.Service
 
 	// 内部组件(不对外暴露)
 	config       *config.Config
@@ -84,17 +87,18 @@ func New(opts ...config.Option) (*Client, error) {
 
 	// 6. 创建服务客户端
 	c := &Client{
-		config:       cfg,
-		tokenManager: tokenManager,
-		httpClient:   httpClient,
-		Contact:      contact.NewService(httpClient),
-		IP:           ip.NewService(httpClient),
-		QRCode:       qrcode.NewService(httpClient),
-		OAuth:        oauth.NewService(httpClient),
-		UpDown:       updown.NewService(httpClient),
-		CorpGroup:    corpgroup.NewService(httpClient),
-		Security:     security.NewService(httpClient),
-		Message:      message.NewService(httpClient),
+		config:          cfg,
+		tokenManager:    tokenManager,
+		httpClient:      httpClient,
+		Contact:         contact.NewService(httpClient),
+		IP:              ip.NewService(httpClient),
+		QRCode:          qrcode.NewService(httpClient),
+		OAuth:           oauth.NewService(httpClient),
+		UpDown:          updown.NewService(httpClient),
+		CorpGroup:       corpgroup.NewService(httpClient),
+		Security:        security.NewService(httpClient),
+		Message:         message.NewService(httpClient),
+		ExternalContact: externalcontact.NewService(httpClient),
 	}
 
 	return c, nil
