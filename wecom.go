@@ -8,6 +8,7 @@ import (
 	"github.com/shuaidd/wecom-core/internal/client"
 	"github.com/shuaidd/wecom-core/internal/retry"
 	"github.com/shuaidd/wecom-core/services/contact"
+	"github.com/shuaidd/wecom-core/services/corpgroup"
 	"github.com/shuaidd/wecom-core/services/ip"
 	"github.com/shuaidd/wecom-core/services/oauth"
 	"github.com/shuaidd/wecom-core/services/qrcode"
@@ -26,6 +27,8 @@ type Client struct {
 	OAuth *oauth.Service
 	// UpDown 上下游服务
 	UpDown *updown.Service
+	// CorpGroup 企业互联服务
+	CorpGroup *corpgroup.Service
 
 	// 内部组件(不对外暴露)
 	config       *config.Config
@@ -83,6 +86,7 @@ func New(opts ...config.Option) (*Client, error) {
 		QRCode:       qrcode.NewService(httpClient),
 		OAuth:        oauth.NewService(httpClient),
 		UpDown:       updown.NewService(httpClient),
+		CorpGroup:    corpgroup.NewService(httpClient),
 	}
 
 	return c, nil
