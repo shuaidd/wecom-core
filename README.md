@@ -795,6 +795,333 @@ case media.UploadTaskStatusFailed:
 }
 ```
 
+### 微信客服
+
+企业微信客服服务，支持客服账号管理、接待人员管理、会话分配与消息收发，帮助企业快速搭建微信客服系统。
+
+#### 客服账号管理
+
+```go
+// 添加客服账号
+addResp, err := client.KF.AddAccount(ctx, &kf.AddAccountRequest{
+    Name:    "客服小王",
+    MediaID: "MEDIA_ID",  // 客服头像临时素材ID
+})
+if err != nil {
+    log.Fatalf("添加客服账号失败: %v", err)
+}
+fmt.Printf("客服账号ID: %s\n", addResp.OpenKfID)
+
+// 获取客服账号列表
+listResp, err := client.KF.ListAccount(ctx, &kf.ListAccountRequest{
+    Offset: 0,
+    Limit:  100,
+})
+if err != nil {
+    log.Fatalf("获取客服账号列表失败: %v", err)
+}
+for _, account := range listResp.AccountList {
+    fmt.Printf("客服ID: %s, 名称: %s, 头像: %s\n",
+        account.OpenKfID, account.Name, account.Avatar)
+}
+
+// 修改客服账号
+err = client.KF.UpdateAccount(ctx, &kf.UpdateAccountRequest{
+    OpenKfID: "OPEN_KFID",
+    Name:     "资深客服小王",
+    MediaID:  "NEW_MEDIA_ID",
+})
+if err != nil {
+    log.Fatalf("修改客服账号失败: %v", err)
+}
+
+// 删除客服账号
+err = client.KF.DeleteAccount(ctx, &kf.DeleteAccountRequest{
+    OpenKfID: "OPEN_KFID",
+})
+if err != nil {
+    log.Fatalf("删除客服账号失败: %v", err)
+}
+```
+
+#### 获取客服链接
+
+```go
+// 获取客服账号链接（用于嵌入网页或生成二维码）
+linkResp, err := client.KF.AddContactWay(ctx, &kf.AddContactWayRequest{
+    OpenKfID: "OPEN_KFID",
+    Scene:    "product_page",  // 可选：场景值，用于区分不同来源
+})
+if err != nil {
+    log.Fatalf("获取客服链接失败: %v", err)
+}
+fmt.Printf("客服链接: %s\n", linkResp.URL)
+
+// 可以在链接后拼接 scene_param 参数
+// 例如: https://work.weixin.qq.com/kf/xxx?enc_scene=xxx&scene_param=a%3D1%26b%3D2
+```
+
+#### 接待人员管理
+
+```go
+// 添加接待人员
+addServicerResp, err := client.KF.AddServicer(ctx, &kf.AddServicerRequest{
+    OpenKfID:         "OPEN_KFID",
+    UserIDList:       []string{"zhangsan", "lisi"},
+    DepartmentIDList: []uint64{2, 4},
+})
+if err != nil {
+    log.Fatalf("添加接待人员失败: %v", err)
+}
+// 查看操作结果
+for _, result := range addServicerResp.ResultList {
+    if result.UserID != "" {
+        fmt.Printf("用户 %s: %s\n", result.UserID, result.ErrMsg)
+    } else {
+        fmt.Printf("部门 %d: %s\n", result.DepartmentID, result.ErrMsg)
+    }
+}
+
+// 获取接待人员列表
+servicerList, err := client.KF.ListServicer(ctx, &kf.ListServicerRequest{
+    OpenKfID: "OPEN_KFID",
+})
+if err != nil {
+    log.Fatalf("获取接待人员列表失败: %v", err)
+}
+for _, servicer := range servicerList.ServicerList {
+    if servicer.UserID != "" {
+        fmt.Printf("接待人员: %s, 状态: %d\n", servicer.UserID, servicer.Status)
+    } else {
+        fmt.Printf("接待部门: %d\n", servicer.DepartmentID)
+    }
+}
+
+// 删除接待人员
+deleteResp, err := client.KF.DeleteServicer(ctx, &kf.DeleteServicerRequest{
+    OpenKfID:         "OPEN_KFID",
+    UserIDList:       []string{"zhangsan"},
+    DepartmentIDList: []uint64{2},
+})
+if err != nil {
+    log.Fatalf("删除接待人员失败: %v", err)
+}
+```
+
+#### 会话分配与消息收发
+
+```go
+// 获取会话状态
+stateResp, err := client.KF.GetServiceState(ctx, &kf.GetServiceStateRequest{
+    OpenKfID:       "OPEN_KFID",
+    ExternalUserID: "EXTERNAL_USERID",
+})
+if err != nil {
+    log.Fatalf("获取会话状态失败: %v", err)
+}
+fmt.Printf("会话状态: %d\n", stateResp.ServiceState)
+// 状态说明：0-未处理, 1-由智能助手接待, 2-待接入池排队中, 3-由人工接待, 4-已结束/未开始
+
+// 变更会话状态（例如：分配给人工接待）
+transResp, err := client.KF.TransServiceState(ctx, &kf.TransServiceStateRequest{
+    OpenKfID:       "OPEN_KFID",
+    ExternalUserID: "EXTERNAL_USERID",
+    ServiceState:   3,  // 变更为人工接待
+    ServicerUserID: "zhangsan",  // 指定接待人员
+})
+if err != nil {
+    log.Fatalf("变更会话状态失败: %v", err)
+}
+if transResp.MsgCode != "" {
+    fmt.Printf("消息code: %s\n", transResp.MsgCode)
+}
+
+// 发送消息（文本消息示例）
+sendResp, err := client.KF.SendMsg(ctx, &kf.SendMsgRequest{
+    ToUser:   "EXTERNAL_USERID",
+    OpenKfID: "OPEN_KFID",
+    MsgType:  "text",
+    Text: &kf.TextContent{
+        Content: "您好，有什么可以帮您的吗？",
+    },
+})
+if err != nil {
+    log.Fatalf("发送消息失败: %v", err)
+}
+fmt.Printf("消息ID: %s\n", sendResp.MsgID)
+
+// 发送图片消息
+_, err = client.KF.SendMsg(ctx, &kf.SendMsgRequest{
+    ToUser:   "EXTERNAL_USERID",
+    OpenKfID: "OPEN_KFID",
+    MsgType:  "image",
+    Image: &kf.MediaContent{
+        MediaID: "MEDIA_ID",
+    },
+})
+
+// 发送菜单消息
+_, err = client.KF.SendMsg(ctx, &kf.SendMsgRequest{
+    ToUser:   "EXTERNAL_USERID",
+    OpenKfID: "OPEN_KFID",
+    MsgType:  "msgmenu",
+    MsgMenu: &kf.MsgMenuContent{
+        HeadContent: "您对本次服务是否满意？",
+        List: []kf.MsgMenuItem{
+            {
+                Type: "click",
+                Click: &kf.MsgMenuClickItem{
+                    ID:      "101",
+                    Content: "满意",
+                },
+            },
+            {
+                Type: "click",
+                Click: &kf.MsgMenuClickItem{
+                    ID:      "102",
+                    Content: "不满意",
+                },
+            },
+        },
+        TailContent: "感谢您的反馈",
+    },
+})
+
+// 发送欢迎语等事件响应消息
+eventResp, err := client.KF.SendMsgOnEvent(ctx, &kf.SendMsgOnEventRequest{
+    Code:    "WELCOME_CODE",  // 来自事件回调
+    MsgType: "text",
+    Text: &kf.TextContent{
+        Content: "欢迎咨询，我们将竭诚为您服务！",
+    },
+})
+if err != nil {
+    log.Fatalf("发送欢迎语失败: %v", err)
+}
+fmt.Printf("欢迎语消息ID: %s\n", eventResp.MsgID)
+```
+
+#### 客户基础信息管理
+
+```go
+// 批量获取客户基础信息
+customerResp, err := client.KF.BatchGetCustomer(ctx, &kf.BatchGetCustomerRequest{
+    ExternalUserIDList:      []string{"wmxxxxxxxxxxxxxxxxxxxxxx", "wmyyyyyyyyyyyyyyyyyyyyyy"},
+    NeedEnterSessionContext: 1,  // 返回客户48小时内最后一次进入会话的上下文信息
+})
+if err != nil {
+    log.Fatalf("获取客户信息失败: %v", err)
+}
+
+// 遍历客户信息
+for _, customer := range customerResp.CustomerList {
+    fmt.Printf("客户: %s, 昵称: %s, 性别: %d\n",
+        customer.ExternalUserID, customer.Nickname, customer.Gender)
+
+    // 查看进入会话上下文
+    if customer.EnterSessionContext != nil {
+        fmt.Printf("  场景值: %s, 场景参数: %s\n",
+            customer.EnterSessionContext.Scene,
+            customer.EnterSessionContext.SceneParam)
+
+        // 视频号信息
+        if customer.EnterSessionContext.WechatChannels != nil {
+            fmt.Printf("  视频号: %s, 场景: %d\n",
+                customer.EnterSessionContext.WechatChannels.Nickname,
+                customer.EnterSessionContext.WechatChannels.Scene)
+        }
+    }
+}
+
+// 查看无效的external_userid
+for _, invalidID := range customerResp.InvalidExternalUserID {
+    fmt.Printf("无效的客户ID: %s\n", invalidID)
+}
+```
+
+#### 升级服务配置
+
+```go
+// 获取配置的专员与客户群
+upgradeConfig, err := client.KF.GetUpgradeServiceConfig(ctx)
+if err != nil {
+    log.Fatalf("获取升级服务配置失败: %v", err)
+}
+
+// 查看专员服务配置
+if upgradeConfig.MemberRange != nil {
+    fmt.Printf("专员列表: %v\n", upgradeConfig.MemberRange.UserIDList)
+    fmt.Printf("专员部门: %v\n", upgradeConfig.MemberRange.DepartmentIDList)
+}
+
+// 查看客户群配置
+if upgradeConfig.GroupchatRange != nil {
+    fmt.Printf("客户群列表: %v\n", upgradeConfig.GroupchatRange.ChatIDList)
+}
+
+// 为客户升级为专员服务
+err = client.KF.UpgradeService(ctx, &kf.UpgradeServiceRequest{
+    OpenKfID:       "kfxxxxxxxxxxxxxx",
+    ExternalUserID: "wmxxxxxxxxxxxxxxxxxx",
+    Type:           1,  // 1:专员服务, 2:客户群服务
+    Member: &kf.UpgradeMember{
+        UserID:  "zhangsan",
+        Wording: "你好，我是你的专属服务专员张三",
+    },
+})
+if err != nil {
+    log.Fatalf("升级服务失败: %v", err)
+}
+fmt.Println("已为客户推荐专员服务")
+
+// 为客户升级为客户群服务
+err = client.KF.UpgradeService(ctx, &kf.UpgradeServiceRequest{
+    OpenKfID:       "kfxxxxxxxxxxxxxx",
+    ExternalUserID: "wmxxxxxxxxxxxxxxxxxx",
+    Type:           2,  // 2:客户群服务
+    Groupchat: &kf.UpgradeGroupchat{
+        ChatID:  "wraaaaaaaaaaaaaaaa",
+        Wording: "欢迎加入你的专属服务群",
+    },
+})
+if err != nil {
+    log.Fatalf("升级服务失败: %v", err)
+}
+fmt.Println("已为客户推荐客户群服务")
+
+// 为客户取消推荐
+err = client.KF.CancelUpgradeService(ctx, &kf.CancelUpgradeServiceRequest{
+    OpenKfID:       "kfxxxxxxxxxxxxxx",
+    ExternalUserID: "wmxxxxxxxxxxxxxxxxxx",
+})
+if err != nil {
+    log.Fatalf("取消推荐失败: %v", err)
+}
+fmt.Println("已取消客户推荐")
+```
+
+支持的消息类型：
+- **文本消息** (`text`)：纯文本内容
+- **图片消息** (`image`)：通过media_id发送图片
+- **语音消息** (`voice`)：通过media_id发送语音
+- **视频消息** (`video`)：通过media_id发送视频
+- **文件消息** (`file`)：通过media_id发送文件
+- **图文链接消息** (`link`)：包含标题、描述、链接和缩略图
+- **小程序消息** (`miniprogram`)：小程序卡片
+- **菜单消息** (`msgmenu`)：交互式菜单
+- **地理位置消息** (`location`)：位置信息
+- **获客链接消息** (`ca_link`)：获客助手链接
+
+功能说明：
+- **客服账号管理**：创建、修改、删除和查询客服账号
+- **客服链接获取**：获取带场景值的客服链接，可嵌入H5页面或生成二维码
+- **接待人员管理**：添加、删除和查询接待人员（支持按用户和部门管理）
+- **会话状态管理**：获取和变更会话状态，实现智能分配
+- **消息收发**：支持10种消息类型的发送
+- **事件响应消息**：发送欢迎语、提示语等场景化消息
+- **场景追踪**：通过场景值(scene)和场景参数(scene_param)追踪用户咨询来源
+- **企业限额**：一家企业最多可添加 **5000个** 客服账号，每个账号最多 **2000个** 接待人员
+
 ### 电子发票
 
 企业微信电子发票管理服务，支持查询和更新电子发票的报销状态。
@@ -1194,6 +1521,15 @@ wecom-core/
     - ✅ 批量查询电子发票
     - ✅ 更新发票状态（锁定、解锁、核销）
     - ✅ 批量更新发票状态
+  - ✅ 微信客服 (KF)
+    - ✅ 客服账号管理（添加、删除、修改、获取列表）
+    - ✅ 获取客服账号链接
+    - ✅ 接待人员管理（添加、删除、获取列表）
+    - ✅ 会话分配与消息收发（获取会话状态、变更会话状态）
+    - ✅ 消息发送（文本、图片、语音、视频、文件、图文链接、小程序、菜单、地理位置、获客链接）
+    - ✅ 事件响应消息（发送欢迎语等场景化消息）
+    - ✅ 客户基础信息管理（批量获取客户基础信息）
+    - ✅ 升级服务配置（获取配置的专员与客户群、为客户升级服务、取消推荐）
   - ⏳ OA 审批
   - ⏳ 会议管理
   - ⏳ 日程管理

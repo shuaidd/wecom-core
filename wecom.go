@@ -13,6 +13,7 @@ import (
 	"github.com/shuaidd/wecom-core/services/externalcontact"
 	"github.com/shuaidd/wecom-core/services/invoice"
 	"github.com/shuaidd/wecom-core/services/ip"
+	"github.com/shuaidd/wecom-core/services/kf"
 	"github.com/shuaidd/wecom-core/services/media"
 	"github.com/shuaidd/wecom-core/services/message"
 	"github.com/shuaidd/wecom-core/services/oauth"
@@ -47,6 +48,8 @@ type Client struct {
 	Media *media.Service
 	// Invoice 电子发票服务
 	Invoice *invoice.Service
+	// KF 微信客服服务
+	KF *kf.Service
 
 	// 内部组件(不对外暴露)
 	config       *config.Config
@@ -111,6 +114,7 @@ func New(opts ...config.Option) (*Client, error) {
 		ExternalContact: externalcontact.NewService(httpClient),
 		Media:           media.NewService(httpClient),
 		Invoice:         invoice.NewService(httpClient),
+		KF:              kf.NewService(httpClient),
 	}
 
 	return c, nil

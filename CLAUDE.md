@@ -179,10 +179,14 @@ Completed:
 - UpDown service (upstream/downstream enterprise features)
 - CorpGroup service (enterprise interconnection)
 - Security service (advanced features, audit logs, device management, file DLP)
+- Agent service (application management, menu management, workbench customization)
+- Media service (upload/download images, temporary media, JSSDK media, async upload)
+- Invoice service (query and update e-invoice status)
+- External contact service (customer management, tags, group chats, moments, statistics, messaging)
+- KF service (customer service - account management, contact links, servicer management, session allocation, message sending, customer basic info, upgrade service configuration)
 
 In Progress:
 - Message service (send messages, receive callbacks, template cards)
 
 Planned:
-- External contact (customer relationship management)
 - 20+ additional business modules per WeCom API documentation
