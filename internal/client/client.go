@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"time"
@@ -204,6 +205,154 @@ func GetAndUnmarshal[T any](c *Client, ctx context.Context, path string, query u
 func PostAndUnmarshal[T any](c *Client, ctx context.Context, path string, body any) (*T, error) {
 	req := NewRequest(MethodPost, path).SetBody(body)
 	return DoAndUnmarshal[T](c, ctx, req)
+}
+
+// PostMultipart 发送multipart/form-data POST请求
+func (c *Client) PostMultipart(ctx context.Context, path string, query url.Values, body []byte, contentType string) (*Response, error) {
+	req := NewMultipartRequest(path, body, contentType)
+	if query != nil {
+		req.Query = query
+	}
+	return c.Do(ctx, req)
+}
+
+// PostMultipartAndUnmarshal 发送multipart/form-data POST请求并自动解析响应
+func PostMultipartAndUnmarshal[T any](c *Client, ctx context.Context, path string, body []byte, contentType string) (*T, error) {
+	resp, err := c.PostMultipart(ctx, path, nil, body, contentType)
+	if err != nil {
+		return nil, err
+	}
+
+	var result T
+	if err := resp.Unmarshal(&result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+// PostMultipartAndUnmarshalWithQuery 发送带查询参数的multipart/form-data POST请求并自动解析响应
+func PostMultipartAndUnmarshalWithQuery[T any](c *Client, ctx context.Context, path string, query url.Values, body []byte, contentType string) (*T, error) {
+	resp, err := c.PostMultipart(ctx, path, query, body, contentType)
+	if err != nil {
+		return nil, err
+	}
+
+	var result T
+	if err := resp.Unmarshal(&result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+// GetMedia 下载媒体文件
+func (c *Client) GetMedia(ctx context.Context, path string, query url.Values, headers map[string]string) ([]byte, error) {
+	var result []byte
+
+	// 使用重试策略执行请求
+	err := c.retryExecutor.Do(ctx, func() error {
+		// 1. 获取 access_token
+		token, err := c.tokenManager.GetToken(ctx)
+		if err != nil {
+			return fmt.Errorf("failed to get access token: %w", err)
+		}
+
+		// 2. 添加 token 到查询参数
+		if query == nil {
+			query = url.Values{}
+		}
+		query.Set("access_token", token)
+
+		// 3. 构建完整URL
+		u, err := url.Parse(c.baseURL)
+		if err != nil {
+			return fmt.Errorf("invalid base URL: %w", err)
+		}
+		u.Path = path
+		u.RawQuery = query.Encode()
+
+		// 4. 创建HTTP请求
+		httpReq, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
+		if err != nil {
+			return fmt.Errorf("failed to create http request: %w", err)
+		}
+
+		// 5. 添加自定义headers（如Range）
+		for key, value := range headers {
+			httpReq.Header.Set(key, value)
+		}
+
+		// 6. 记录请求日志
+		startTime := time.Now()
+		c.logger.Debug("API Request (Media)", withTraceID(ctx,
+			logger.F("method", httpReq.Method),
+			logger.F("url", httpReq.URL.String()))...)
+
+		// 7. 发送请求
+		httpResp, err := c.httpClient.Do(httpReq)
+		if err != nil {
+			duration := time.Since(startTime)
+			c.logger.Error("Media request failed", withTraceID(ctx,
+				logger.F("error", err),
+				logger.F("duration", duration))...)
+			return fmt.Errorf("http request failed: %w", err)
+		}
+		defer httpResp.Body.Close()
+
+		duration := time.Since(startTime)
+
+		// 8. 检查HTTP状态码
+		if httpResp.StatusCode != http.StatusOK && httpResp.StatusCode != http.StatusPartialContent {
+			// 尝试解析错误响应
+			var errResp Response
+			body, _ := io.ReadAll(httpResp.Body)
+			if jsonErr := json.Unmarshal(body, &errResp); jsonErr == nil && errResp.ErrCode != 0 {
+				c.logger.Error("Media request failed", withTraceID(ctx,
+					logger.F("url", httpReq.URL.String()),
+					logger.F("errcode", errResp.ErrCode),
+					logger.F("errmsg", errResp.ErrMsg),
+					logger.F("duration", duration))...)
+
+				// Token 失效，刷新后重试
+				apiErr := errors.New(errResp.ErrCode, errResp.ErrMsg)
+				if errors.IsTokenExpired(apiErr) {
+					c.logger.Warn("Token expired, refreshing", withTraceID(ctx,
+						logger.F("errcode", errResp.ErrCode))...)
+					if refreshErr := c.tokenManager.RefreshToken(ctx); refreshErr != nil {
+						c.logger.Error("Failed to refresh token", withTraceID(ctx,
+							logger.F("error", refreshErr))...)
+					}
+				}
+
+				return apiErr
+			}
+			return fmt.Errorf("unexpected status code: %d", httpResp.StatusCode)
+		}
+
+		// 9. 读取响应体
+		result, err = io.ReadAll(httpResp.Body)
+		if err != nil {
+			c.logger.Error("Failed to read media response", withTraceID(ctx,
+				logger.F("error", err),
+				logger.F("duration", duration))...)
+			return fmt.Errorf("failed to read response body: %w", err)
+		}
+
+		// 10. 记录成功日志
+		c.logger.Info("Media request successful", withTraceID(ctx,
+			logger.F("url", httpReq.URL.String()),
+			logger.F("size", len(result)),
+			logger.F("duration", duration))...)
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 // logRequestDetails 打印请求详情

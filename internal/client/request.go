@@ -30,6 +30,10 @@ type Request struct {
 	Query url.Values
 	// Body 请求体
 	Body any
+	// RawBody 原始请求体（用于multipart）
+	RawBody []byte
+	// ContentType 内容类型（用于multipart）
+	ContentType string
 }
 
 // NewRequest 创建新请求
@@ -53,6 +57,17 @@ func (r *Request) SetBody(body any) *Request {
 	return r
 }
 
+// NewMultipartRequest 创建multipart/form-data请求
+func NewMultipartRequest(path string, body []byte, contentType string) *Request {
+	return &Request{
+		Method:      MethodPost,
+		Path:        path,
+		Query:       url.Values{},
+		RawBody:     body,
+		ContentType: contentType,
+	}
+}
+
 // BuildHTTPRequest 构建http.Request
 func (r *Request) BuildHTTPRequest(ctx context.Context, baseURL string) (*http.Request, error) {
 	// 构建完整URL
@@ -65,12 +80,18 @@ func (r *Request) BuildHTTPRequest(ctx context.Context, baseURL string) (*http.R
 
 	// 构建请求体
 	var body io.Reader
-	if r.Body != nil && r.Method == MethodPost {
-		jsonData, err := json.Marshal(r.Body)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal request body: %w", err)
+	if r.Method == MethodPost {
+		if r.RawBody != nil {
+			// 使用原始body（用于multipart）
+			body = bytes.NewReader(r.RawBody)
+		} else if r.Body != nil {
+			// 使用JSON body
+			jsonData, err := json.Marshal(r.Body)
+			if err != nil {
+				return nil, fmt.Errorf("failed to marshal request body: %w", err)
+			}
+			body = bytes.NewReader(jsonData)
 		}
-		body = bytes.NewReader(jsonData)
 	}
 
 	// 创建HTTP请求
@@ -80,8 +101,14 @@ func (r *Request) BuildHTTPRequest(ctx context.Context, baseURL string) (*http.R
 	}
 
 	// 设置请求头
-	if r.Method == MethodPost && r.Body != nil {
-		req.Header.Set("Content-Type", "application/json; charset=utf-8")
+	if r.Method == MethodPost {
+		if r.ContentType != "" {
+			// 使用自定义ContentType（用于multipart）
+			req.Header.Set("Content-Type", r.ContentType)
+		} else if r.Body != nil {
+			// 使用JSON ContentType
+			req.Header.Set("Content-Type", "application/json; charset=utf-8")
+		}
 	}
 
 	return req, nil

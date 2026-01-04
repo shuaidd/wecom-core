@@ -696,6 +696,192 @@ if contactListResp.NextCursor != "" {
 }
 ```
 
+### 素材管理
+
+企业微信素材管理服务，支持图片、语音、视频、文件等媒体资源的上传和下载。
+
+#### 上传图片
+
+```go
+// 上传图片（本地文件）
+imageResp, err := client.Media.UploadImage(ctx, "/path/to/image.jpg")
+if err != nil {
+    log.Fatalf("上传图片失败: %v", err)
+}
+fmt.Printf("图片URL（永久有效）: %s\n", imageResp.URL)
+
+// 从 io.Reader 上传图片
+file, _ := os.Open("/path/to/image.jpg")
+defer file.Close()
+imageResp, err = client.Media.UploadImageFromReader(ctx, file, "image.jpg")
+```
+
+#### 上传临时素材
+
+```go
+// 上传临时素材（本地文件）- 有效期3天
+mediaResp, err := client.Media.UploadMedia(ctx, media.MediaTypeImage, "/path/to/image.jpg")
+if err != nil {
+    log.Fatalf("上传素材失败: %v", err)
+}
+fmt.Printf("MediaID: %s（3天内有效）\n", mediaResp.MediaID)
+
+// 从 io.Reader 上传临时素材
+file, _ := os.Open("/path/to/video.mp4")
+defer file.Close()
+mediaResp, err = client.Media.UploadMediaFromReader(ctx, media.MediaTypeVideo, file, "video.mp4")
+```
+
+支持的媒体类型：
+- **图片（image）**: 10MB，支持JPG、PNG格式
+- **语音（voice）**: 2MB，播放长度不超过60s，支持AMR格式
+- **视频（video）**: 10MB，支持MP4格式
+- **普通文件（file）**: 20MB
+
+#### 获取临时素材
+
+```go
+// 获取临时素材
+mediaData, err := client.Media.GetMedia(ctx, "MEDIA_ID")
+if err != nil {
+    log.Fatalf("获取素材失败: %v", err)
+}
+// 保存到文件
+os.WriteFile("/path/to/download.jpg", mediaData, 0644)
+
+// 使用Range分块下载（大文件）
+mediaData, err = client.Media.GetMediaWithRange(ctx, "MEDIA_ID", "bytes=0-1048575")
+```
+
+#### 获取高清语音素材
+
+```go
+// 获取从JSSDK上传的高清语音素材（speex格式，16K采样率）
+voiceData, err := client.Media.GetJSSDKMedia(ctx, "MEDIA_ID")
+if err != nil {
+    log.Fatalf("获取语音素材失败: %v", err)
+}
+os.WriteFile("/path/to/voice.speex", voiceData, 0644)
+```
+
+#### 异步上传大文件
+
+```go
+// 异步上传临时素材（支持最高200M）
+uploadResp, err := client.Media.UploadByURL(ctx, &media.UploadByURLRequest{
+    Scene:    1,  // 1-客户联系入群欢迎语素材
+    Type:     "video",
+    Filename: "large_video.mp4",
+    URL:      "https://example.com/large_video.mp4",  // 必须支持Range分块下载
+    MD5:      "file_md5_hash",
+})
+if err != nil {
+    log.Fatalf("创建上传任务失败: %v", err)
+}
+
+// 查询异步上传任务结果
+result, err := client.Media.GetUploadByURLResult(ctx, uploadResp.JobID)
+if err != nil {
+    log.Fatalf("查询任务失败: %v", err)
+}
+
+switch result.Status {
+case media.UploadTaskStatusProcessing:
+    fmt.Println("任务处理中...")
+case media.UploadTaskStatusCompleted:
+    fmt.Printf("上传成功，MediaID: %s\n", result.Detail.MediaID)
+case media.UploadTaskStatusFailed:
+    fmt.Printf("上传失败: %s\n", result.Detail.ErrMsg)
+}
+```
+
+### 电子发票
+
+企业微信电子发票管理服务，支持查询和更新电子发票的报销状态。
+
+#### 查询电子发票
+
+```go
+// 查询单个电子发票
+invoiceInfo, err := client.Invoice.GetInvoiceInfo(ctx, "CARD_ID", "ENCRYPT_CODE")
+if err != nil {
+    log.Fatalf("查询发票失败: %v", err)
+}
+
+fmt.Printf("发票类型: %s\n", invoiceInfo.Type)
+fmt.Printf("发票抬头: %s\n", invoiceInfo.UserInfo.Title)
+fmt.Printf("发票金额: %.2f元\n", float64(invoiceInfo.UserInfo.Fee)/100)
+fmt.Printf("开票时间: %d\n", invoiceInfo.UserInfo.BillingTime)
+fmt.Printf("发票号码: %s\n", invoiceInfo.UserInfo.BillingCode)
+fmt.Printf("PDF链接: %s\n", invoiceInfo.UserInfo.PdfURL)
+fmt.Printf("报销状态: %s\n", invoiceInfo.UserInfo.ReimburseStatus)
+
+// 批量查询电子发票
+batchResp, err := client.Invoice.GetInvoiceInfoBatch(ctx, []invoice.InvoiceItem{
+    {CardID: "CARD_ID_1", EncryptCode: "ENCRYPT_CODE_1"},
+    {CardID: "CARD_ID_2", EncryptCode: "ENCRYPT_CODE_2"},
+})
+if err != nil {
+    log.Fatalf("批量查询发票失败: %v", err)
+}
+
+for _, inv := range batchResp.ItemList {
+    fmt.Printf("发票: %s, 金额: %.2f元\n",
+        inv.UserInfo.BillingCode,
+        float64(inv.UserInfo.Fee)/100)
+}
+```
+
+#### 更新发票状态
+
+```go
+// 更新单个发票状态 - 锁定发票
+err = client.Invoice.UpdateInvoiceStatus(ctx,
+    "CARD_ID",
+    "ENCRYPT_CODE",
+    invoice.ReimburseStatusLock,
+)
+if err != nil {
+    log.Fatalf("锁定发票失败: %v", err)
+}
+fmt.Println("发票已锁定")
+
+// 更新单个发票状态 - 核销发票（不可逆操作）
+err = client.Invoice.UpdateInvoiceStatus(ctx,
+    "CARD_ID",
+    "ENCRYPT_CODE",
+    invoice.ReimburseStatusClosure,
+)
+if err != nil {
+    log.Fatalf("核销发票失败: %v", err)
+}
+fmt.Println("发票已核销")
+
+// 批量更新发票状态
+err = client.Invoice.UpdateStatusBatch(ctx,
+    "USER_OPENID",
+    invoice.ReimburseStatusLock,
+    []invoice.InvoiceItem{
+        {CardID: "CARD_ID_1", EncryptCode: "ENCRYPT_CODE_1"},
+        {CardID: "CARD_ID_2", EncryptCode: "ENCRYPT_CODE_2"},
+    },
+)
+if err != nil {
+    log.Fatalf("批量更新发票状态失败: %v", err)
+}
+fmt.Println("批量操作成功")
+```
+
+发票状态说明：
+- **INVOICE_REIMBURSE_INIT**: 发票初始状态，未锁定
+- **INVOICE_REIMBURSE_LOCK**: 发票已锁定，无法重复提交报销
+- **INVOICE_REIMBURSE_CLOSURE**: 发票已核销，从用户卡包中移除（不可逆）
+
+注意事项：
+1. 报销方须保证在报销、锁定、解锁后及时将状态同步至微信端
+2. 批量更新为事务性操作，任一发票更新失败则所有操作回滚
+3. 报销状态为不可逆状态，请谨慎调用
+
 ### 消息管理
 
 ```go
@@ -996,10 +1182,21 @@ wecom-core/
     - ⏳ 上传附件资源（需要文件上传功能支持，待实现）
 
 - ⏳ **阶段三：更多业务模块**（规划中）
-  - 素材管理
-  - OA 审批
-  - 会议管理
-  - 日程管理
+  - ✅ 素材管理 (Media)
+    - ✅ 上传图片（永久有效）
+    - ✅ 上传临时素材（图片、语音、视频、文件）
+    - ✅ 获取临时素材（支持Range分块下载）
+    - ✅ 获取高清语音素材
+    - ✅ 异步上传临时素材（支持200M大文件）
+    - ✅ 查询异步上传任务结果
+  - ✅ 电子发票 (Invoice)
+    - ✅ 查询电子发票
+    - ✅ 批量查询电子发票
+    - ✅ 更新发票状态（锁定、解锁、核销）
+    - ✅ 批量更新发票状态
+  - ⏳ OA 审批
+  - ⏳ 会议管理
+  - ⏳ 日程管理
   - 等 20+ 个模块
 
 ## 示例
