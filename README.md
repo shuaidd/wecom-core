@@ -702,6 +702,134 @@ if contactListResp.NextCursor != "" {
 // 发送应用消息（敬请期待更多示例）
 ```
 
+### 应用管理
+
+企业微信应用管理服务，支持应用设置、菜单管理和工作台自定义展示。
+
+#### 应用信息管理
+
+```go
+// 获取应用详情
+agentInfo, err := client.Agent.Get(ctx, agentID)
+fmt.Printf("应用ID: %d, 名称: %s\n", agentInfo.AgentID, agentInfo.Name)
+
+// 获取应用列表
+agentList, err := client.Agent.List(ctx)
+for _, app := range agentList.AgentList {
+    fmt.Printf("应用: [%d] %s\n", app.AgentID, app.Name)
+}
+
+// 设置应用信息
+err = client.Agent.Set(ctx, &agent.SetAgentRequest{
+    AgentID:     agentID,
+    Name:        "应用名称",
+    Description: "应用描述",
+    HomeURL:     "https://example.com",
+})
+```
+
+#### 菜单管理
+
+```go
+// 创建应用菜单
+err = client.Agent.CreateMenu(ctx, &agent.CreateMenuRequest{
+    AgentID: agentID,
+    Button: []agent.MenuButton{
+        {
+            Type: "click",
+            Name: "今日歌曲",
+            Key:  "V1001_TODAY_MUSIC",
+        },
+        {
+            Name: "菜单",
+            SubButton: []agent.MenuButton{
+                {
+                    Type: "view",
+                    Name: "搜索",
+                    URL:  "http://www.soso.com/",
+                },
+                {
+                    Type: "click",
+                    Name: "赞一下我们",
+                    Key:  "V1001_GOOD",
+                },
+            },
+        },
+    },
+})
+
+// 获取应用菜单
+menu, err := client.Agent.GetMenu(ctx, agentID)
+
+// 删除应用菜单
+err = client.Agent.DeleteMenu(ctx, agentID)
+```
+
+#### 工作台自定义展示
+
+```go
+// 设置工作台模板（图片型）
+err = client.Agent.SetWorkbenchTemplate(ctx, &agent.SetWorkbenchTemplateRequest{
+    AgentID: agentID,
+    Type:    agent.WorkbenchTypeImage,
+    Image: &agent.ImageTemplate{
+        URL:     "https://example.com/image.png",
+        JumpURL: "https://example.com",
+    },
+})
+
+// 设置工作台模板（关键数据型）
+err = client.Agent.SetWorkbenchTemplate(ctx, &agent.SetWorkbenchTemplateRequest{
+    AgentID: agentID,
+    Type:    agent.WorkbenchTypeKeydata,
+    Keydata: &agent.KeydataTemplate{
+        Items: []agent.KeydataItem{
+            {Key: "待审批", Data: "2", JumpURL: "https://example.com/approval"},
+            {Key: "待办事项", Data: "5", JumpURL: "https://example.com/todo"},
+        },
+    },
+    ReplaceUserData: false,
+})
+
+// 获取工作台模板
+template, err := client.Agent.GetWorkbenchTemplate(ctx, agentID)
+
+// 设置用户工作台数据
+err = client.Agent.SetWorkbenchData(ctx, &agent.SetWorkbenchDataRequest{
+    AgentID: agentID,
+    UserID:  "zhangsan",
+    Type:    agent.WorkbenchTypeKeydata,
+    Keydata: &agent.KeydataTemplate{
+        Items: []agent.KeydataItem{
+            {Key: "待审批", Data: "2", JumpURL: "https://example.com/approval"},
+        },
+    },
+})
+
+// 批量设置用户工作台数据
+err = client.Agent.BatchSetWorkbenchData(ctx, &agent.BatchSetWorkbenchDataRequest{
+    AgentID:    agentID,
+    UserIDList: []string{"zhangsan", "lisi"},
+    Data: &agent.WorkbenchUserData{
+        Type: agent.WorkbenchTypeKeydata,
+        Keydata: &agent.KeydataTemplate{
+            Items: []agent.KeydataItem{
+                {Key: "待审批", Data: "0"},
+            },
+        },
+    },
+})
+
+// 获取用户工作台数据
+userData, err := client.Agent.GetWorkbenchData(ctx, agentID, "zhangsan")
+```
+
+支持的工作台模板类型：
+- **关键数据型** (`WorkbenchTypeKeydata`)：展示关键业务数据
+- **图片型** (`WorkbenchTypeImage`)：展示图片广告
+- **列表型** (`WorkbenchTypeList`)：展示列表信息
+- **Webview型** (`WorkbenchTypeWebview`)：嵌入网页内容
+
 ### 身份验证
 
 ```go
@@ -845,6 +973,10 @@ wecom-core/
   - ✅ 企业互联 (CorpGroup)
   - ✅ 安全管理 (Security)
   - ✅ 消息管理 (Message)
+  - ✅ 应用管理 (Agent)
+    - ✅ 应用信息管理（获取应用详情、获取应用列表、设置应用）
+    - ✅ 菜单管理（创建菜单、获取菜单、删除菜单）
+    - ✅ 工作台自定义展示（设置/获取模板、设置/批量设置/获取用户数据）
   - ✅ 外部联系人 (ExternalContact)
     - ✅ 客户管理（获取客户列表、获取客户详情、修改备注、批量获取）
     - ✅ 客户标签管理（企业标签、规则组标签、客户打标）
@@ -864,7 +996,6 @@ wecom-core/
     - ⏳ 上传附件资源（需要文件上传功能支持，待实现）
 
 - ⏳ **阶段三：更多业务模块**（规划中）
-  - 应用管理
   - 素材管理
   - OA 审批
   - 会议管理
@@ -877,6 +1008,7 @@ wecom-core/
 
 - [基础示例](./examples/basic/main.go)
 - [通讯录示例](./examples/contact/main.go)
+- [应用管理示例](./examples/agent/main.go)
 
 ## 贡献
 

@@ -7,6 +7,7 @@ import (
 	"github.com/shuaidd/wecom-core/internal/auth"
 	"github.com/shuaidd/wecom-core/internal/client"
 	"github.com/shuaidd/wecom-core/internal/retry"
+	"github.com/shuaidd/wecom-core/services/agent"
 	"github.com/shuaidd/wecom-core/services/contact"
 	"github.com/shuaidd/wecom-core/services/corpgroup"
 	"github.com/shuaidd/wecom-core/services/externalcontact"
@@ -20,6 +21,8 @@ import (
 
 // Client 企业微信SDK客户端
 type Client struct {
+	// Agent 应用管理服务
+	Agent *agent.Service
 	// Contact 通讯录服务
 	Contact *contact.Service
 	// IP IP相关服务
@@ -90,6 +93,7 @@ func New(opts ...config.Option) (*Client, error) {
 		config:          cfg,
 		tokenManager:    tokenManager,
 		httpClient:      httpClient,
+		Agent:           agent.NewService(httpClient),
 		Contact:         contact.NewService(httpClient),
 		IP:              ip.NewService(httpClient),
 		QRCode:          qrcode.NewService(httpClient),
