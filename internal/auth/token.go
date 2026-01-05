@@ -31,8 +31,10 @@ type TokenResponse struct {
 type TokenManager struct {
 	// corpID 企业ID
 	corpID string
-	// corpSecret 应用凭证密钥
+	// corpSecret 应用凭证密钥（向后兼容单应用模式）
 	corpSecret string
+	// agents 多应用配置，key为应用名称或ID
+	agents map[string]*AgentInfo
 	// baseURL API基础URL
 	baseURL string
 	// cache 缓存
@@ -41,8 +43,17 @@ type TokenManager struct {
 	logger logger.Logger
 	// httpClient HTTP客户端
 	httpClient *http.Client
-	// refreshLock 刷新锁
-	refreshLock sync.Mutex
+	// refreshLock 刷新锁(使用map存储每个应用的锁)
+	refreshLocks map[string]*sync.Mutex
+	// refreshLocksMapLock 保护refreshLocks map的锁
+	refreshLocksMapLock sync.Mutex
+}
+
+// AgentInfo 应用信息
+type AgentInfo struct {
+	AgentID int64
+	Secret  string
+	Name    string
 }
 
 // NewTokenManager 创建Token管理器
@@ -52,97 +63,179 @@ func NewTokenManager(corpID, corpSecret, baseURL string, c cache.Cache, log logg
 	}
 
 	return &TokenManager{
-		corpID:     corpID,
-		corpSecret: corpSecret,
-		baseURL:    baseURL,
-		cache:      c,
-		logger:     log,
-		httpClient: &http.Client{
-			Timeout: 30 * time.Second,
-		},
+		corpID:              corpID,
+		corpSecret:          corpSecret,
+		baseURL:             baseURL,
+		cache:               c,
+		logger:              log,
+		httpClient:          &http.Client{Timeout: 30 * time.Second},
+		agents:              make(map[string]*AgentInfo),
+		refreshLocks:        make(map[string]*sync.Mutex),
+		refreshLocksMapLock: sync.Mutex{},
 	}
 }
 
-// GetToken 获取token
+// RegisterAgent 注册应用
+func (tm *TokenManager) RegisterAgent(agentKey string, agentID int64, secret string) {
+	tm.agents[agentKey] = &AgentInfo{
+		AgentID: agentID,
+		Secret:  secret,
+		Name:    agentKey,
+	}
+}
+
+// getRefreshLock 获取应用的刷新锁
+func (tm *TokenManager) getRefreshLock(agentKey string) *sync.Mutex {
+	tm.refreshLocksMapLock.Lock()
+	defer tm.refreshLocksMapLock.Unlock()
+
+	if lock, exists := tm.refreshLocks[agentKey]; exists {
+		return lock
+	}
+
+	lock := &sync.Mutex{}
+	tm.refreshLocks[agentKey] = lock
+	return lock
+}
+
+// GetToken 获取token（默认应用，向后兼容）
 func (tm *TokenManager) GetToken(ctx context.Context) (string, error) {
+	return tm.GetTokenByAgent(ctx, "")
+}
+
+// GetTokenByAgent 根据应用key获取token
+func (tm *TokenManager) GetTokenByAgent(ctx context.Context, agentKey string) (string, error) {
+	// 获取应用的 secret
+	secret := tm.getAgentSecret(agentKey)
+	if secret == "" {
+		return "", fmt.Errorf("agent not found or secret is empty: %s", agentKey)
+	}
+
+	cacheKey := tm.cacheKey(agentKey)
+
 	// 1. 从缓存获取
-	token, expireAt, err := tm.cache.Get(ctx, tm.cacheKey())
+	token, expireAt, err := tm.cache.Get(ctx, cacheKey)
 	if err == nil && time.Now().Before(expireAt) {
 		tm.logger.Debug("Token retrieved from cache",
+			logger.F("agent_key", agentKey),
 			logger.F("expire_at", expireAt))
 		return token, nil
 	}
 
-	// if true {
-	// 	return "eqDikpYTc_jxtEmVZGbfeXrqpMArfyuMZR6TDYXjaVhu_gUx9fl9q8cxUqMUz2bhzyvj-QbRFgLhzEqcpm0XHa2lNs2fch_PZBbbEQ37OYq6ZPQ49gX68PHrkNYRe6JKyXc7yhHxKO2CGSMjPCh3adr5c-qJR4nRX9RP4TbfdPEkll-o9dIArQKUbhg2_UczB4DFrHYtaxcGo3Cih_Wiqg",nil
-	// }
-
 	// 2. 加锁刷新（防止并发重复获取）
-	tm.refreshLock.Lock()
-	defer tm.refreshLock.Unlock()
+	lock := tm.getRefreshLock(agentKey)
+	lock.Lock()
+	defer lock.Unlock()
 
 	// 3. Double-check（可能已被其他协程刷新）
-	token, expireAt, err = tm.cache.Get(ctx, tm.cacheKey())
+	token, expireAt, err = tm.cache.Get(ctx, cacheKey)
 	if err == nil && time.Now().Before(expireAt) {
 		tm.logger.Debug("Token retrieved from cache after lock",
+			logger.F("agent_key", agentKey),
 			logger.F("expire_at", expireAt))
 		return token, nil
 	}
 
 	// 4. 调用 API 获取 token
-	tm.logger.Info("Fetching new token from API")
-	token, expiresIn, err := tm.fetchTokenFromAPI(ctx)
+	tm.logger.Info("Fetching new token from API",
+		logger.F("agent_key", agentKey))
+	token, expiresIn, err := tm.fetchTokenFromAPI(ctx, secret)
 	if err != nil {
 		tm.logger.Error("Failed to fetch token",
+			logger.F("agent_key", agentKey),
 			logger.F("error", err))
 		return "", err
 	}
 
 	// 5. 缓存 token（提前 5 分钟过期）
 	expireAt = time.Now().Add(time.Duration(expiresIn-TokenExpireOffset) * time.Second)
-	if err := tm.cache.Set(ctx, tm.cacheKey(), token, expireAt); err != nil {
+	if err := tm.cache.Set(ctx, cacheKey, token, expireAt); err != nil {
 		tm.logger.Warn("Failed to cache token",
+			logger.F("agent_key", agentKey),
 			logger.F("error", err))
 	}
 
 	tm.logger.Info("Token refreshed successfully",
+		logger.F("agent_key", agentKey),
 		logger.F("expires_in", expiresIn),
 		logger.F("expire_at", expireAt))
 
 	return token, nil
 }
 
-// RefreshToken 强制刷新token（用于 token 失效重试）
+// RefreshToken 强制刷新token（用于 token 失效重试，默认应用）
 func (tm *TokenManager) RefreshToken(ctx context.Context) error {
-	tm.refreshLock.Lock()
-	defer tm.refreshLock.Unlock()
+	return tm.RefreshTokenByAgent(ctx, "")
+}
 
-	tm.logger.Info("Force refreshing token")
+// RefreshTokenByAgent 强制刷新指定应用的token
+func (tm *TokenManager) RefreshTokenByAgent(ctx context.Context, agentKey string) error {
+	// 获取应用的 secret
+	secret := tm.getAgentSecret(agentKey)
+	if secret == "" {
+		return fmt.Errorf("agent not found or secret is empty: %s", agentKey)
+	}
 
-	token, expiresIn, err := tm.fetchTokenFromAPI(ctx)
+	lock := tm.getRefreshLock(agentKey)
+	lock.Lock()
+	defer lock.Unlock()
+
+	tm.logger.Info("Force refreshing token",
+		logger.F("agent_key", agentKey))
+
+	token, expiresIn, err := tm.fetchTokenFromAPI(ctx, secret)
 	if err != nil {
 		tm.logger.Error("Failed to refresh token",
+			logger.F("agent_key", agentKey),
 			logger.F("error", err))
 		return err
 	}
 
+	cacheKey := tm.cacheKey(agentKey)
 	expireAt := time.Now().Add(time.Duration(expiresIn-TokenExpireOffset) * time.Second)
-	if err := tm.cache.Set(ctx, tm.cacheKey(), token, expireAt); err != nil {
+	if err := tm.cache.Set(ctx, cacheKey, token, expireAt); err != nil {
 		tm.logger.Warn("Failed to cache refreshed token",
+			logger.F("agent_key", agentKey),
 			logger.F("error", err))
 	}
 
 	tm.logger.Info("Token force refreshed successfully",
+		logger.F("agent_key", agentKey),
 		logger.F("expires_in", expiresIn),
 		logger.F("expire_at", expireAt))
 
 	return nil
 }
 
+// getAgentSecret 获取应用的 secret
+func (tm *TokenManager) getAgentSecret(agentKey string) string {
+	// 如果 agentKey 为空，使用默认应用
+	if agentKey == "" {
+		// 优先使用 corpSecret（向后兼容）
+		if tm.corpSecret != "" {
+			return tm.corpSecret
+		}
+		// 如果只有一个应用，使用该应用
+		if len(tm.agents) == 1 {
+			for _, agent := range tm.agents {
+				return agent.Secret
+			}
+		}
+		return ""
+	}
+
+	// 查找指定应用
+	if agent, ok := tm.agents[agentKey]; ok {
+		return agent.Secret
+	}
+
+	return ""
+}
+
 // fetchTokenFromAPI 从API获取token
-func (tm *TokenManager) fetchTokenFromAPI(ctx context.Context) (token string, expiresIn int, err error) {
+func (tm *TokenManager) fetchTokenFromAPI(ctx context.Context, secret string) (token string, expiresIn int, err error) {
 	url := fmt.Sprintf("%s/cgi-bin/gettoken?corpid=%s&corpsecret=%s",
-		tm.baseURL, tm.corpID, tm.corpSecret)
+		tm.baseURL, tm.corpID, secret)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
@@ -173,6 +266,9 @@ func (tm *TokenManager) fetchTokenFromAPI(ctx context.Context) (token string, ex
 }
 
 // cacheKey 获取缓存key
-func (tm *TokenManager) cacheKey() string {
-	return fmt.Sprintf("wecom:token:%s", tm.corpID)
+func (tm *TokenManager) cacheKey(agentKey string) string {
+	if agentKey == "" {
+		return fmt.Sprintf("wecom:token:%s", tm.corpID)
+	}
+	return fmt.Sprintf("wecom:token:%s:%s", tm.corpID, agentKey)
 }

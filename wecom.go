@@ -22,6 +22,18 @@ import (
 	"github.com/shuaidd/wecom-core/services/updown"
 )
 
+// 暴露给用户的类型别名，用于自定义 API 调用
+
+// AgentConfig 应用配置（用于配置多应用）
+type AgentConfig = config.AgentConfig
+
+// Response 响应对象，包含原始响应数据
+type Response = client.Response
+
+// CommonResponse 企业微信API通用响应字段
+// 用户自定义响应类型时应该嵌入此类型
+type CommonResponse = client.CommonResponse
+
 // Client 企业微信SDK客户端
 type Client struct {
 	// Agent 应用管理服务
@@ -76,7 +88,14 @@ func New(opts ...config.Option) (*Client, error) {
 		cfg.Logger,
 	)
 
-	// 4. 创建重试策略
+	// 4. 注册多应用配置到 TokenManager
+	if len(cfg.Agents) > 0 {
+		for key, agentCfg := range cfg.Agents {
+			tokenManager.RegisterAgent(key, agentCfg.AgentID, agentCfg.Secret)
+		}
+	}
+
+	// 5. 创建重试策略
 	retryPolicy := retry.NewPolicy(
 		cfg.MaxRetries,
 		cfg.InitialBackoff,
@@ -84,7 +103,7 @@ func New(opts ...config.Option) (*Client, error) {
 	)
 	retryExecutor := retry.NewExecutor(retryPolicy, cfg.Logger)
 
-	// 5. 创建 HTTP 客户端
+	// 6. 创建 HTTP 客户端
 	httpClient := client.New(
 		cfg.BaseURL,
 		cfg.Timeout,
@@ -97,7 +116,7 @@ func New(opts ...config.Option) (*Client, error) {
 		httpClient.SetDebug(true)
 	}
 
-	// 6. 创建服务客户端
+	// 7. 创建服务客户端
 	c := &Client{
 		config:          cfg,
 		tokenManager:    tokenManager,
@@ -123,4 +142,101 @@ func New(opts ...config.Option) (*Client, error) {
 // WithTraceID 将 TraceId 添加到 context
 func WithTraceID(ctx context.Context, traceID string) context.Context {
 	return client.WithTraceID(ctx, traceID)
+}
+
+// WithAgentName 将应用名称添加到 context
+// 使用此函数可以在调用API时指定使用哪个应用的凭证
+func WithAgentName(ctx context.Context, agentName string) context.Context {
+	return client.WithAgentName(ctx, agentName)
+}
+
+// WithAgentID 将应用ID添加到 context
+// 使用此函数可以在调用API时指定使用哪个应用的凭证
+func WithAgentID(ctx context.Context, agentID int64) context.Context {
+	return client.WithAgentID(ctx, agentID)
+}
+
+// CustomGet 发送自定义 GET 请求
+// 自动处理 access_token 注入和重试逻辑
+//
+// 示例：
+//
+//	resp, err := client.CustomGet(ctx, "/cgi-bin/custom/api", url.Values{"param": []string{"value"}})
+//	if err != nil {
+//	    return err
+//	}
+//	// 手动解析响应
+//	var result YourCustomType
+//	if err := resp.Unmarshal(&result); err != nil {
+//	    return err
+//	}
+func (c *Client) CustomGet(ctx context.Context, path string, query map[string]string) (*client.Response, error) {
+	q := make(map[string][]string)
+	for k, v := range query {
+		q[k] = []string{v}
+	}
+	return c.httpClient.Get(ctx, path, q)
+}
+
+// CustomPost 发送自定义 POST 请求
+// 自动处理 access_token 注入和重试逻辑
+//
+// 示例：
+//
+//	req := YourCustomRequest{Field: "value"}
+//	resp, err := client.CustomPost(ctx, "/cgi-bin/custom/api", req)
+//	if err != nil {
+//	    return err
+//	}
+//	// 手动解析响应
+//	var result YourCustomType
+//	if err := resp.Unmarshal(&result); err != nil {
+//	    return err
+//	}
+func (c *Client) CustomPost(ctx context.Context, path string, body any) (*client.Response, error) {
+	return c.httpClient.Post(ctx, path, body)
+}
+
+// CustomGetAndUnmarshal 发送自定义 GET 请求并自动解析响应
+// 自动处理 access_token 注入、重试逻辑和响应解析
+//
+// 示例：
+//
+//	type CustomResponse struct {
+//	    client.CommonResponse
+//	    Data string `json:"data"`
+//	}
+//	result, err := client.CustomGetAndUnmarshal[CustomResponse](ctx, "/cgi-bin/custom/api", map[string]string{"param": "value"})
+//	if err != nil {
+//	    return err
+//	}
+//	fmt.Println(result.Data)
+func CustomGetAndUnmarshal[T any](c *Client, ctx context.Context, path string, query map[string]string) (*T, error) {
+	q := make(map[string][]string)
+	for k, v := range query {
+		q[k] = []string{v}
+	}
+	return client.GetAndUnmarshal[T](c.httpClient, ctx, path, q)
+}
+
+// CustomPostAndUnmarshal 发送自定义 POST 请求并自动解析响应
+// 自动处理 access_token 注入、重试逻辑和响应解析
+//
+// 示例：
+//
+//	type CustomRequest struct {
+//	    Field string `json:"field"`
+//	}
+//	type CustomResponse struct {
+//	    client.CommonResponse
+//	    Result string `json:"result"`
+//	}
+//	req := CustomRequest{Field: "value"}
+//	result, err := client.CustomPostAndUnmarshal[CustomResponse](c, ctx, "/cgi-bin/custom/api", req)
+//	if err != nil {
+//	    return err
+//	}
+//	fmt.Println(result.Result)
+func CustomPostAndUnmarshal[T any](c *Client, ctx context.Context, path string, body any) (*T, error) {
+	return client.PostAndUnmarshal[T](c.httpClient, ctx, path, body)
 }

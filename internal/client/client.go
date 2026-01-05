@@ -21,6 +21,10 @@ type contextKey string
 const (
 	// traceIDKey TraceId 的 context key
 	traceIDKey contextKey = "trace_id"
+	// agentNameKey 应用名称的 context key
+	agentNameKey contextKey = "agent_name"
+	// agentIDKey 应用ID的 context key
+	agentIDKey contextKey = "agent_id"
 )
 
 // WithTraceID 将 TraceId 添加到 context
@@ -36,6 +40,35 @@ func getTraceID(ctx context.Context) string {
 	if traceID, ok := ctx.Value(traceIDKey).(string); ok {
 		return traceID
 	}
+	return ""
+}
+
+// WithAgentName 将应用名称添加到 context
+func WithAgentName(ctx context.Context, agentName string) context.Context {
+	return context.WithValue(ctx, agentNameKey, agentName)
+}
+
+// WithAgentID 将应用ID添加到 context
+func WithAgentID(ctx context.Context, agentID int64) context.Context {
+	return context.WithValue(ctx, agentIDKey, agentID)
+}
+
+// getAgentKey 从 context 中获取应用标识（优先使用名称，其次使用ID）
+func getAgentKey(ctx context.Context) string {
+	if ctx == nil {
+		return ""
+	}
+
+	// 优先使用 agentName
+	if agentName, ok := ctx.Value(agentNameKey).(string); ok && agentName != "" {
+		return agentName
+	}
+
+	// 其次使用 agentID
+	if agentID, ok := ctx.Value(agentIDKey).(int64); ok && agentID > 0 {
+		return fmt.Sprintf("%d", agentID)
+	}
+
 	return ""
 }
 
@@ -81,33 +114,37 @@ func (c *Client) Do(ctx context.Context, req *Request) (*Response, error) {
 
 	// 使用重试策略执行请求
 	err := c.retryExecutor.Do(ctx, func() error {
-		// 1. 获取 access_token
-		token, err := c.tokenManager.GetToken(ctx)
+		// 1. 从 context 获取应用标识
+		agentKey := getAgentKey(ctx)
+
+		// 2. 获取 access_token（根据应用标识）
+		token, err := c.tokenManager.GetTokenByAgent(ctx, agentKey)
 		if err != nil {
 			return fmt.Errorf("failed to get access token: %w", err)
 		}
 
-		// 2. 添加 token 到请求
+		// 3. 添加 token 到请求
 		req.AddQuery("access_token", token)
 
-		// 3. 构建 HTTP 请求
+		// 4. 构建 HTTP 请求
 		httpReq, err := req.BuildHTTPRequest(ctx, c.baseURL)
 		if err != nil {
 			return fmt.Errorf("failed to build http request: %w", err)
 		}
 
-		// 4. 记录请求日志
+		// 5. 记录请求日志
 		startTime := time.Now()
 		c.logger.Debug("API Request", withTraceID(ctx,
 			logger.F("method", httpReq.Method),
-			logger.F("url", httpReq.URL.String()))...)
+			logger.F("url", httpReq.URL.String()),
+			logger.F("agent_key", agentKey))...)
 
-		// 4.1. Debug模式：打印请求详情
+		// 5.1. Debug模式：打印请求详情
 		if c.debug {
 			c.logRequestDetails(ctx, httpReq, req.Body)
 		}
 
-		// 5. 发送请求
+		// 6. 发送请求
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {
 			duration := time.Since(startTime)
@@ -118,11 +155,11 @@ func (c *Client) Do(ctx context.Context, req *Request) (*Response, error) {
 		}
 		defer httpResp.Body.Close()
 
-		// 6. 解析响应
+		// 7. 解析响应
 		resp, err = ParseResponse(httpResp)
 		duration := time.Since(startTime)
 
-		// 6.1. Debug模式：打印响应详情
+		// 7.1. Debug模式：打印响应详情
 		if c.debug {
 			c.logResponseDetails(ctx, httpResp.StatusCode, resp)
 		}
@@ -134,20 +171,22 @@ func (c *Client) Do(ctx context.Context, req *Request) (*Response, error) {
 				logger.F("errmsg", resp.ErrMsg),
 				logger.F("duration", duration))...)
 
-			// 7. Token 失效，刷新后重试
+			// 8. Token 失效，刷新后重试
 			if errors.IsTokenExpired(err) {
 				c.logger.Warn("Token expired, refreshing", withTraceID(ctx,
-					logger.F("errcode", resp.ErrCode))...)
-				if refreshErr := c.tokenManager.RefreshToken(ctx); refreshErr != nil {
+					logger.F("errcode", resp.ErrCode),
+					logger.F("agent_key", agentKey))...)
+				if refreshErr := c.tokenManager.RefreshTokenByAgent(ctx, agentKey); refreshErr != nil {
 					c.logger.Error("Failed to refresh token", withTraceID(ctx,
-						logger.F("error", refreshErr))...)
+						logger.F("error", refreshErr),
+						logger.F("agent_key", agentKey))...)
 				}
 			}
 
 			return err
 		}
 
-		// 8. 记录成功日志
+		// 9. 记录成功日志
 		c.logger.Info("API Request successful", withTraceID(ctx,
 			logger.F("url", httpReq.URL.String()),
 			logger.F("duration", duration))...)
@@ -252,19 +291,22 @@ func (c *Client) GetMedia(ctx context.Context, path string, query url.Values, he
 
 	// 使用重试策略执行请求
 	err := c.retryExecutor.Do(ctx, func() error {
-		// 1. 获取 access_token
-		token, err := c.tokenManager.GetToken(ctx)
+		// 1. 从 context 获取应用标识
+		agentKey := getAgentKey(ctx)
+
+		// 2. 获取 access_token（根据应用标识）
+		token, err := c.tokenManager.GetTokenByAgent(ctx, agentKey)
 		if err != nil {
 			return fmt.Errorf("failed to get access token: %w", err)
 		}
 
-		// 2. 添加 token 到查询参数
+		// 3. 添加 token 到查询参数
 		if query == nil {
 			query = url.Values{}
 		}
 		query.Set("access_token", token)
 
-		// 3. 构建完整URL
+		// 4. 构建完整URL
 		u, err := url.Parse(c.baseURL)
 		if err != nil {
 			return fmt.Errorf("invalid base URL: %w", err)
@@ -272,24 +314,25 @@ func (c *Client) GetMedia(ctx context.Context, path string, query url.Values, he
 		u.Path = path
 		u.RawQuery = query.Encode()
 
-		// 4. 创建HTTP请求
+		// 5. 创建HTTP请求
 		httpReq, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 		if err != nil {
 			return fmt.Errorf("failed to create http request: %w", err)
 		}
 
-		// 5. 添加自定义headers（如Range）
+		// 6. 添加自定义headers（如Range）
 		for key, value := range headers {
 			httpReq.Header.Set(key, value)
 		}
 
-		// 6. 记录请求日志
+		// 7. 记录请求日志
 		startTime := time.Now()
 		c.logger.Debug("API Request (Media)", withTraceID(ctx,
 			logger.F("method", httpReq.Method),
-			logger.F("url", httpReq.URL.String()))...)
+			logger.F("url", httpReq.URL.String()),
+			logger.F("agent_key", agentKey))...)
 
-		// 7. 发送请求
+		// 8. 发送请求
 		httpResp, err := c.httpClient.Do(httpReq)
 		if err != nil {
 			duration := time.Since(startTime)
@@ -302,7 +345,7 @@ func (c *Client) GetMedia(ctx context.Context, path string, query url.Values, he
 
 		duration := time.Since(startTime)
 
-		// 8. 检查HTTP状态码
+		// 9. 检查HTTP状态码
 		if httpResp.StatusCode != http.StatusOK && httpResp.StatusCode != http.StatusPartialContent {
 			// 尝试解析错误响应
 			var errResp Response
@@ -318,10 +361,12 @@ func (c *Client) GetMedia(ctx context.Context, path string, query url.Values, he
 				apiErr := errors.New(errResp.ErrCode, errResp.ErrMsg)
 				if errors.IsTokenExpired(apiErr) {
 					c.logger.Warn("Token expired, refreshing", withTraceID(ctx,
-						logger.F("errcode", errResp.ErrCode))...)
-					if refreshErr := c.tokenManager.RefreshToken(ctx); refreshErr != nil {
+						logger.F("errcode", errResp.ErrCode),
+						logger.F("agent_key", agentKey))...)
+					if refreshErr := c.tokenManager.RefreshTokenByAgent(ctx, agentKey); refreshErr != nil {
 						c.logger.Error("Failed to refresh token", withTraceID(ctx,
-							logger.F("error", refreshErr))...)
+							logger.F("error", refreshErr),
+							logger.F("agent_key", agentKey))...)
 					}
 				}
 
@@ -330,7 +375,7 @@ func (c *Client) GetMedia(ctx context.Context, path string, query url.Values, he
 			return fmt.Errorf("unexpected status code: %d", httpResp.StatusCode)
 		}
 
-		// 9. 读取响应体
+		// 10. 读取响应体
 		result, err = io.ReadAll(httpResp.Body)
 		if err != nil {
 			c.logger.Error("Failed to read media response", withTraceID(ctx,
@@ -339,7 +384,7 @@ func (c *Client) GetMedia(ctx context.Context, path string, query url.Values, he
 			return fmt.Errorf("failed to read response body: %w", err)
 		}
 
-		// 10. 记录成功日志
+		// 11. 记录成功日志
 		c.logger.Info("Media request successful", withTraceID(ctx,
 			logger.F("url", httpReq.URL.String()),
 			logger.F("size", len(result)),
