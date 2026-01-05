@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/shuaidd/wecom-core/pkg/cache"
+	"github.com/shuaidd/wecom-core/pkg/interceptor"
 	"github.com/shuaidd/wecom-core/pkg/logger"
 )
 
@@ -110,5 +111,26 @@ func WithCache(cache cache.Cache) Option {
 func WithDebug(debug bool) Option {
 	return func(c *Config) {
 		c.Debug = debug
+	}
+}
+
+// WithRequestInterceptor 添加请求拦截器
+func WithRequestInterceptor(interceptors ...interceptor.RequestInterceptor) Option {
+	return func(c *Config) {
+		c.RequestInterceptors = append(c.RequestInterceptors, interceptors...)
+	}
+}
+
+// WithResponseInterceptor 添加响应拦截器（解析前）
+func WithResponseInterceptor(interceptors ...interceptor.ResponseInterceptor) Option {
+	return func(c *Config) {
+		c.ResponseInterceptors = append(c.ResponseInterceptors, interceptors...)
+	}
+}
+
+// WithAfterResponseInterceptor 添加响应后拦截器（解析后）
+func WithAfterResponseInterceptor(interceptors ...interceptor.AfterResponseInterceptor) Option {
+	return func(c *Config) {
+		c.AfterResponseInterceptors = append(c.AfterResponseInterceptors, interceptors...)
 	}
 }

@@ -84,6 +84,8 @@ type Client struct {
 	tokenManager *auth.TokenManager
 	// retryExecutor 重试执行器
 	retryExecutor *retry.Executor
+	// interceptors 拦截器
+	interceptors *Interceptors
 	// debug 是否打印请求和响应详情
 	debug bool
 }
@@ -98,6 +100,7 @@ func New(baseURL string, timeout time.Duration, log logger.Logger, tm *auth.Toke
 		logger:        log,
 		tokenManager:  tm,
 		retryExecutor: re,
+		interceptors:  NewInterceptors(),
 		debug:         false,
 	}
 }
@@ -105,6 +108,24 @@ func New(baseURL string, timeout time.Duration, log logger.Logger, tm *auth.Toke
 // SetDebug 设置是否打印请求和响应详情
 func (c *Client) SetDebug(debug bool) *Client {
 	c.debug = debug
+	return c
+}
+
+// AddRequestInterceptor 添加请求拦截器
+func (c *Client) AddRequestInterceptor(interceptor RequestInterceptor) *Client {
+	c.interceptors.AddRequestInterceptor(interceptor)
+	return c
+}
+
+// AddResponseInterceptor 添加响应拦截器（解析前）
+func (c *Client) AddResponseInterceptor(interceptor ResponseInterceptor) *Client {
+	c.interceptors.AddResponseInterceptor(interceptor)
+	return c
+}
+
+// AddAfterResponseInterceptor 添加响应后拦截器（解析后）
+func (c *Client) AddAfterResponseInterceptor(interceptor AfterResponseInterceptor) *Client {
+	c.interceptors.AddAfterResponseInterceptor(interceptor)
 	return c
 }
 
@@ -132,6 +153,13 @@ func (c *Client) Do(ctx context.Context, req *Request) (*Response, error) {
 			return fmt.Errorf("failed to build http request: %w", err)
 		}
 
+		// 4.1. 执行请求前拦截器
+		if err := c.interceptors.executeRequestInterceptors(ctx, httpReq, req.Body); err != nil {
+			c.logger.Error("Request interceptor failed", withTraceID(ctx,
+				logger.F("error", err))...)
+			return fmt.Errorf("request interceptor failed: %w", err)
+		}
+
 		// 5. 记录请求日志
 		startTime := time.Now()
 		c.logger.Debug("API Request", withTraceID(ctx,
@@ -154,6 +182,13 @@ func (c *Client) Do(ctx context.Context, req *Request) (*Response, error) {
 			return fmt.Errorf("http request failed: %w", err)
 		}
 		defer httpResp.Body.Close()
+
+		// 6.1. 执行响应前拦截器（解析前）
+		if err := c.interceptors.executeResponseInterceptors(ctx, httpResp); err != nil {
+			c.logger.Error("Response interceptor failed", withTraceID(ctx,
+				logger.F("error", err))...)
+			return fmt.Errorf("response interceptor failed: %w", err)
+		}
 
 		// 7. 解析响应
 		resp, err = ParseResponse(httpResp)
@@ -190,6 +225,13 @@ func (c *Client) Do(ctx context.Context, req *Request) (*Response, error) {
 		c.logger.Info("API Request successful", withTraceID(ctx,
 			logger.F("url", httpReq.URL.String()),
 			logger.F("duration", duration))...)
+
+		// 9.1. 执行响应后拦截器（解析后）
+		if err := c.interceptors.executeAfterResponseInterceptors(ctx, resp); err != nil {
+			c.logger.Error("After response interceptor failed", withTraceID(ctx,
+				logger.F("error", err))...)
+			return fmt.Errorf("after response interceptor failed: %w", err)
+		}
 
 		return nil
 	})

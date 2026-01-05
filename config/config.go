@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/shuaidd/wecom-core/pkg/cache"
+	"github.com/shuaidd/wecom-core/pkg/interceptor"
 	"github.com/shuaidd/wecom-core/pkg/logger"
 )
 
@@ -54,6 +55,15 @@ type Config struct {
 
 	// Cache Token缓存，默认为内存缓存
 	Cache cache.Cache
+
+	// RequestInterceptors 请求拦截器列表
+	RequestInterceptors []interceptor.RequestInterceptor
+
+	// ResponseInterceptors 响应拦截器列表（解析前）
+	ResponseInterceptors []interceptor.ResponseInterceptor
+
+	// AfterResponseInterceptors 响应后拦截器列表（解析后）
+	AfterResponseInterceptors []interceptor.AfterResponseInterceptor
 
 	// 是否开启debug模式
 	Debug bool

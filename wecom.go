@@ -7,6 +7,7 @@ import (
 	"github.com/shuaidd/wecom-core/internal/auth"
 	"github.com/shuaidd/wecom-core/internal/client"
 	"github.com/shuaidd/wecom-core/internal/retry"
+	"github.com/shuaidd/wecom-core/pkg/interceptor"
 	"github.com/shuaidd/wecom-core/services/agent"
 	"github.com/shuaidd/wecom-core/services/contact"
 	"github.com/shuaidd/wecom-core/services/corpgroup"
@@ -33,6 +34,18 @@ type Response = client.Response
 // CommonResponse 企业微信API通用响应字段
 // 用户自定义响应类型时应该嵌入此类型
 type CommonResponse = client.CommonResponse
+
+// RequestInterceptor 请求拦截器
+type RequestInterceptor = interceptor.RequestInterceptor
+
+// ResponseInterceptor 响应拦截器（解析前）
+type ResponseInterceptor = interceptor.ResponseInterceptor
+
+// AfterResponseInterceptor 响应后拦截器（解析后）
+type AfterResponseInterceptor = interceptor.AfterResponseInterceptor
+
+// InterceptorResponse 拦截器中使用的响应对象
+type InterceptorResponse = interceptor.Response
 
 // Client 企业微信SDK客户端
 type Client struct {
@@ -116,7 +129,18 @@ func New(opts ...config.Option) (*Client, error) {
 		httpClient.SetDebug(true)
 	}
 
-	// 7. 创建服务客户端
+	// 7. 注册拦截器
+	for _, interceptor := range cfg.RequestInterceptors {
+		httpClient.AddRequestInterceptor(interceptor)
+	}
+	for _, interceptor := range cfg.ResponseInterceptors {
+		httpClient.AddResponseInterceptor(interceptor)
+	}
+	for _, interceptor := range cfg.AfterResponseInterceptors {
+		httpClient.AddAfterResponseInterceptor(interceptor)
+	}
+
+	// 8. 创建服务客户端
 	c := &Client{
 		config:          cfg,
 		tokenManager:    tokenManager,
