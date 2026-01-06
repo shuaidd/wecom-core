@@ -1209,6 +1209,289 @@ fmt.Println("批量操作成功")
 2. 批量更新为事务性操作，任一发票更新失败则所有操作回滚
 3. 报销状态为不可逆状态，请谨慎调用
 
+### 邮件服务
+
+企业微信邮件服务，支持发送普通邮件、日程邮件、会议邮件，以及管理公共邮箱。
+
+#### 发送普通邮件
+
+```go
+// 发送普通邮件
+resp, err := client.Email.SendNormalEmail(ctx,
+    &email.EmailRecipient{
+        Emails:  []string{"user@example.com"},
+        UserIDs: []string{"zhangsan"},
+    },
+    "邮件标题",
+    "邮件正文内容",
+    email.WithCC(&email.EmailRecipient{
+        UserIDs: []string{"lisi"},
+    }),
+    email.WithAttachments([]*email.Attachment{
+        {
+            FileName: "document.pdf",
+            Content:  "BASE64_ENCODED_CONTENT",
+        },
+    }),
+)
+if err != nil {
+    log.Fatalf("发送邮件失败: %v", err)
+}
+fmt.Println("邮件发送成功")
+```
+
+#### 发送日程邮件
+
+```go
+// 发送日程邮件
+resp, err := client.Email.SendScheduleEmail(ctx,
+    &email.EmailRecipient{
+        UserIDs: []string{"zhangsan", "lisi"},
+    },
+    "项目评审会议",
+    "讨论Q1项目进展",
+    &email.Schedule{
+        Location:  "3楼会议室",
+        StartTime: time.Now().Add(24 * time.Hour).Unix(),
+        EndTime:   time.Now().Add(25 * time.Hour).Unix(),
+        Reminders: &email.ScheduleReminders{
+            IsRemind:              1,
+            RemindBeforeEventMins: 15,
+            Timezone:              8,
+        },
+    },
+)
+if err != nil {
+    log.Fatalf("发送日程邮件失败: %v", err)
+}
+```
+
+#### 发送会议邮件
+
+```go
+// 发送会议邮件
+resp, err := client.Email.SendMeetingEmail(ctx,
+    &email.EmailRecipient{
+        UserIDs: []string{"zhangsan", "lisi", "wangwu"},
+    },
+    "季度总结会议",
+    "回顾Q4工作成果",
+    &email.Schedule{
+        Location:  "线上会议",
+        StartTime: time.Now().Add(48 * time.Hour).Unix(),
+        EndTime:   time.Now().Add(50 * time.Hour).Unix(),
+        Reminders: &email.ScheduleReminders{
+            IsRemind:              1,
+            RemindBeforeEventMins: 30,
+            Timezone:              8,
+        },
+    },
+    &email.Meeting{
+        Hosts: &email.EmailRecipient{
+            UserIDs: []string{"zhangsan"},
+        },
+        MeetingAdmins: &email.EmailRecipient{
+            UserIDs: []string{"zhangsan"},
+        },
+        Option: &email.MeetingOption{
+            Password:              "123456",
+            AutoRecord:            2,  // 云录制
+            EnableWaitingRoom:     true,
+            AllowEnterBeforeHost:  true,
+            EnableScreenWatermark: true,
+        },
+    },
+)
+if err != nil {
+    log.Fatalf("发送会议邮件失败: %v", err)
+}
+```
+
+#### 公共邮箱管理
+
+```go
+// 创建公共邮箱
+createResp, err := client.Email.CreatePublicMail(ctx, &email.CreatePublicMailRequest{
+    Email: "support@company.com",
+    Name:  "客户支持",
+    UserIDList: &email.StringList{
+        List: []string{"zhangsan", "lisi"},
+    },
+    DepartmentList: &email.IDList{
+        List: []uint32{1, 2},
+    },
+    CreateAuthCode: 1,  // 创建客户端专用密码
+    AuthCodeInfo: &email.AuthCodeInfo{
+        Remark: "办公电脑",
+    },
+})
+if err != nil {
+    log.Fatalf("创建公共邮箱失败: %v", err)
+}
+fmt.Printf("公共邮箱ID: %d\n", createResp.ID)
+if createResp.AuthCode != "" {
+    fmt.Printf("客户端专用密码: %s\n", createResp.AuthCode)
+}
+
+// 更新公共邮箱
+updateResp, err := client.Email.UpdatePublicMail(ctx, &email.UpdatePublicMailRequest{
+    ID:   createResp.ID,
+    Name: "客户支持中心",
+    AliasList: &email.StringList{
+        List: []string{"service@company.com"},
+    },
+})
+if err != nil {
+    log.Fatalf("更新公共邮箱失败: %v", err)
+}
+
+// 获取公共邮箱详情
+getResp, err := client.Email.GetPublicMail(ctx, []uint32{createResp.ID})
+if err != nil {
+    log.Fatalf("获取公共邮箱失败: %v", err)
+}
+for _, mailbox := range getResp.List {
+    fmt.Printf("邮箱: %s, 名称: %s\n", mailbox.Email, mailbox.Name)
+}
+
+// 搜索公共邮箱
+searchResp, err := client.Email.SearchPublicMail(ctx, 1, "support")
+if err != nil {
+    log.Fatalf("搜索公共邮箱失败: %v", err)
+}
+for _, mailbox := range searchResp.List {
+    fmt.Printf("找到邮箱: %s\n", mailbox.Email)
+}
+
+// 获取客户端专用密码列表
+authCodeList, err := client.Email.GetAuthCodeList(ctx, createResp.ID)
+if err != nil {
+    log.Fatalf("获取密码列表失败: %v", err)
+}
+for _, authCode := range authCodeList.AuthCodeList {
+    fmt.Printf("密码ID: %d, 备注: %s\n", authCode.AuthCodeID, authCode.Remark)
+}
+
+// 删除客户端专用密码
+err = client.Email.DeleteAuthCode(ctx, createResp.ID, authCodeID)
+if err != nil {
+    log.Fatalf("删除密码失败: %v", err)
+}
+
+// 删除公共邮箱
+err = client.Email.DeletePublicMail(ctx, createResp.ID)
+if err != nil {
+    log.Fatalf("删除公共邮箱失败: %v", err)
+}
+```
+
+#### 应用邮箱账号管理
+
+```go
+// 查询应用邮箱账号
+aliasResp, err := client.Email.GetAppEmailAlias(ctx)
+if err != nil {
+    log.Fatalf("查询应用邮箱账号失败: %v", err)
+}
+fmt.Printf("主邮箱: %s\n", aliasResp.Email)
+fmt.Printf("别名邮箱: %v\n", aliasResp.AliasList)
+
+// 更新应用邮箱账号
+// 原有的应用邮箱账号将会作为别名邮箱，具有收信能力
+err = client.Email.UpdateAppEmailAlias(ctx, &email.UpdateAppEmailAliasRequest{
+    NewEmail: "newemail@company.com",
+})
+if err != nil {
+    log.Fatalf("更新应用邮箱账号失败: %v", err)
+}
+fmt.Println("应用邮箱账号更新成功")
+```
+
+#### 邮件群组管理
+
+```go
+// 创建邮件群组
+err = client.Email.CreateGroup(ctx, &email.CreateGroupRequest{
+    GroupID:   "sales@company.com",
+    GroupName: "销售团队",
+    EmailList: &email.StringList{
+        List: []string{"zhangsan@company.com", "lisi@company.com"},
+    },
+    DepartmentList: &email.IDList{
+        List: []uint32{1, 2},
+    },
+    AllowType: 3,  // 自定义成员
+    AllowEmailList: &email.StringList{
+        List: []string{"manager@company.com"},
+    },
+})
+if err != nil {
+    log.Fatalf("创建邮件群组失败: %v", err)
+}
+fmt.Println("邮件群组创建成功")
+
+// 获取邮件群组详情
+groupDetail, err := client.Email.GetGroup(ctx, "sales@company.com")
+if err != nil {
+    log.Fatalf("获取邮件群组失败: %v", err)
+}
+fmt.Printf("群组名称: %s\n", groupDetail.GroupName)
+fmt.Printf("群组成员: %v\n", groupDetail.EmailList.List)
+fmt.Printf("使用权限: %d\n", groupDetail.AllowType)
+
+// 更新邮件群组
+// 注意：Json数组类型传空值将会清空其内容，不传则保持不变
+err = client.Email.UpdateGroup(ctx, &email.UpdateGroupRequest{
+    GroupID:   "sales@company.com",
+    GroupName: "销售一组",
+    EmailList: &email.StringList{
+        List: []string{"zhangsan@company.com", "wangwu@company.com"},
+    },
+})
+if err != nil {
+    log.Fatalf("更新邮件群组失败: %v", err)
+}
+fmt.Println("邮件群组更新成功")
+
+// 模糊搜索邮件群组
+searchResp, err := client.Email.SearchGroup(ctx, 1, "sales")
+if err != nil {
+    log.Fatalf("搜索邮件群组失败: %v", err)
+}
+fmt.Printf("找到 %d 个群组\n", searchResp.Count)
+for _, group := range searchResp.Groups {
+    fmt.Printf("群组ID: %s, 名称: %s\n", group.GroupID, group.GroupName)
+}
+
+// 获取全部邮件群组
+allGroups, err := client.Email.SearchGroup(ctx, 0, "")
+if err != nil {
+    log.Fatalf("获取全部邮件群组失败: %v", err)
+}
+fmt.Printf("共有 %d 个邮件群组\n", allGroups.Count)
+
+// 删除邮件群组
+err = client.Email.DeleteGroup(ctx, "sales@company.com")
+if err != nil {
+    log.Fatalf("删除邮件群组失败: %v", err)
+}
+fmt.Println("邮件群组删除成功")
+```
+
+功能说明：
+- **发送邮件**：支持发送普通邮件、日程邮件、会议邮件
+- **附件支持**：支持添加附件（base64编码），总大小不超过50M，最多200个附件
+- **收件人类型**：支持邮箱地址和企业内成员UserID两种方式
+- **抄送密送**：支持设置抄送(CC)和密送(BCC)
+- **日程管理**：支持创建、修改、取消日程，支持重复日程设置
+- **会议功能**：支持设置会议密码、录制、等候室、水印等选项
+- **公共邮箱**：支持创建、更新、删除、查询公共邮箱
+- **权限管理**：支持按成员、部门、标签设置公共邮箱使用权限
+- **客户端密码**：支持为公共邮箱创建和管理客户端专用密码
+- **应用邮箱账号**：支持查询和更新应用邮箱账号及别名
+- **邮件群组**：支持创建、获取、更新、搜索、删除邮件群组
+- **群组权限**：支持设置群组使用权限（企业成员、任何人、组内成员、自定义成员）
+
 ### 消息管理
 
 ```go
@@ -1530,6 +1813,12 @@ wecom-core/
     - ✅ 事件响应消息（发送欢迎语等场景化消息）
     - ✅ 客户基础信息管理（批量获取客户基础信息）
     - ✅ 升级服务配置（获取配置的专员与客户群、为客户升级服务、取消推荐）
+  - ✅ 邮件服务 (Email)
+    - ✅ 发送邮件（普通邮件、日程邮件、会议邮件）
+    - ✅ 公共邮箱管理（创建、更新、删除、获取、搜索）
+    - ✅ 客户端专用密码管理（获取列表、删除）
+    - ✅ 应用邮箱账号管理（查询、更新）
+    - ✅ 邮件群组管理（创建、获取、更新、搜索、删除）
   - ⏳ OA 审批
   - ⏳ 会议管理
   - ⏳ 日程管理
