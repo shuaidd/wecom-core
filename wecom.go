@@ -22,6 +22,7 @@ import (
 	"github.com/shuaidd/wecom-core/services/qrcode"
 	"github.com/shuaidd/wecom-core/services/security"
 	"github.com/shuaidd/wecom-core/services/updown"
+	"github.com/shuaidd/wecom-core/services/wedoc"
 )
 
 // 暴露给用户的类型别名，用于自定义 API 调用
@@ -78,6 +79,8 @@ type Client struct {
 	KF *kf.Service
 	// Email 邮件服务
 	Email *email.Service
+	// Wedoc 微文档服务
+	Wedoc *wedoc.Service
 
 	// 内部组件(不对外暴露)
 	config       *config.Config
@@ -162,6 +165,7 @@ func New(opts ...config.Option) (*Client, error) {
 		Invoice:         invoice.NewService(httpClient),
 		KF:              kf.NewService(httpClient),
 		Email:           email.NewService(httpClient),
+		Wedoc:           wedoc.New(httpClient),
 	}
 
 	return c, nil

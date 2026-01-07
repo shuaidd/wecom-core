@@ -1492,6 +1492,820 @@ fmt.Println("邮件群组删除成功")
 - **邮件群组**：支持创建、获取、更新、搜索、删除邮件群组
 - **群组权限**：支持设置群组使用权限（企业成员、任何人、组内成员、自定义成员）
 
+### 微文档管理
+
+企业微信微文档服务，支持文档、表格、智能表格的创建和管理，以及收集表的创建、编辑和数据收集。
+
+#### 文档管理
+
+```go
+// 新建文档
+createDocResp, err := client.Wedoc.CreateDoc(ctx, &wedoc.CreateDocRequest{
+    DocType:    3, // 3:文档 4:表格 10:智能表格
+    DocName:    "测试文档",
+    AdminUsers: []string{"zhangsan"},
+})
+if err != nil {
+    log.Fatalf("创建文档失败: %v", err)
+}
+fmt.Printf("文档创建成功: DocID=%s, URL=%s\n", createDocResp.DocID, createDocResp.URL)
+
+// 获取文档基础信息
+docInfo, err := client.Wedoc.GetDocBaseInfo(ctx, &wedoc.GetDocBaseInfoRequest{
+    DocID: docID,
+})
+if err != nil {
+    log.Fatalf("获取文档信息失败: %v", err)
+}
+fmt.Printf("文档信息: Name=%s, Type=%d\n", docInfo.DocBaseInfo.DocName, docInfo.DocBaseInfo.DocType)
+
+// 重命名文档
+err = client.Wedoc.RenameDoc(ctx, &wedoc.RenameDocRequest{
+    DocID:   docID,
+    NewName: "新文档名称",
+})
+if err != nil {
+    log.Fatalf("重命名文档失败: %v", err)
+}
+
+// 分享文档
+shareResp, err := client.Wedoc.ShareDoc(ctx, &wedoc.ShareDocRequest{
+    DocID: docID,
+})
+if err != nil {
+    log.Fatalf("分享文档失败: %v", err)
+}
+fmt.Printf("文档分享链接: %s\n", shareResp.ShareURL)
+
+// 删除文档
+err = client.Wedoc.DeleteDoc(ctx, &wedoc.DeleteDocRequest{
+    DocID: docID,
+})
+if err != nil {
+    log.Fatalf("删除文档失败: %v", err)
+}
+```
+
+#### 文档内容管理
+
+```go
+// 获取文档数据
+documentData, err := client.Wedoc.GetDocument(ctx, &wedoc.GetDocumentRequest{
+    DocID: "DOCID",
+})
+if err != nil {
+    log.Fatalf("获取文档数据失败: %v", err)
+}
+fmt.Printf("文档版本: %d\n", documentData.Version)
+
+// 批量编辑文档内容
+err = client.Wedoc.BatchUpdateDocument(ctx, &wedoc.BatchUpdateDocumentRequest{
+    DocID:   "DOCID",
+    Version: 10,
+    Requests: []wedoc.UpdateRequest{
+        {
+            InsertText: &wedoc.InsertText{
+                Text: "插入的文本内容",
+                Location: wedoc.Location{
+                    Index: 10,
+                },
+            },
+        },
+        {
+            InsertTable: &wedoc.InsertTable{
+                Rows: 3,
+                Cols: 3,
+                Location: wedoc.Location{
+                    Index: 20,
+                },
+            },
+        },
+        {
+            InsertImage: &wedoc.InsertImage{
+                ImageID: "https://example.com/image.png",
+                Location: wedoc.Location{
+                    Index: 30,
+                },
+                Width:  300,
+                Height: 200,
+            },
+        },
+    },
+})
+if err != nil {
+    log.Fatalf("批量编辑文档失败: %v", err)
+}
+
+// 上传文档图片
+imageResp, err := client.Wedoc.ImageUpload(ctx, &wedoc.ImageUploadRequest{
+    DocID:         "DOCID",
+    Base64Content: "BASE64_ENCODED_IMAGE_CONTENT",
+})
+if err != nil {
+    log.Fatalf("上传图片失败: %v", err)
+}
+fmt.Printf("图片URL: %s, 宽度: %d, 高度: %d\n", imageResp.URL, imageResp.Width, imageResp.Height)
+```
+
+#### 表格内容管理
+
+```go
+// 获取表格行列信息
+properties, err := client.Wedoc.GetSheetProperties(ctx, &wedoc.GetSheetPropertiesRequest{
+    DocID: "SPREADSHEET_DOCID",
+})
+if err != nil {
+    log.Fatalf("获取表格行列信息失败: %v", err)
+}
+for _, prop := range properties.Properties {
+    fmt.Printf("工作表: %s, 行数: %d, 列数: %d\n",
+        prop.Title, prop.RowCount, prop.ColumnCount)
+}
+
+// 获取表格数据
+rangeData, err := client.Wedoc.GetSheetRangeData(ctx, &wedoc.GetSheetRangeDataRequest{
+    DocID:   "SPREADSHEET_DOCID",
+    SheetID: "SHEET_ID",
+    Range:   "A1:C10", // A1表示法
+})
+if err != nil {
+    log.Fatalf("获取表格数据失败: %v", err)
+}
+for _, row := range rangeData.Data.Result.Rows {
+    for _, cell := range row.Values {
+        if cell.CellValue != nil {
+            fmt.Printf("%s\t", cell.CellValue.Text)
+        }
+    }
+    fmt.Println()
+}
+
+// 批量编辑表格内容
+updateResp, err := client.Wedoc.BatchUpdateSpreadsheet(ctx, &wedoc.BatchUpdateSpreadsheetRequest{
+    DocID: "SPREADSHEET_DOCID",
+    Requests: []wedoc.SpreadsheetUpdateRequest{
+        {
+            // 新增工作表
+            AddSheetRequest: &wedoc.SpreadsheetAddSheetRequest{
+                Title:       "新工作表",
+                RowCount:    100,
+                ColumnCount: 26,
+            },
+        },
+        {
+            // 更新范围内单元格内容
+            UpdateRangeRequest: &wedoc.UpdateRangeRequest{
+                SheetID: "SHEET_ID",
+                GridData: &wedoc.GridData{
+                    StartRow:    0,
+                    StartColumn: 0,
+                    Rows: []*wedoc.RowData{
+                        {
+                            Values: []*wedoc.CellData{
+                                {
+                                    CellValue: &wedoc.CellValue{
+                                        Text: "单元格内容",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        {
+            // 删除连续的行
+            DeleteDimensionRequest: &wedoc.DeleteDimensionRequest{
+                SheetID:    "SHEET_ID",
+                Dimension:  "ROW",
+                StartIndex: 5,
+                EndIndex:   10,
+            },
+        },
+    },
+})
+if err != nil {
+    log.Fatalf("批量编辑表格失败: %v", err)
+}
+
+// 查看操作结果
+for _, resp := range updateResp.Data.Responses {
+    if resp.AddSheetResponse != nil {
+        fmt.Printf("新增工作表: %s\n", resp.AddSheetResponse.Properties.Title)
+    }
+    if resp.UpdateRangeResponse != nil {
+        fmt.Printf("更新了 %d 个单元格\n", resp.UpdateRangeResponse.UpdatedCells)
+    }
+    if resp.DeleteDimensionResponse != nil {
+        fmt.Printf("删除了 %d 行/列\n", resp.DeleteDimensionResponse.Deleted)
+    }
+}
+```
+
+#### 收集表管理
+
+```go
+// 创建收集表
+createFormResp, err := client.Wedoc.CreateForm(ctx, &wedoc.CreateFormRequest{
+    FormInfo: wedoc.FormInfo{
+        FormTitle: "员工信息收集表",
+        FormDesc:  "请填写您的个人信息",
+        FormQuestion: wedoc.FormQuestion{
+            Items: []wedoc.QuestionItem{
+                {
+                    QuestionID: 1,
+                    Title:      "您的姓名",
+                    Pos:        1,
+                    Status:     1,
+                    ReplyType:  1, // 1:文本
+                    MustReply:  true,
+                },
+                {
+                    QuestionID: 2,
+                    Title:      "您的部门",
+                    Pos:        2,
+                    Status:     1,
+                    ReplyType:  2, // 2:单选
+                    MustReply:  true,
+                    OptionItem: []wedoc.OptionItem{
+                        {Key: 1, Value: "技术部", Status: 1},
+                        {Key: 2, Value: "产品部", Status: 1},
+                        {Key: 3, Value: "运营部", Status: 1},
+                    },
+                },
+            },
+        },
+        FormSetting: wedoc.FormSetting{
+            FillOutAuth:     0,     // 0:所有人可填写
+            AllowMultiFill:  false, // 不允许多次填写
+            CanNotifySubmit: true,  // 有回复时提醒
+        },
+    },
+})
+if err != nil {
+    log.Fatalf("创建收集表失败: %v", err)
+}
+fmt.Printf("收集表创建成功: FormID=%s\n", createFormResp.FormID)
+
+// 获取收集表信息
+formInfo, err := client.Wedoc.GetFormInfo(ctx, &wedoc.GetFormInfoRequest{
+    FormID: formID,
+})
+if err != nil {
+    log.Fatalf("获取收集表信息失败: %v", err)
+}
+fmt.Printf("收集表: %s, 问题数=%d\n", formInfo.FormInfo.FormTitle, len(formInfo.FormInfo.FormQuestion.Items))
+
+// 编辑收集表（修改设置）
+err = client.Wedoc.ModifyForm(ctx, &wedoc.ModifyFormRequest{
+    Oper:   2, // 2:全量修改设置
+    FormID: formID,
+    FormInfo: wedoc.FormInfo{
+        FormSetting: wedoc.FormSetting{
+            AllowMultiFill: true, // 修改为允许多次填写
+        },
+    },
+})
+
+// 获取收集表统计信息
+statistic, err := client.Wedoc.GetFormStatistic(ctx, &wedoc.GetFormStatisticRequest{
+    RepeatedID: repeatedID, // 从GetFormInfo获取
+    ReqType:    1,          // 1:只获取统计结果
+})
+if err != nil {
+    log.Fatalf("获取统计信息失败: %v", err)
+}
+fmt.Printf("已填写: %d次, 已填写人数: %d, 未填写人数: %d\n",
+    statistic.FillCnt, statistic.FillUserCnt, statistic.UnfillUserCnt)
+
+// 获取已提交列表
+submitList, err := client.Wedoc.GetFormStatistic(ctx, &wedoc.GetFormStatisticRequest{
+    RepeatedID: repeatedID,
+    ReqType:    2,              // 2:获取已提交列表
+    StartTime:  1700000000,     // 筛选开始时间
+    EndTime:    1800000000,     // 筛选结束时间
+    Limit:      20,
+})
+
+// 读取收集表答案
+answers, err := client.Wedoc.GetFormAnswer(ctx, &wedoc.GetFormAnswerRequest{
+    RepeatedID: repeatedID,
+    AnswerIDs:  []uint64{1, 2, 3}, // 答案ID列表
+})
+if err != nil {
+    log.Fatalf("读取答案失败: %v", err)
+}
+for _, answer := range answers.Answer.AnswerList {
+    fmt.Printf("用户=%s, 回答数=%d\n", answer.UserName, len(answer.Reply.Items))
+}
+```
+
+#### 智能表格内容管理
+
+智能表格（Smartsheet）提供类似数据库的表格能力，支持对记录、字段、视图、子表和编组进行完整的CRUD操作。
+
+##### 记录管理
+
+```go
+// 添加记录
+addResp, err := client.Wedoc.AddRecords(ctx, &wedoc.AddRecordsRequest{
+    DocID:   "DOCID",
+    SheetID: "SHEETID",
+    KeyType: "CELL_VALUE_KEY_TYPE_FIELD_TITLE", // 使用字段标题作为key
+    Records: []wedoc.AddRecord{
+        {
+            Values: map[string]interface{}{
+                "姓名": []map[string]interface{}{
+                    {"type": "text", "text": "张三"},
+                },
+                "年龄": 25,
+                "是否在职": true,
+            },
+        },
+    },
+})
+
+// 查询记录
+records, err := client.Wedoc.GetRecords(ctx, &wedoc.GetRecordsRequest{
+    DocID:   "DOCID",
+    SheetID: "SHEETID",
+    Offset:  0,
+    Limit:   100,
+})
+for _, record := range records.Records {
+    fmt.Printf("记录ID=%s, 创建时间=%s\n", record.RecordID, record.CreateTime)
+}
+
+// 更新记录
+updateResp, err := client.Wedoc.UpdateRecords(ctx, &wedoc.UpdateRecordsRequest{
+    DocID:   "DOCID",
+    SheetID: "SHEETID",
+    Records: []wedoc.UpdateRecord{
+        {
+            RecordID: "RECORD_ID",
+            Values: map[string]interface{}{
+                "年龄": 26,
+            },
+        },
+    },
+})
+
+// 删除记录
+err = client.Wedoc.DeleteRecords(ctx, &wedoc.DeleteRecordsRequest{
+    DocID:     "DOCID",
+    SheetID:   "SHEETID",
+    RecordIDs: []string{"RECORD_ID_1", "RECORD_ID_2"},
+})
+```
+
+##### 字段管理
+
+```go
+// 添加字段
+addFieldsResp, err := client.Wedoc.AddFields(ctx, &wedoc.AddFieldsRequest{
+    DocID:   "DOCID",
+    SheetID: "SHEETID",
+    Fields: []wedoc.AddField{
+        {
+            FieldTitle: "电话号码",
+            FieldType:  "FIELD_TYPE_PHONE_NUMBER",
+        },
+        {
+            FieldTitle: "进度",
+            FieldType:  "FIELD_TYPE_PROGRESS",
+            PropertyProgress: &wedoc.ProgressFieldProperty{
+                DecimalPlaces: 2, // 保留2位小数
+            },
+        },
+    },
+})
+
+// 查询字段
+fields, err := client.Wedoc.GetFields(ctx, &wedoc.GetFieldsRequest{
+    DocID:   "DOCID",
+    SheetID: "SHEETID",
+})
+for _, field := range fields.Fields {
+    fmt.Printf("字段: ID=%s, 标题=%s, 类型=%s\n",
+        field.FieldID, field.FieldTitle, field.FieldType)
+}
+
+// 更新字段
+updateFieldsResp, err := client.Wedoc.UpdateFields(ctx, &wedoc.UpdateFieldsRequest{
+    DocID:   "DOCID",
+    SheetID: "SHEETID",
+    Fields: []wedoc.UpdateField{
+        {
+            FieldID:    "FIELD_ID",
+            FieldTitle: "新字段名称",
+        },
+    },
+})
+
+// 删除字段
+err = client.Wedoc.DeleteFields(ctx, &wedoc.DeleteFieldsRequest{
+    DocID:    "DOCID",
+    SheetID:  "SHEETID",
+    FieldIDs: []string{"FIELD_ID_1", "FIELD_ID_2"},
+})
+```
+
+##### 视图管理
+
+```go
+// 添加视图
+addViewResp, err := client.Wedoc.AddView(ctx, &wedoc.AddViewRequest{
+    DocID:     "DOCID",
+    SheetID:   "SHEETID",
+    ViewTitle: "销售视图",
+    ViewType:  "VIEW_TYPE_GRID", // 表格视图
+    Property: &wedoc.ViewProperty{
+        AutoSort: true,
+        SortSpec: &wedoc.SortSpec{
+            SortInfos: []wedoc.SortInfo{
+                {FieldID: "FIELD_ID", Desc: true}, // 降序排序
+            },
+        },
+        FilterSpec: &wedoc.FilterSpec{
+            Conjunction: "CONJUNCTION_AND",
+            Conditions: []wedoc.Condition{
+                {
+                    FieldID:  "STATUS_FIELD_ID",
+                    Operator: "OPERATOR_IS",
+                    StringValue: &wedoc.FilterStringValue{
+                        Value: []string{"进行中"},
+                    },
+                },
+            },
+        },
+    },
+})
+
+// 查询视图
+views, err := client.Wedoc.GetViews(ctx, &wedoc.GetViewsRequest{
+    DocID:   "DOCID",
+    SheetID: "SHEETID",
+})
+
+// 更新视图
+updateViewResp, err := client.Wedoc.UpdateView(ctx, &wedoc.UpdateViewRequest{
+    DocID:     "DOCID",
+    SheetID:   "SHEETID",
+    ViewID:    "VIEW_ID",
+    ViewTitle: "更新后的视图名称",
+})
+
+// 删除视图
+err = client.Wedoc.DeleteView(ctx, &wedoc.DeleteViewRequest{
+    DocID:   "DOCID",
+    SheetID: "SHEETID",
+    ViewID:  "VIEW_ID",
+})
+```
+
+##### 子表管理
+
+```go
+// 添加子表
+addSheetResp, err := client.Wedoc.AddSheet(ctx, &wedoc.AddSheetRequest{
+    DocID: "DOCID",
+    Properties: &wedoc.SheetProperty{
+        Title: "新子表",
+        Index: 0, // 插入位置
+    },
+})
+
+// 查询子表
+sheets, err := client.Wedoc.GetSheet(ctx, &wedoc.GetSheetRequest{
+    DocID:            "DOCID",
+    NeedAllTypeSheet: true, // 包含仪表盘和说明页
+})
+for _, sheet := range sheets.SheetList {
+    fmt.Printf("子表: ID=%s, 标题=%s, 类型=%s\n",
+        sheet.SheetID, sheet.Title, sheet.Type)
+}
+
+// 更新子表
+updateSheetResp, err := client.Wedoc.UpdateSheet(ctx, &wedoc.UpdateSheetRequest{
+    DocID:   "DOCID",
+    SheetID: "SHEET_ID",
+    Properties: &wedoc.SheetProperty{
+        Title: "更新后的子表名称",
+    },
+})
+
+// 删除子表
+err = client.Wedoc.DeleteSheet(ctx, &wedoc.DeleteSheetRequest{
+    DocID:   "DOCID",
+    SheetID: "SHEET_ID",
+})
+```
+
+##### 编组管理
+
+```go
+// 添加编组（字段分组）
+addGroupResp, err := client.Wedoc.AddFieldGroup(ctx, &wedoc.AddFieldGroupRequest{
+    DocID:   "DOCID",
+    SheetID: "SHEETID",
+    Name:    "基础信息",
+    Children: []wedoc.FieldGroupChildren{
+        {FieldID: "FIELD_ID_1"},
+        {FieldID: "FIELD_ID_2"},
+    },
+})
+
+// 获取编组
+groups, err := client.Wedoc.GetFieldGroup(ctx, &wedoc.GetFieldGroupRequest{
+    DocID:   "DOCID",
+    SheetID: "SHEETID",
+})
+
+// 更新编组
+updateGroupResp, err := client.Wedoc.UpdateFieldGroup(ctx, &wedoc.UpdateFieldGroupRequest{
+    DocID:        "DOCID",
+    SheetID:      "SHEETID",
+    FieldGroupID: "GROUP_ID",
+    Name:         "更新后的编组名称",
+})
+
+// 删除编组
+err = client.Wedoc.DeleteFieldGroup(ctx, &wedoc.DeleteFieldGroupRequest{
+    DocID:        "DOCID",
+    SheetID:      "SHEETID",
+    FieldGroupID: "GROUP_ID",
+})
+```
+
+#### 文档权限管理
+
+```go
+// 获取文档权限信息
+authInfo, err := client.Wedoc.GetDocAuth(ctx, &wedoc.GetDocAuthRequest{
+    DocID: "DOCID",
+})
+if err != nil {
+    log.Fatalf("获取文档权限失败: %v", err)
+}
+
+// 查看文档查看规则
+fmt.Printf("允许企业内成员浏览: %t\n", authInfo.AccessRule.EnableCorpInternal)
+fmt.Printf("企业内成员获得权限: %d\n", authInfo.AccessRule.CorpInternalAuth)
+
+// 查看文档安全设置
+if authInfo.SecureSetting.Watermark.ShowText {
+    fmt.Printf("水印文字: %s\n", authInfo.SecureSetting.Watermark.Text)
+}
+
+// 修改文档安全设置
+enableReadonlyCopy := false
+err = client.Wedoc.ModDocSaftySetting(ctx, &wedoc.ModDocSaftySettingRequest{
+    DocID:              "DOCID",
+    EnableReadonlyCopy: &enableReadonlyCopy,
+    Watermark: &wedoc.Watermark{
+        MarginType:      1,    // 1:稀疏 2:紧密
+        ShowVisitorName: true,
+        ShowText:        true,
+        Text:            "企业机密",
+    },
+})
+if err != nil {
+    log.Fatalf("修改文档安全设置失败: %v", err)
+}
+
+// 修改文档查看规则
+enableCorpInternal := true
+corpInternalAuth := 1
+err = client.Wedoc.ModDocJoinRule(ctx, &wedoc.ModDocJoinRuleRequest{
+    DocID:              "DOCID",
+    EnableCorpInternal: &enableCorpInternal,
+    CorpInternalAuth:   &corpInternalAuth,  // 1:只读 2:读写
+    CoAuthList: []wedoc.CoAuth{
+        {
+            Type:         2,  // 2:部门
+            DepartmentID: 1,
+            Auth:         1,  // 1:只读 2:读写
+        },
+    },
+})
+if err != nil {
+    log.Fatalf("修改文档查看规则失败: %v", err)
+}
+
+// 修改文档通知范围及权限
+err = client.Wedoc.ModDocMember(ctx, &wedoc.ModDocMemberRequest{
+    DocID: "DOCID",
+    UpdateFileMemberList: []wedoc.DocMember{
+        {
+            Type:   1,          // 1:用户
+            UserID: "zhangsan",
+            Auth:   7,          // 1:只读 2:读写 7:管理员
+        },
+    },
+    DelFileMemberList: []wedoc.DocMember{
+        {
+            Type:   1,
+            UserID: "lisi",
+        },
+    },
+})
+if err != nil {
+    log.Fatalf("修改文档通知范围失败: %v", err)
+}
+```
+
+#### 智能表格内容权限管理
+
+```go
+// 查询智能表格子表权限（全员权限）
+privResp, err := client.Wedoc.GetSheetPriv(ctx, &wedoc.GetSheetPrivRequest{
+    DocID: "DOCID",
+    Type:  1,  // 1:全员权限 2:额外权限
+})
+if err != nil {
+    log.Fatalf("查询子表权限失败: %v", err)
+}
+
+for _, rule := range privResp.RuleList {
+    fmt.Printf("规则ID: %d, 类型: %d, 名称: %s\n", rule.RuleID, rule.Type, rule.Name)
+    for _, priv := range rule.PrivList {
+        fmt.Printf("  子表: %s, 权限: %d\n", priv.SheetID, priv.Priv)
+    }
+}
+
+// 更新智能表格子表权限
+err = client.Wedoc.UpdateSheetPriv(ctx, &wedoc.UpdateSheetPrivRequest{
+    DocID: "DOCID",
+    Type:  1,  // 1:全员权限
+    PrivList: []wedoc.SheetPriv{
+        {
+            SheetID:                   "SHEET_ID",
+            Priv:                      2,     // 2:可编辑
+            CanInsertRecord:           true,
+            CanDeleteRecord:           true,
+            CanCreateModifyDeleteView: true,
+            FieldPriv: &wedoc.FieldPriv{
+                FieldRangeType: 1,  // 1:所有字段
+            },
+            RecordPriv: &wedoc.RecordPriv{
+                RecordRangeType: 1,  // 1:全部记录
+            },
+        },
+    },
+})
+if err != nil {
+    log.Fatalf("更新子表权限失败: %v", err)
+}
+
+// 新增智能表格指定成员额外权限
+createRuleResp, err := client.Wedoc.CreateRule(ctx, &wedoc.CreateRuleRequest{
+    DocID: "DOCID",
+    Name:  "销售团队权限",
+})
+if err != nil {
+    log.Fatalf("创建权限规则失败: %v", err)
+}
+fmt.Printf("规则ID: %d\n", createRuleResp.RuleID)
+
+// 更新智能表格指定成员额外权限
+err = client.Wedoc.ModRuleMember(ctx, &wedoc.ModRuleMemberRequest{
+    DocID:  "DOCID",
+    RuleID: createRuleResp.RuleID,
+    AddMemberRange: &wedoc.MemberRange{
+        UserIDList: []string{"zhangsan", "lisi"},
+    },
+})
+if err != nil {
+    log.Fatalf("更新成员权限失败: %v", err)
+}
+
+// 为权限规则设置具体权限
+err = client.Wedoc.UpdateSheetPriv(ctx, &wedoc.UpdateSheetPrivRequest{
+    DocID:  "DOCID",
+    Type:   2,  // 2:额外权限
+    RuleID: createRuleResp.RuleID,
+    Name:   "销售团队权限",
+    PrivList: []wedoc.SheetPriv{
+        {
+            SheetID: "SHEET_ID",
+            Priv:    2,  // 2:可编辑
+            FieldPriv: &wedoc.FieldPriv{
+                FieldRangeType: 2,  // 2:部分字段
+                FieldRuleList: []wedoc.FieldRule{
+                    {
+                        FieldID:   "FIELD_ID_1",
+                        FieldType: "FIELD_TYPE_TEXT",
+                        CanEdit:   true,
+                        CanInsert: true,
+                        CanView:   true,
+                    },
+                },
+            },
+            RecordPriv: &wedoc.RecordPriv{
+                RecordRangeType: 2,  // 2:满足任意条件的记录
+                RecordRuleList: []wedoc.RecordRule{
+                    {
+                        FieldID:   "CREATED_USER",
+                        OperType:  1,  // 1:包含自己
+                    },
+                },
+                OtherPriv: 1,  // 1:不可编辑
+            },
+        },
+    },
+})
+
+// 删除智能表格指定成员额外权限
+err = client.Wedoc.DeleteRule(ctx, &wedoc.DeleteRuleRequest{
+    DocID:      "DOCID",
+    RuleIDList: []uint32{createRuleResp.RuleID},
+})
+if err != nil {
+    log.Fatalf("删除权限规则失败: %v", err)
+}
+```
+
+#### 高级功能账号管理
+
+```go
+// 分配高级功能账号
+addResp, err := client.Wedoc.BatchAddVip(ctx, &wedoc.BatchAddVipRequest{
+    UserIDList: []string{"zhangsan", "lisi", "wangwu"},
+})
+if err != nil {
+    log.Fatalf("分配高级功能账号失败: %v", err)
+}
+
+fmt.Printf("分配成功: %v\n", addResp.SuccUserIDList)
+fmt.Printf("分配失败: %v\n", addResp.FailUserIDList)
+
+// 获取高级功能账号列表
+listResp, err := client.Wedoc.ListVip(ctx, &wedoc.ListVipRequest{
+    Limit: 100,
+})
+if err != nil {
+    log.Fatalf("获取账号列表失败: %v", err)
+}
+
+fmt.Printf("高级功能账号列表: %v\n", listResp.UserIDList)
+fmt.Printf("是否还有更多: %t\n", listResp.HasMore)
+
+// 分页获取
+if listResp.HasMore {
+    nextPageResp, err := client.Wedoc.ListVip(ctx, &wedoc.ListVipRequest{
+        Cursor: listResp.NextCursor,
+        Limit:  100,
+    })
+    _ = nextPageResp
+    _ = err
+}
+
+// 取消高级功能账号
+delResp, err := client.Wedoc.BatchDelVip(ctx, &wedoc.BatchDelVipRequest{
+    UserIDList: []string{"wangwu"},
+})
+if err != nil {
+    log.Fatalf("取消高级功能账号失败: %v", err)
+}
+
+fmt.Printf("取消成功: %v\n", delResp.SuccUserIDList)
+fmt.Printf("取消失败: %v\n", delResp.FailUserIDList)
+```
+
+支持的文档类型：
+- **文档** (`DocType=3`)：在线文档编辑
+- **表格** (`DocType=4`)：电子表格
+- **智能表格** (`DocType=10`)：数据库式表格
+
+支持的问题类型：
+- **文本** (`ReplyType=1`)：文本输入，支持字符数、数字、邮箱、手机号等校验
+- **单选** (`ReplyType=2`)：单选题，支持"其他"选项
+- **多选** (`ReplyType=3`)：多选题，支持限制选项数量
+- **位置** (`ReplyType=5`)：地理位置，支持自动定位和范围限制
+- **图片** (`ReplyType=9`)：图片上传，支持数量和大小限制
+- **文件** (`ReplyType=10`)：文件上传
+- **日期** (`ReplyType=11`)：日期选择
+- **时间** (`ReplyType=14`)：时间选择
+- **下拉列表** (`ReplyType=15`)：下拉选择
+- **体温** (`ReplyType=16`)：体温输入
+- **签名** (`ReplyType=17`)：手写签名
+- **部门** (`ReplyType=18`)：选择部门
+- **成员** (`ReplyType=19`)：选择成员
+- **时长** (`ReplyType=22`)：时长计算
+
+功能说明：
+- **文档管理**：创建、获取信息、重命名、分享、删除文档/表格/智能表格
+- **收集表创建**：支持创建包含多种问题类型的收集表，最多200个问题
+- **收集表编辑**：支持全量修改问题和设置
+- **答案收集**：支持读取收集表答案，批量最多100个
+- **统计查询**：支持查询统计信息、已提交列表、未提交列表
+- **权限控制**：支持设置填写权限（所有人/指定人员/部门）
+- **定时重复**：支持设置定时重复收集（每天/每周/每月）
+- **问题校验**：支持为不同问题类型设置校验规则
+- **文档权限管理**：获取文档权限信息、修改文档安全设置、修改文档查看规则、修改文档通知范围及权限
+- **智能表格内容权限**：查询和更新子表权限、管理成员额外权限、设置字段和记录级别权限
+- **高级功能账号管理**：分配和取消高级功能账号、获取账号列表
+
 ### 消息管理
 
 ```go
@@ -1819,6 +2633,16 @@ wecom-core/
     - ✅ 客户端专用密码管理（获取列表、删除）
     - ✅ 应用邮箱账号管理（查询、更新）
     - ✅ 邮件群组管理（创建、获取、更新、搜索、删除）
+  - ✅ 微文档 (Wedoc)
+    - ✅ 文档管理（新建文档/表格/智能表格、获取基础信息、重命名、分享、删除）
+    - ✅ 文档内容管理（获取文档数据、批量编辑文档内容、上传文档图片）
+    - ✅ 表格内容管理（获取表格行列信息、获取表格数据、批量编辑表格内容）
+    - ✅ 收集表管理（创建收集表、获取信息、编辑收集表）
+    - ✅ 收集表数据（读取答案、获取统计信息、已提交/未提交列表）
+    - ✅ 智能表格内容管理（记录、字段、视图、子表、编组的完整CRUD操作）
+    - ✅ 文档权限管理（获取权限信息、修改安全设置、修改查看规则、修改通知范围及权限）
+    - ✅ 智能表格内容权限（查询和更新子表权限、管理成员额外权限、字段和记录级别权限）
+    - ✅ 高级功能账号管理（分配、取消、获取高级功能账号列表）
   - ⏳ OA 审批
   - ⏳ 会议管理
   - ⏳ 日程管理
@@ -1831,6 +2655,7 @@ wecom-core/
 - [基础示例](./examples/basic/main.go)
 - [通讯录示例](./examples/contact/main.go)
 - [应用管理示例](./examples/agent/main.go)
+- [微文档示例](./examples/wedoc/main.go)
 
 ## 贡献
 

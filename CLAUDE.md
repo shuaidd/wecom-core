@@ -114,17 +114,34 @@ When implementing new WeCom API modules:
    - `[module-name].go` - Service struct and constructor
    - `[feature].go` - Group related API methods (e.g., user.go, department.go)
    - Each method should accept `context.Context` as first parameter
-   - Use `c.client.Get()` or `c.client.Post()` for API calls
+   - **IMPORTANT**: Use `client.PostAndUnmarshal[T]()` or `client.GetAndUnmarshal[T]()` for API calls
+     - ✅ **Correct**: `return client.PostAndUnmarshal[ResponseType](s.client, ctx, url, req)`
+     - ❌ **Wrong**: `s.client.Post(ctx, url, req, &resp)` - This is the old API and will cause compilation errors
+     - For endpoints with no response data (only errcode/errmsg), use `client.CommonResponse` as the type
+   - Example:
+     ```go
+     // For endpoints returning data
+     func (s *Service) GetSomething(ctx context.Context, req *SomeRequest) (*SomeResponse, error) {
+         return client.PostAndUnmarshal[SomeResponse](s.client, ctx, "/api/path", req)
+     }
+
+     // For endpoints returning only errcode/errmsg
+     func (s *Service) DeleteSomething(ctx context.Context, req *DeleteRequest) error {
+         _, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/api/path", req)
+         return err
+     }
+     ```
 
 3. **Register service** in `wecom.go`:
    - Add field to `Client` struct
    - Initialize in `New()` function
 
 4. **Follow existing patterns**:
-   - Check `services/contact/` for reference implementation
+   - Check `services/contact/` or `services/wedoc/` for reference implementation
    - Error handling: return errors directly, don't wrap unnecessarily
    - Logging: client handles logging, don't add redundant logs
    - Token management: client handles automatically, don't manually manage
+   - **Always use `client.PostAndUnmarshal` or `client.GetAndUnmarshal`** - never call `s.client.Post` or `s.client.Get` directly
 
 5. **Update documentation**:
    - **IMPORTANT**: After completing API integration, MUST update `README.md` to document the new service and its usage
@@ -184,6 +201,8 @@ Completed:
 - Invoice service (query and update e-invoice status)
 - External contact service (customer management, tags, group chats, moments, statistics, messaging)
 - KF service (customer service - account management, contact links, servicer management, session allocation, message sending, customer basic info, upgrade service configuration)
+- Email service (send emails, public mailbox management, email group management)
+- Wedoc service (document management, form management, form data collection)
 
 In Progress:
 - Message service (send messages, receive callbacks, template cards)
