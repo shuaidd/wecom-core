@@ -9,6 +9,7 @@ import (
 	"github.com/shuaidd/wecom-core/internal/retry"
 	"github.com/shuaidd/wecom-core/pkg/interceptor"
 	"github.com/shuaidd/wecom-core/services/agent"
+	"github.com/shuaidd/wecom-core/services/calendar"
 	"github.com/shuaidd/wecom-core/services/contact"
 	"github.com/shuaidd/wecom-core/services/corpgroup"
 	"github.com/shuaidd/wecom-core/services/email"
@@ -53,6 +54,8 @@ type InterceptorResponse = interceptor.Response
 type Client struct {
 	// Agent 应用管理服务
 	Agent *agent.Service
+	// Calendar 日历服务
+	Calendar *calendar.Service
 	// Contact 通讯录服务
 	Contact *contact.Service
 	// IP IP相关服务
@@ -152,6 +155,7 @@ func New(opts ...config.Option) (*Client, error) {
 		tokenManager:    tokenManager,
 		httpClient:      httpClient,
 		Agent:           agent.NewService(httpClient),
+		Calendar:        calendar.NewService(httpClient),
 		Contact:         contact.NewService(httpClient),
 		IP:              ip.NewService(httpClient),
 		QRCode:          qrcode.NewService(httpClient),

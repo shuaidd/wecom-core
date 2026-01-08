@@ -1,0 +1,15 @@
+package calendar
+
+import (
+	"github.com/shuaidd/wecom-core/internal/client"
+)
+
+// Service 日历服务
+type Service struct {
+	client *client.Client
+}
+
+// NewService 创建日历服务实例
+func NewService(c *client.Client) *Service {
+	return &Service{client: c}
+}

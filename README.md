@@ -2543,6 +2543,216 @@ if err != nil {
 }
 ```
 
+### 日历管理
+
+企业微信日历服务，支持日历和日程的创建、查询、更新和删除，以及日程参与者管理。
+
+#### 日历管理
+
+```go
+// 创建日历
+createCalResp, err := client.Calendar.CreateCalendar(ctx, &calendar.CreateCalendarRequest{
+    Calendar: calendar.Calendar{
+        Summary:     "团队日历",
+        Color:       "#FF3030",
+        Description: "团队工作日历",
+        Admins:      []string{"zhangsan", "lisi"},
+        Shares: []calendar.Share{
+            {UserID: "wangwu", Permission: 1}, // 1:可查看
+        },
+    },
+})
+if err != nil {
+    log.Fatalf("创建日历失败: %v", err)
+}
+fmt.Printf("日历创建成功: CalID=%s\n", createCalResp.CalID)
+
+// 获取日历详情
+calResp, err := client.Calendar.GetCalendar(ctx, &calendar.GetCalendarRequest{
+    CalIDList: []string{calID},
+})
+if err != nil {
+    log.Fatalf("获取日历失败: %v", err)
+}
+for _, cal := range calResp.CalendarList {
+    fmt.Printf("日历: %s, 颜色: %s\n", cal.Summary, cal.Color)
+}
+
+// 更新日历
+updateResp, err := client.Calendar.UpdateCalendar(ctx, &calendar.UpdateCalendarRequest{
+    Calendar: calendar.Calendar{
+        CalID:       calID,
+        Summary:     "更新后的日历名称",
+        Color:       "#0000FF",
+        Description: "更新后的描述",
+    },
+})
+if err != nil {
+    log.Fatalf("更新日历失败: %v", err)
+}
+
+// 删除日历
+err = client.Calendar.DeleteCalendar(ctx, &calendar.DeleteCalendarRequest{
+    CalID: calID,
+})
+if err != nil {
+    log.Fatalf("删除日历失败: %v", err)
+}
+```
+
+#### 日程管理
+
+```go
+// 创建日程
+createSchResp, err := client.Calendar.CreateSchedule(ctx, &calendar.CreateScheduleRequest{
+    Schedule: calendar.Schedule{
+        Summary:     "需求评审会议",
+        Description: "2.0版本需求初步评审",
+        Location:    "10楼1005会议室",
+        StartTime:   1571274600,
+        EndTime:     1571320210,
+        CalID:       calID,
+        Attendees: []calendar.Attendee{
+            {UserID: "zhangsan"},
+            {UserID: "lisi"},
+        },
+        Reminders: &calendar.Reminders{
+            IsRemind:              1,
+            RemindBeforeEventSecs: 3600, // 提前1小时提醒
+        },
+    },
+})
+if err != nil {
+    log.Fatalf("创建日程失败: %v", err)
+}
+fmt.Printf("日程创建成功: ScheduleID=%s\n", createSchResp.ScheduleID)
+
+// 获取日程详情
+schResp, err := client.Calendar.GetSchedule(ctx, &calendar.GetScheduleRequest{
+    ScheduleIDList: []string{scheduleID},
+})
+if err != nil {
+    log.Fatalf("获取日程失败: %v", err)
+}
+for _, sch := range schResp.ScheduleList {
+    fmt.Printf("日程: %s, 地点: %s\n", sch.Summary, sch.Location)
+}
+
+// 更新日程
+updateSchResp, err := client.Calendar.UpdateSchedule(ctx, &calendar.UpdateScheduleRequest{
+    Schedule: calendar.Schedule{
+        ScheduleID:  scheduleID,
+        Summary:     "更新后的会议主题",
+        Description: "更新后的会议描述",
+        StartTime:   1571274600,
+        EndTime:     1571320210,
+    },
+})
+if err != nil {
+    log.Fatalf("更新日程失败: %v", err)
+}
+
+// 新增日程参与者
+err = client.Calendar.AddAttendees(ctx, &calendar.AddAttendeesRequest{
+    ScheduleID: scheduleID,
+    Attendees: []calendar.Attendee{
+        {UserID: "wangwu"},
+    },
+})
+if err != nil {
+    log.Fatalf("新增参与者失败: %v", err)
+}
+
+// 删除日程参与者
+err = client.Calendar.DeleteAttendees(ctx, &calendar.DeleteAttendeesRequest{
+    ScheduleID: scheduleID,
+    Attendees: []calendar.Attendee{
+        {UserID: "wangwu"},
+    },
+})
+if err != nil {
+    log.Fatalf("删除参与者失败: %v", err)
+}
+
+// 获取日历下的日程列表
+scheduleListResp, err := client.Calendar.GetScheduleByCalendar(ctx, &calendar.GetScheduleByCalendarRequest{
+    CalID:  calID,
+    Offset: 0,
+    Limit:  100,
+})
+if err != nil {
+    log.Fatalf("获取日程列表失败: %v", err)
+}
+for _, sch := range scheduleListResp.ScheduleList {
+    fmt.Printf("日程: %s, 时间: %d - %d\n", sch.Summary, sch.StartTime, sch.EndTime)
+}
+
+// 取消日程
+err = client.Calendar.DeleteSchedule(ctx, &calendar.DeleteScheduleRequest{
+    ScheduleID: scheduleID,
+})
+if err != nil {
+    log.Fatalf("取消日程失败: %v", err)
+}
+```
+
+#### 重复日程管理
+
+```go
+// 创建重复日程（每周重复）
+createSchResp, err := client.Calendar.CreateSchedule(ctx, &calendar.CreateScheduleRequest{
+    Schedule: calendar.Schedule{
+        Summary:   "周会",
+        StartTime: 1571274600,
+        EndTime:   1571320210,
+        CalID:     calID,
+        Reminders: &calendar.Reminders{
+            IsRemind:   1,
+            IsRepeat:   1,
+            RepeatType: 1, // 1:每周
+            Timezone:   8, // 东八区
+        },
+    },
+})
+
+// 更新重复日程 - 仅修改此日程
+updateSchResp, err := client.Calendar.UpdateSchedule(ctx, &calendar.UpdateScheduleRequest{
+    OpMode:      1,           // 1:仅修改此日程
+    OpStartTime: 1663135200,  // 指定要修改的周期开始时间
+    Schedule: calendar.Schedule{
+        ScheduleID: scheduleID,
+        StartTime:  1663142400, // 新的开始时间
+        EndTime:    1663146000,
+    },
+})
+
+// 更新重复日程 - 修改将来的所有日程
+updateSchResp, err := client.Calendar.UpdateSchedule(ctx, &calendar.UpdateScheduleRequest{
+    OpMode:      2,          // 2:修改将来的所有日程
+    OpStartTime: 1663135200, // 从这个周期开始修改
+    Schedule: calendar.Schedule{
+        ScheduleID: scheduleID,
+        Summary:    "更新后的周会",
+        StartTime:  1663135200,
+        EndTime:    1663138800,
+    },
+})
+
+// 取消重复日程 - 仅删除此日程
+err = client.Calendar.DeleteSchedule(ctx, &calendar.DeleteScheduleRequest{
+    ScheduleID:  scheduleID,
+    OpMode:      1,          // 1:仅删除此日程
+    OpStartTime: 1663135200, // 指定要删除的周期开始时间
+})
+
+// 取消重复日程 - 删除本次及后续日程
+err = client.Calendar.DeleteSchedule(ctx, &calendar.DeleteScheduleRequest{
+    ScheduleID:  scheduleID,
+    OpMode:      2,          // 2:删除本次及后续日程
+    OpStartTime: 1663135200, // 从这个周期开始删除
+})
+```
+
 ## 项目结构
 
 ```
@@ -2643,9 +2853,14 @@ wecom-core/
     - ✅ 文档权限管理（获取权限信息、修改安全设置、修改查看规则、修改通知范围及权限）
     - ✅ 智能表格内容权限（查询和更新子表权限、管理成员额外权限、字段和记录级别权限）
     - ✅ 高级功能账号管理（分配、取消、获取高级功能账号列表）
+  - ✅ 日历管理 (Calendar)
+    - ✅ 日历管理（创建、获取、更新、删除日历）
+    - ✅ 日程管理（创建、获取、更新、取消日程）
+    - ✅ 日程参与者管理（新增、删除参与者）
+    - ✅ 获取日历下的日程列表
+    - ✅ 重复日程管理（支持不同操作模式）
   - ⏳ OA 审批
   - ⏳ 会议管理
-  - ⏳ 日程管理
   - 等 20+ 个模块
 
 ## 示例
