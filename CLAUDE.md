@@ -204,6 +204,7 @@ Completed:
 - Email service (send emails, public mailbox management, email group management)
 - Wedoc service (document management, form management, form data collection)
 - Meeting service (create, update, cancel, get info, get user meeting IDs)
+- ReserveMeeting service (advanced meeting management - guest management, attendee management, enrollment management, health check, waiting room management, custom links)
 
 In Progress:
 - Message service (send messages, receive callbacks, template cards)

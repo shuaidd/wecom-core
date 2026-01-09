@@ -2903,6 +2903,370 @@ createResp, err := client.Meeting.Create(ctx, &meeting.CreateMeetingRequest{
 })
 ```
 
+### 预约会议高级管理
+
+企业微信预约会议高级管理服务，提供丰富的会议管理功能，包括会议嘉宾管理、参会成员管理、报名管理、健康度检查、等候室管理等高级特性。
+
+#### 会议基础操作
+
+```go
+// 创建预约会议（完整配置）
+createResp, err := client.ReserveMeeting.Create(ctx, &reserve_meeting.CreateMeetingRequest{
+    AdminUserID:      "zhangsan",
+    Title:            "产品发布会",
+    MeetingStart:     time.Now().Add(24 * time.Hour).Unix(),
+    MeetingDuration:  7200,
+    Description:      "新产品发布会",
+    Location:         "线上会议",
+    Invitees: &reserve_meeting.Invitees{
+        UserID: []string{"lisi", "wangwu"},
+    },
+    Guests: []reserve_meeting.Guest{
+        {
+            Area:        "86",
+            PhoneNumber: "13800138000",
+            GuestName:   "特邀嘉宾",
+        },
+    },
+    Settings: &reserve_meeting.Settings{
+        Password:              "123456",
+        EnableWaitingRoom:     true,
+        AllowEnterBeforeHost:  true,
+        EnableEnterMute:       1,
+        AllowUnmuteSelf:       true,
+        MuteAll:              false,
+        AllowExternalUser:     true,
+        EnableScreenWatermark: false,
+        WatermarkType:         1,
+        AutoRecordType:        "none",
+        EnableEnroll:          true,
+        EnableHostKey:         true,
+        HostKey:               "888888",
+        Hosts: &reserve_meeting.Hosts{
+            UserID: []string{"zhangsan", "lisi"},
+        },
+        RemindScope: 3,
+        RingUsers: &reserve_meeting.RingUsers{
+            UserID: []string{"lisi", "wangwu"},
+        },
+    },
+    Reminders: &reserve_meeting.Reminders{
+        IsRepeat:        1,
+        RepeatType:      1,
+        RepeatUntilType: 1,
+        RepeatUntilCount: 10,
+        RepeatInterval:   1,
+        RepeatDayOfWeek:  []uint32{1, 3, 5},
+        RemindBefore:    []uint32{900, 3600},
+    },
+})
+if err != nil {
+    log.Fatalf("创建会议失败: %v", err)
+}
+fmt.Printf("会议创建成功: MeetingID=%s, MeetingCode=%s, MeetingLink=%s\n",
+    createResp.MeetingID, createResp.MeetingCode, createResp.MeetingLink)
+
+// 修改预约会议
+err = client.ReserveMeeting.Update(ctx, &reserve_meeting.UpdateMeetingRequest{
+    MeetingID:       meetingID,
+    Title:           "更新后的标题",
+    MeetingStart:    time.Now().Add(48 * time.Hour).Unix(),
+    MeetingDuration: 10800,
+    Settings: &reserve_meeting.Settings{
+        EnableWaitingRoom: false,
+    },
+})
+
+// 取消预约会议
+err = client.ReserveMeeting.Cancel(ctx, meetingID)
+
+// 取消周期性子会议
+err = client.ReserveMeeting.CancelWithSubMeeting(ctx, meetingID, subMeetingID)
+
+// 获取会议详情
+info, err := client.ReserveMeeting.GetInfo(ctx, meetingID)
+fmt.Printf("会议标题: %s, 状态: %d, 类型: %d\n", info.Title, info.Status, info.MeetingType)
+
+// 通过会议号获取会议详情
+info, err = client.ReserveMeeting.GetInfoByCode(ctx, meetingCode)
+
+// 获取周期性子会议详情
+subInfo, err := client.ReserveMeeting.GetSubMeetingInfo(ctx, meetingID, subMeetingID)
+```
+
+#### 受邀成员与嘉宾管理
+
+```go
+// 获取会议受邀成员列表
+inviteesResp, err := client.ReserveMeeting.GetInvitees(ctx, meetingID)
+fmt.Printf("受邀成员: %v\n", inviteesResp.Invitees)
+
+// 分页获取受邀成员
+for inviteesResp.HasMore {
+    inviteesResp, err = client.ReserveMeeting.GetInviteesWithCursor(ctx, meetingID, inviteesResp.NextCursor)
+}
+
+// 更新会议受邀成员列表（最多2000人）
+err = client.ReserveMeeting.SetInvitees(ctx, &reserve_meeting.SetInviteesRequest{
+    MeetingID: meetingID,
+    Invitees: []reserve_meeting.Invitee{
+        {UserID: "zhangsan"},
+        {UserID: "lisi"},
+        {UserID: "wangwu"},
+    },
+})
+
+// 获取会议嘉宾列表
+guestsResp, err := client.ReserveMeeting.GetGuests(ctx, meetingID)
+fmt.Printf("会议号: %s, 嘉宾数: %d\n", guestsResp.MeetingCode, len(guestsResp.Guests))
+for _, guest := range guestsResp.Guests {
+    fmt.Printf("嘉宾: %s, 手机: %s\n", guest.GuestName, guest.PhoneNumber)
+}
+
+// 更新会议嘉宾列表
+err = client.ReserveMeeting.SetGuests(ctx, &reserve_meeting.SetGuestsRequest{
+    MeetingID: meetingID,
+    Guests: []reserve_meeting.Guest{
+        {
+            Area:        "86",
+            PhoneNumber: "13900139000",
+            GuestName:   "产品总监",
+        },
+    },
+})
+```
+
+#### 参会成员管理
+
+```go
+// 获取实时会中成员列表
+realtimeResp, err := client.ReserveMeeting.GetRealtimeAttendeeList(ctx, meetingID)
+for _, attendee := range realtimeResp.Attendees {
+    fmt.Printf("成员: %s, 角色: %d, 麦克风: %v, 摄像头: %v\n",
+        attendee.UserID, attendee.Role, attendee.AudioState, attendee.VideoState)
+}
+
+// 分页获取实时会中成员
+for realtimeResp.HasMore {
+    realtimeResp, err = client.ReserveMeeting.GetRealtimeAttendeeListWithCursor(ctx,
+        &reserve_meeting.GetRealtimeAttendeeListRequest{
+            MeetingID: meetingID,
+            Cursor:    realtimeResp.NextCursor,
+            Limit:     50,
+        })
+}
+
+// 获取已参会成员列表
+attendeeResp, err := client.ReserveMeeting.GetAttendeeList(ctx, meetingID)
+for _, attendee := range attendeeResp.Attendees {
+    fmt.Printf("成员: %s, 入会时间: %s, 离会时间: %s, 角色: %d\n",
+        attendee.UserID, attendee.JoinTime, attendee.QuitTime, attendee.Role)
+}
+
+// 按时间范围获取参会成员
+timeRangeResp, err := client.ReserveMeeting.GetAttendeeListWithCursor(ctx,
+    &reserve_meeting.GetAttendeeListRequest{
+        MeetingID:    meetingID,
+        StartTime:    startTime,
+        EndTime:      endTime,
+        Cursor:       "",
+        Limit:        100,
+    })
+
+// 获取成员会议ID列表
+meetingIDsResp, err := client.ReserveMeeting.GetUserMeetingIDs(ctx, &reserve_meeting.GetUserMeetingIDsRequest{
+    UserID:    "zhangsan",
+    BeginTime: time.Now().Add(-30 * 24 * time.Hour).Unix(),
+    EndTime:   time.Now().Unix(),
+    Limit:     100,
+})
+fmt.Printf("会议ID列表: %v\n", meetingIDsResp.MeetingIDList)
+
+// 检查成员设备是否入会
+checkResp, err := client.ReserveMeeting.CheckDeviceInMeeting(ctx, &reserve_meeting.CheckDeviceInMeetingRequest{
+    UserID:         "zhangsan",
+    InstanceIDList: []int32{1, 2},  // 1:PC, 2:Mac
+    MeetingIDList:  []string{meetingID},
+})
+for _, result := range checkResp.ResultList {
+    fmt.Printf("会议: %s, 设备: %d 已入会\n", result.MeetingID, result.InstanceID)
+}
+```
+
+#### 会议健康度与质量
+
+```go
+// 获取会议健康度
+qualityResp, err := client.ReserveMeeting.GetQuality(ctx, &reserve_meeting.GetQualityRequest{
+    MeetingID:    meetingID,
+    SubMeetingID: subMeetingID,
+    StartTime:   startTime,
+    Limit:        20,
+})
+fmt.Printf("会议健康度: %d (0:无数据 1:健康 2:告警)\n", qualityResp.Quality)
+fmt.Printf("音频质量: %d, 视频质量: %d, 网络质量: %d\n",
+    qualityResp.AudioQuality, qualityResp.VideoQuality, qualityResp.NetworkQuality)
+
+// 查看成员健康度
+for _, attendee := range qualityResp.Attendees {
+    fmt.Printf("成员: %s, 设备: %d, 健康度: %d\n",
+        attendee.UserID, attendee.InstanceID, attendee.Quality)
+    if len(attendee.Problems) > 0 {
+        fmt.Printf("  问题: %v\n", attendee.Problems)
+    }
+}
+```
+
+#### 等候室管理
+
+```go
+// 获取实时等候室成员列表
+waitingResp, err := client.ReserveMeeting.WaitingRoomGetCurrentUserList(ctx, meetingID)
+for _, user := range waitingResp.UserList {
+    fmt.Printf("用户: %s, 设备: %d, 临时ID: %s\n",
+        user.UserID, user.InstanceID, user.TmpOpenID)
+}
+
+// 分页获取等候室成员
+for waitingResp.HasMore {
+    waitingResp, err = client.ReserveMeeting.WaitingRoomGetCurrentUserListWithCursor(ctx,
+        meetingID, 50, waitingResp.NextCursor)
+}
+
+// 获取等候室成员记录（历史记录）
+historyResp, err := client.ReserveMeeting.WaitingRoomGetUserList(ctx, meetingID)
+for _, user := range historyResp.UserList {
+    fmt.Printf("用户: %s, 入会时间: %d, 离会时间: %d\n",
+        user.UserID, user.JoinTime, user.QuitTime)
+}
+```
+
+#### 用户专属参会链接
+
+```go
+// 创建用户专属参会链接
+createURLResp, err := client.ReserveMeeting.CreateCustomerShortURL(ctx,
+    &reserve_meeting.CreateCustomerShortURLRequest{
+        MeetingID:    meetingID,
+        CustomerData: "user_001",
+    })
+fmt.Printf("专属链接: %s\n", createURLResp.MeetingShortURLCustomerData[0].MeetingShortURL)
+
+// 获取会议的所有专属参会链接
+getURLResp, err := client.ReserveMeeting.GetCustomerShortURL(ctx, meetingID)
+for _, item := range getURLResp.MeetingShortURLCustomerDataList {
+    fmt.Printf("标识: %s, 链接: %s\n", item.CustomerData, item.MeetingShortURL)
+}
+```
+
+#### 报名管理
+
+```go
+// 获取会议报名配置
+configResp, err := client.ReserveMeeting.EnrollGetConfig(ctx, meetingID)
+fmt.Printf("审批类型: %d (1:自动 2:手动)\n", configResp.ApproveType)
+fmt.Printf("是否收集问题: %d\n", configResp.IsCollectQuestion)
+
+// 修改会议报名配置
+setConfigResp, err := client.ReserveMeeting.EnrollSetConfig(ctx,
+    &reserve_meeting.EnrollSetConfigRequest{
+        MeetingID:                     meetingID,
+        ApproveType:                   1,
+        IsCollectQuestion:             2,
+        NoRegistrationNeededForStaff:  false,
+        QuestionList: []reserve_meeting.Question{
+            {
+                IsRequired:    2,
+                QuestionTitle: "您的职位",
+                QuestionType:  1,
+                OptionList: []reserve_meeting.Option{
+                    {Content: "产品经理"},
+                    {Content: "开发工程师"},
+                },
+            },
+            {
+                IsRequired:    2,
+                QuestionTitle: "手机号",
+                SpecialType:   2,
+            },
+        },
+    })
+fmt.Printf("问题数量: %d\n", setConfigResp.QuestionCount)
+
+// 获取会议报名信息
+enrollListResp, err := client.ReserveMeeting.EnrollList(ctx, meetingID)
+for _, enroll := range enrollListResp.EnrollList {
+    fmt.Printf("报名ID: %s, 昵称: %s, 状态: %d\n",
+        enroll.EnrollID, enroll.NickName, enroll.Status)
+    for _, answer := range enroll.AnswerList {
+        fmt.Printf("  问题: %s, 回答: %v\n", answer.QuestionTitle, answer.AnswerContent)
+    }
+}
+
+// 按状态筛选报名信息
+pendingResp, err := client.ReserveMeeting.EnrollListByStatus(ctx, meetingID, 1)
+
+// 导入会议报名信息
+importResp, err := client.ReserveMeeting.EnrollImport(ctx,
+    &reserve_meeting.EnrollImportRequest{
+        MeetingID: meetingID,
+        EnrollList: []reserve_meeting.EnrollImportItem{
+            {
+                UserID:      "zhangsan",
+                NickName:    "张三",
+            },
+            {
+                Area:        "86",
+                PhoneNumber: "13900139000",
+                NickName:    "李四",
+            },
+        },
+    })
+fmt.Printf("成功导入 %d 条记录\n", importResp.TotalCount)
+
+// 审批会议报名信息
+approveResp, err := client.ReserveMeeting.EnrollApprove(ctx,
+    &reserve_meeting.EnrollApproveRequest{
+        MeetingID:    meetingID,
+        Action:       3,  // 3:批准, 2:拒绝, 1:取消批准
+        EnrollIDList: []string{"enroll_id_1", "enroll_id_2"},
+    })
+fmt.Printf("成功处理 %d 条记录\n", approveResp.HandledCount)
+
+// 删除会议报名信息
+deleteResp, err := client.ReserveMeeting.EnrollDelete(ctx,
+    &reserve_meeting.EnrollDeleteRequest{
+        MeetingID: meetingID,
+        EnrollIDList: []reserve_meeting.EnrollIDItem{
+            {EnrollID: "enroll_id_1"},
+        },
+    })
+fmt.Printf("成功删除 %d 条记录\n", deleteResp.TotalCount)
+
+// 通过临时ID查询报名ID
+queryResp, err := client.ReserveMeeting.EnrollQueryByTmpOpenID(ctx,
+    &reserve_meeting.EnrollQueryByTmpOpenIDRequest{
+        MeetingID:     meetingID,
+        SortingRules:  1,
+        TmpOpenIDList: []string{"tmp_openid_1", "tmp_openid_2"},
+    })
+for _, item := range queryResp.EnrollIDList {
+    fmt.Printf("临时ID: %s, 报名ID: %s\n", item.TmpOpenID, item.EnrollID)
+}
+```
+
+功能说明：
+- **会议基础操作**：创建、修改、取消会议，支持周期性会议
+- **嘉宾管理**：支持添加会议嘉宾（外部人员）
+- **受邀成员管理**：支持查看和更新会议受邀成员列表（最多2000人）
+- **参会成员管理**：实时获取会中成员、历史参会记录、成员会议列表
+- **健康度检查**：获取会议及成员的健康度和质量指标
+- **等候室管理**：管理等候室成员，支持实时和历史记录查询
+- **专属链接**：为用户生成专属参会链接，便于追踪来源
+- **报名管理**：支持会议报名配置、报名信息查询、导入、审批和删除
+- **设备检查**：检查成员设备是否已入会
+- **分页支持**：所有列表接口都支持分页查询
+
 ## 项目结构
 
 ```
