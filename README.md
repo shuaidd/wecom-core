@@ -2753,6 +2753,156 @@ err = client.Calendar.DeleteSchedule(ctx, &calendar.DeleteScheduleRequest{
 })
 ```
 
+### 会议管理
+
+企业微信会议服务，支持会议的创建、修改、取消、查询详情等功能。
+
+#### 创建预约会议
+
+```go
+// 创建预约会议
+createResp, err := client.Meeting.Create(ctx, &meeting.CreateMeetingRequest{
+    AdminUserID:      "zhangsan",
+    Title:            "产品评审会议",
+    MeetingStart:     1571274600,
+    MeetingDuration:  3600,
+    Description:      "2.0版本产品评审",
+    Location:         "10楼1005会议室",
+    Invitees: &meeting.Invitees{
+        UserID: []string{"lisi", "wangwu"},
+    },
+    Settings: &meeting.Settings{
+        RemindScope:           3, // 提醒所有成员
+        Password:              "123456",
+        EnableWaitingRoom:     true,
+        AllowEnterBeforeHost:  true,
+        EnableEnterMute:       1, // 入会时静音
+        EnableScreenWatermark: false,
+        Hosts: &meeting.Hosts{
+            UserID: []string{"zhangsan"},
+        },
+        RingUsers: &meeting.RingUsers{
+            UserID: []string{"lisi", "wangwu"},
+        },
+    },
+    Reminders: &meeting.Reminders{
+        IsRepeat:     0, // 非周期性会议
+        RemindBefore: []int{900, 3600}, // 15分钟前和1小时前提醒
+    },
+})
+if err != nil {
+    log.Fatalf("创建会议失败: %v", err)
+}
+fmt.Printf("会议创建成功: MeetingID=%s\n", createResp.MeetingID)
+```
+
+#### 修改预约会议
+
+```go
+// 修改预约会议
+err = client.Meeting.Update(ctx, &meeting.UpdateMeetingRequest{
+    MeetingID:       meetingID,
+    Title:           "更新后的会议标题",
+    MeetingStart:    1571278800,
+    MeetingDuration: 7200,
+    Description:     "更新后的会议描述",
+    Location:        "11楼会议室",
+    Invitees: &meeting.Invitees{
+        UserID: []string{"lisi", "wangwu", "zhaoliu"},
+    },
+})
+if err != nil {
+    log.Fatalf("修改会议失败: %v", err)
+}
+```
+
+#### 取消预约会议
+
+```go
+// 取消预约会议
+err = client.Meeting.Cancel(ctx, meetingID)
+if err != nil {
+    log.Fatalf("取消会议失败: %v", err)
+}
+fmt.Println("会议已取消")
+```
+
+#### 获取会议详情
+
+```go
+// 获取会议详情
+info, err := client.Meeting.GetInfo(ctx, meetingID)
+if err != nil {
+    log.Fatalf("获取会议详情失败: %v", err)
+}
+
+fmt.Printf("会议标题: %s\n", info.Title)
+fmt.Printf("会议状态: %d (1:待开始 2:会议中 3:已结束 4:已取消 5:已过期)\n", info.Status)
+fmt.Printf("会议号: %s\n", info.MeetingCode)
+fmt.Printf("入会链接: %s\n", info.MeetingLink)
+
+// 遍历参会成员
+for _, member := range info.Attendees.Member {
+    fmt.Printf("成员: %s, 状态: %d, 入会次数: %d, 累计时长: %d秒\n",
+        member.UserID, member.Status, member.TotalJoinCount, member.CumulativeTime)
+}
+```
+
+#### 获取成员会议ID列表
+
+```go
+// 获取成员会议ID列表
+resp, err := client.Meeting.GetUserMeetingIDs(ctx, &meeting.GetUserMeetingIDsRequest{
+    UserID:    "zhangsan",
+    Cursor:    "0", // 初次调用填"0"
+    Limit:     100,
+    BeginTime: 1570000000,
+    EndTime:   1580000000,
+})
+if err != nil {
+    log.Fatalf("获取成员会议列表失败: %v", err)
+}
+
+fmt.Printf("会议ID列表: %v\n", resp.MeetingIDList)
+
+// 分页拉取
+for resp.NextCursor != "" {
+    resp, err = client.Meeting.GetUserMeetingIDs(ctx, &meeting.GetUserMeetingIDsRequest{
+        UserID: "zhangsan",
+        Cursor: resp.NextCursor,
+        Limit:  100,
+    })
+    if err != nil {
+        break
+    }
+    fmt.Printf("更多会议ID: %v\n", resp.MeetingIDList)
+}
+```
+
+#### 创建周期性会议
+
+```go
+// 创建周期性会议（每周重复）
+createResp, err := client.Meeting.Create(ctx, &meeting.CreateMeetingRequest{
+    AdminUserID:      "zhangsan",
+    Title:            "周会",
+    MeetingStart:     1571274600,
+    MeetingDuration:  3600,
+    Description:      "每周例行会议",
+    Location:         "10楼会议室",
+    Invitees: &meeting.Invitees{
+        UserID: []string{"lisi", "wangwu"},
+    },
+    Reminders: &meeting.Reminders{
+        IsRepeat:      1,           // 周期性会议
+        RepeatType:   1,           // 每周
+        RepeatUntil:   1576876813,  // 重复结束时间
+        RepeatInterval: 1,         // 重复间隔
+        RemindBefore: []int{900},  // 15分钟前提醒
+    },
+})
+```
+
 ## 项目结构
 
 ```
@@ -2859,8 +3009,13 @@ wecom-core/
     - ✅ 日程参与者管理（新增、删除参与者）
     - ✅ 获取日历下的日程列表
     - ✅ 重复日程管理（支持不同操作模式）
+  - ✅ 会议管理 (Meeting)
+    - ✅ 创建预约会议
+    - ✅ 修改预约会议
+    - ✅ 取消预约会议
+    - ✅ 获取会议详情
+    - ✅ 获取成员会议ID列表
   - ⏳ OA 审批
-  - ⏳ 会议管理
   - 等 20+ 个模块
 
 ## 示例

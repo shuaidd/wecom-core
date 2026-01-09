@@ -18,6 +18,7 @@ import (
 	"github.com/shuaidd/wecom-core/services/ip"
 	"github.com/shuaidd/wecom-core/services/kf"
 	"github.com/shuaidd/wecom-core/services/media"
+	"github.com/shuaidd/wecom-core/services/meeting"
 	"github.com/shuaidd/wecom-core/services/message"
 	"github.com/shuaidd/wecom-core/services/oauth"
 	"github.com/shuaidd/wecom-core/services/qrcode"
@@ -84,6 +85,8 @@ type Client struct {
 	Email *email.Service
 	// Wedoc 微文档服务
 	Wedoc *wedoc.Service
+	// Meeting 会议服务
+	Meeting *meeting.Service
 
 	// 内部组件(不对外暴露)
 	config       *config.Config
@@ -170,6 +173,7 @@ func New(opts ...config.Option) (*Client, error) {
 		KF:              kf.NewService(httpClient),
 		Email:           email.NewService(httpClient),
 		Wedoc:           wedoc.New(httpClient),
+		Meeting:         meeting.NewService(httpClient),
 	}
 
 	return c, nil
