@@ -231,3 +231,36 @@ type RingUsers struct {
 	// UserID 指定响铃的成员userid
 	UserID []string `json:"userid,omitempty"`
 }
+
+// MeetingStartRecord 会议发起记录
+type MeetingStartRecord struct {
+	// UserID 会议发起者的userid
+	UserID string `json:"userid"`
+	// StartTime 会议发起时间
+	StartTime int64 `json:"start_time"`
+}
+
+// GetMeetingStartListRequest 获取会议发起记录请求
+type GetMeetingStartListRequest struct {
+	// Type 查询类型：1-发起成功的会议记录，2-发起失败的会议
+	Type int `json:"type"`
+	// BeginTime 查询范围起始时间戳，单位为秒
+	BeginTime int64 `json:"begin_time"`
+	// EndTime 查询范围结束时间戳，单位为秒
+	EndTime int64 `json:"end_time"`
+	// Limit 每次拉取的数据量，默认值200，最大值1000
+	Limit int `json:"limit,omitempty"`
+	// Cursor 用于分页查询的游标
+	Cursor string `json:"cursor,omitempty"`
+}
+
+// GetMeetingStartListResponse 获取会议发起记录响应
+type GetMeetingStartListResponse struct {
+	common.Response
+	// NextCursor 当前数据最后一个key值
+	NextCursor string `json:"next_cursor,omitempty"`
+	// HasMore 是否还有数据待拉取
+	HasMore bool `json:"has_more,omitempty"`
+	// MeetingList 发起会议成功或失败的记录信息
+	MeetingList []MeetingStartRecord `json:"meeting_list,omitempty"`
+}

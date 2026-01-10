@@ -2903,6 +2903,244 @@ createResp, err := client.Meeting.Create(ctx, &meeting.CreateMeetingRequest{
 })
 ```
 
+#### 会议统计管理
+
+企业微信会议统计管理服务，支持获取会议发起记录等统计功能。
+
+##### 获取会议发起记录
+
+```go
+// 获取会议发起记录
+resp, err := client.Meeting.GetStartList(ctx, &meeting.GetMeetingStartListRequest{
+    Type:       1,  // 1-发起成功的会议记录，2-发起失败的会议
+    BeginTime:  1700000000,
+    EndTime:    1700001000,
+    Limit:      1000,
+    Cursor:     "",  // 首次调用可不填
+})
+if err != nil {
+    log.Fatalf("获取会议发起记录失败: %v", err)
+}
+
+fmt.Printf("是否还有数据: %t\n", resp.HasMore)
+fmt.Printf("下一页游标: %s\n", resp.NextCursor)
+
+for _, record := range resp.MeetingList {
+    fmt.Printf("发起者: %s, 发起时间: %d\n", record.UserID, record.StartTime)
+}
+
+// 分页拉取
+if resp.NextCursor != "" {
+    nextResp, err := client.Meeting.GetStartList(ctx, &meeting.GetMeetingStartListRequest{
+        Type:      1,
+        BeginTime: 1700000000,
+        EndTime:   1700001000,
+        Limit:     1000,
+        Cursor:    resp.NextCursor,
+    })
+    _ = nextResp
+    _ = err
+}
+```
+
+注意：查询时间跨度不能超过30天，查询区间是左闭右开的，记录会按时间从大到小排序。
+
+### 会中控制管理
+
+企业微信会中控制管理服务，支持对进行中的会议进行实时控制，包括成员管理、会议设置、投票管理等功能。
+
+#### 会中实时控制
+
+```go
+// 移出成员
+err := client.Meeting.KickoutUsers(ctx, &meeting.KickoutUsersRequest{
+    MeetingID: "meetingid123",
+    AllowRejoin: true,
+    OperatedUsers: []meeting.OperatedUser{
+        {TmpOpenID: "MS_OPENID", InstanceID: 1},
+    },
+})
+
+// 修改成员昵称
+err = client.Meeting.SetNicknames(ctx, &meeting.SetNicknamesRequest{
+    MeetingID: "meetingid123",
+    OperatedUsers: []meeting.OperatedUser{
+        {TmpOpenID: "MS_OPENID", InstanceID: 1, Nickname: "新昵称"},
+    },
+})
+
+// 静音成员
+err = client.Meeting.MuteUser(ctx, &meeting.MuteUserRequest{
+    MeetingID: "meetingid123",
+    Option: true, // true:静音；false:解除静音
+    OperatedUser: meeting.OperatedUser{TmpOpenID: "MS_OPENID", InstanceID: 1},
+})
+
+// 结束会议
+err = client.Meeting.Dismiss(ctx, &meeting.DismissMeetingRequest{
+    MeetingID: "meetingid123",
+    ForceDismiss: 1,
+    RetrieveCode: 0,
+})
+
+// 管理联席主持人
+err = client.Meeting.SetCohost(ctx, &meeting.SetCohostRequest{
+    MeetingID: "meetingid123",
+    Action: true, // true:设置联席主持人；false:撤销联席主持人
+    OperatedUser: meeting.OperatedUser{TmpOpenID: "MS_OPENID", InstanceID: 1},
+})
+
+// 管理会中设置
+err = client.Meeting.SetMeetingSettings(ctx, &meeting.MeetingSettingsRequest{
+    MeetingID: "meetingid123",
+    MuteAll: true,
+    AllowUnmuteSelf: true,
+    EnableEnterMute: 1,
+    MeetingLocked: false,
+    HideMeetingCodePassword: false,
+    AllowChat: 0,
+    AllowShareScreen: true,
+    AllowExternalUser: false,
+    PlayIvrOnJoin: true,
+    EnableWaitingRoom: true,
+})
+
+// 管理等候室成员
+err = client.Meeting.ManageWaitingRoomUsers(ctx, &meeting.ManageWaitingRoomUsersRequest{
+    MeetingID: "meetingid123",
+    OperateType: 1, // 1:将等候室成员移入会议；2:将会中成员移入等候室；3:将等候室成员移出等候室
+    AllowRejoin: true,
+    OperatedUsers: []meeting.OperatedUser{
+        {TmpOpenID: "MS_OPENID", InstanceID: 1},
+    },
+})
+
+// 关闭或开启成员视频
+err = client.Meeting.SwitchUserVideo(ctx, &meeting.SwitchUserVideoRequest{
+    MeetingID: "meetingid123",
+    Video: false, // false:关闭视频；true:开启视频（仅MRA设备）
+    OperatedUser: meeting.OperatedUser{TmpOpenID: "MS_OPENID", InstanceID: 1},
+})
+
+// 关闭成员屏幕共享
+err = client.Meeting.CloseScreenShare(ctx, &meeting.CloseScreenShareRequest{
+    MeetingID: "meetingid123",
+    OperatedUser: meeting.OperatedUser{TmpOpenID: "MS_OPENID", InstanceID: 1},
+})
+```
+
+#### 会议投票管理
+
+```go
+// 创建会议投票主题
+createResp, err := client.Meeting.CreatePollTheme(ctx, &meeting.CreatePollThemeRequest{
+    OperatorUserID: "OPENID",
+    InstanceID: 1,
+    MeetingID: "meetingid123",
+    PollTopic: "投票主题",
+    PollDesc: "投票描述",
+    IsAnony: 0,
+    PollQuestions: []meeting.PollQuestion{
+        {
+            QuestionDesc: "问题描述",
+            QuestionType: 0, // 0:单选；1:多选
+            PollOption: []string{"选项1", "选项2", "选项3"},
+        },
+    },
+})
+if err != nil {
+    log.Fatalf("创建投票主题失败: %v", err)
+}
+fmt.Printf("投票主题ID: %s\n", createResp.PollThemeID)
+
+// 修改会议投票主题
+err = client.Meeting.UpdatePollTheme(ctx, &meeting.UpdatePollThemeRequest{
+    OperatorUserID: "OPENID",
+    InstanceID: 1,
+    MeetingID: "meetingid123",
+    PollThemeID: "theme123",
+    PollTopic: "更新后的主题",
+    PollDesc: "更新后的描述",
+    IsAnony: 1,
+    PollQuestions: []meeting.PollQuestion{
+        {
+            QuestionDesc: "新问题描述",
+            QuestionType: 1,
+            PollOption: []string{"新选项1", "新选项2"},
+        },
+    },
+})
+
+// 删除会议投票
+err = client.Meeting.DeletePoll(ctx, &meeting.DeletePollRequest{
+    OperatorUserID: "OPENID",
+    InstanceID: 1,
+    MeetingID: "meetingid123",
+    PollThemeID: "theme123", // 或 PollID: "poll123"
+})
+
+// 结束会议投票
+err = client.Meeting.FinishPoll(ctx, &meeting.FinishPollRequest{
+    OperatorUserID: "OPENID",
+    InstanceID: 1,
+    MeetingID: "meetingid123",
+    PollThemeID: "theme123",
+    PollID: "poll123",
+})
+
+// 获取会议投票主题信息
+themeInfo, err := client.Meeting.GetPollThemeInfo(ctx, &meeting.GetPollThemeInfoRequest{
+    OperatorUserID: "OPENID",
+    InstanceID: 1,
+    MeetingID: "meetingid123",
+    PollThemeID: "theme123",
+})
+if err != nil {
+    log.Fatalf("获取投票主题信息失败: %v", err)
+}
+fmt.Printf("投票主题: %s, 描述: %s, 匿名: %d\n", themeInfo.PollTopic, themeInfo.PollDesc, themeInfo.IsAnony)
+
+// 获取会议投票详情
+pollDetail, err := client.Meeting.GetPollDetail(ctx, &meeting.GetPollDetailRequest{
+    OperatorUserID: "OPENID",
+    InstanceID: 1,
+    MeetingID: "meetingid123",
+    PollID: "poll123",
+})
+if err != nil {
+    log.Fatalf("获取投票详情失败: %v", err)
+}
+fmt.Printf("投票状态: %d, 投票人数: %d\n", pollDetail.Status, pollDetail.VoteTotalNum)
+
+// 获取会议投票列表
+pollList, err := client.Meeting.GetPollList(ctx, &meeting.GetPollListRequest{
+    OperatorUserID: "OPENID",
+    InstanceID: 1,
+    MeetingID: "meetingid123",
+})
+if err != nil {
+    log.Fatalf("获取投票列表失败: %v", err)
+}
+for _, theme := range pollList.PollsThemeInfo {
+    fmt.Printf("主题ID: %s\n", theme.PollThemeID)
+    for _, poll := range theme.PollsInfo {
+        fmt.Printf("  投票ID: %s, 标题: %s, 状态: %d\n", poll.PollID, poll.PollTopic, poll.Status)
+    }
+}
+
+// 发起会议投票
+startResp, err := client.Meeting.StartPoll(ctx, &meeting.StartPollRequest{
+    OperatorUserID: "OPENID",
+    InstanceID: 1,
+    MeetingID: "meetingid123",
+    PollThemeID: "theme123",
+})
+if err != nil {
+    log.Fatalf("发起投票失败: %v", err)
+}
+fmt.Printf("投票ID: %s\n", startResp.PollID)
+```
+
 ### 预约会议高级管理
 
 企业微信预约会议高级管理服务，提供丰富的会议管理功能，包括会议嘉宾管理、参会成员管理、报名管理、健康度检查、等候室管理等高级特性。
@@ -3379,6 +3617,7 @@ wecom-core/
     - ✅ 取消预约会议
     - ✅ 获取会议详情
     - ✅ 获取成员会议ID列表
+    - ✅ 会议统计管理（获取会议发起记录）
   - ⏳ OA 审批
   - 等 20+ 个模块
 

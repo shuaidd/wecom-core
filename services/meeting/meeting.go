@@ -54,3 +54,9 @@ func (s *Service) GetInfo(ctx context.Context, meetingID string) (*meeting.GetMe
 func (s *Service) GetUserMeetingIDs(ctx context.Context, req *meeting.GetUserMeetingIDsRequest) (*meeting.GetUserMeetingIDsResponse, error) {
 	return client.PostAndUnmarshal[meeting.GetUserMeetingIDsResponse](s.client, ctx, "/cgi-bin/meeting/get_user_meetingid", req)
 }
+
+// GetStartList 获取会议发起记录
+// 文档: https://developer.work.weixin.qq.com/document/path/96191
+func (s *Service) GetStartList(ctx context.Context, req *meeting.GetMeetingStartListRequest) (*meeting.GetMeetingStartListResponse, error) {
+	return client.PostAndUnmarshal[meeting.GetMeetingStartListResponse](s.client, ctx, "/cgi-bin/meeting/statistics/get_start_list", req)
+}

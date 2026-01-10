@@ -203,7 +203,7 @@ Completed:
 - KF service (customer service - account management, contact links, servicer management, session allocation, message sending, customer basic info, upgrade service configuration)
 - Email service (send emails, public mailbox management, email group management)
 - Wedoc service (document management, form management, form data collection)
-- Meeting service (create, update, cancel, get info, get user meeting IDs)
+- Meeting service (create, update, cancel, get info, get user meeting IDs, statistics management, in-meeting control, poll management)
 - ReserveMeeting service (advanced meeting management - guest management, attendee management, enrollment management, health check, waiting room management, custom links)
 
 In Progress:
