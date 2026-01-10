@@ -25,6 +25,7 @@ import (
 	"github.com/shuaidd/wecom-core/services/reserve_meeting"
 	"github.com/shuaidd/wecom-core/services/security"
 	"github.com/shuaidd/wecom-core/services/updown"
+	"github.com/shuaidd/wecom-core/services/webinar"
 	"github.com/shuaidd/wecom-core/services/wedoc"
 )
 
@@ -90,6 +91,8 @@ type Client struct {
 	Meeting *meeting.Service
 	// ReserveMeeting 预约会议高级管理服务
 	ReserveMeeting *reserve_meeting.Service
+	// Webinar 网络研讨会服务
+	Webinar *webinar.Service
 
 	// 内部组件(不对外暴露)
 	config       *config.Config
@@ -178,6 +181,7 @@ func New(opts ...config.Option) (*Client, error) {
 		Wedoc:           wedoc.New(httpClient),
 		Meeting:         meeting.NewService(httpClient),
 		ReserveMeeting:  reserve_meeting.NewService(httpClient),
+		Webinar:         webinar.NewService(httpClient),
 	}
 
 	return c, nil

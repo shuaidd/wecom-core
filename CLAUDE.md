@@ -205,6 +205,7 @@ Completed:
 - Wedoc service (document management, form management, form data collection)
 - Meeting service (create, update, cancel, get info, get user meeting IDs, statistics management, in-meeting control, poll management)
 - ReserveMeeting service (advanced meeting management - guest management, attendee management, enrollment management, health check, waiting room management, custom links)
+- Webinar service (webinar management - update, cancel, enroll config, enroll management, guest management, warm-up configuration)
 
 In Progress:
 - Message service (send messages, receive callbacks, template cards)
