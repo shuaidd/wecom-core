@@ -27,6 +27,7 @@ import (
 	"github.com/shuaidd/wecom-core/services/updown"
 	"github.com/shuaidd/wecom-core/services/webinar"
 	"github.com/shuaidd/wecom-core/services/wedoc"
+	"github.com/shuaidd/wecom-core/services/wedrive"
 )
 
 // 暴露给用户的类型别名，用于自定义 API 调用
@@ -87,6 +88,8 @@ type Client struct {
 	Email *email.Service
 	// Wedoc 微文档服务
 	Wedoc *wedoc.Service
+	// Wedrive 微盘服务
+	Wedrive *wedrive.Service
 	// Meeting 会议服务
 	Meeting *meeting.Service
 	// ReserveMeeting 预约会议高级管理服务
@@ -179,6 +182,7 @@ func New(opts ...config.Option) (*Client, error) {
 		KF:              kf.NewService(httpClient),
 		Email:           email.NewService(httpClient),
 		Wedoc:           wedoc.New(httpClient),
+		Wedrive:         wedrive.New(httpClient),
 		Meeting:         meeting.NewService(httpClient),
 		ReserveMeeting:  reserve_meeting.NewService(httpClient),
 		Webinar:         webinar.NewService(httpClient),
