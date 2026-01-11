@@ -23,16 +23,16 @@ type FormQuestion struct {
 
 // QuestionItem 问题项
 type QuestionItem struct {
-	QuestionID              uint32                  `json:"question_id"`                         // 问题id，从1开始
-	Title                   string                  `json:"title"`                               // 问题描述
-	Pos                     uint32                  `json:"pos"`                                 // 问题序号，从1开始
-	Status                  uint32                  `json:"status"`                              // 问题状态。1：正常；2：被删除
-	ReplyType               uint32                  `json:"reply_type"`                          // 问题类型。1：文本；2：单选；3：多选；5：位置；9：图片；10：文件；11：日期；14：时间；15：下拉列表；16：体温；17：签名；18：部门；19：成员 22：时长
-	MustReply               bool                    `json:"must_reply"`                          // 是否必答
-	Note                    string                  `json:"note,omitempty"`                      // 问题备注
-	Placeholder             string                  `json:"placeholder,omitempty"`               // 编辑提示
-	QuestionExtendSetting   QuestionExtendSetting   `json:"question_extend_setting,omitempty"`   // 问题的额外设置
-	OptionItem              []OptionItem            `json:"option_item,omitempty"`               // 单选/多选/下拉列表题的选项列表
+	QuestionID            uint32                `json:"question_id"`                       // 问题id，从1开始
+	Title                 string                `json:"title"`                             // 问题描述
+	Pos                   uint32                `json:"pos"`                               // 问题序号，从1开始
+	Status                uint32                `json:"status"`                            // 问题状态。1：正常；2：被删除
+	ReplyType             uint32                `json:"reply_type"`                        // 问题类型。1：文本；2：单选；3：多选；5：位置；9：图片；10：文件；11：日期；14：时间；15：下拉列表；16：体温；17：签名；18：部门；19：成员 22：时长
+	MustReply             bool                  `json:"must_reply"`                        // 是否必答
+	Note                  string                `json:"note,omitempty"`                    // 问题备注
+	Placeholder           string                `json:"placeholder,omitempty"`             // 编辑提示
+	QuestionExtendSetting QuestionExtendSetting `json:"question_extend_setting,omitempty"` // 问题的额外设置
+	OptionItem            []OptionItem          `json:"option_item,omitempty"`             // 单选/多选/下拉列表题的选项列表
 }
 
 // OptionItem 选项
@@ -60,11 +60,11 @@ type QuestionExtendSetting struct {
 
 // TextSetting 文本题设置
 type TextSetting struct {
-	ValidationType uint32  `json:"validation_type,omitempty"`   // 校验类型。0: 字符个数 1: 数字 2: 电子邮箱 3: 网址 4: 身份证 5: 手机号（大陆地区） 6: 固定电话
+	ValidationType   uint32  `json:"validation_type,omitempty"`   // 校验类型。0: 字符个数 1: 数字 2: 电子邮箱 3: 网址 4: 身份证 5: 手机号（大陆地区） 6: 固定电话
 	ValidationDetail uint32  `json:"validation_detail,omitempty"` // 校验详情
-	CharLen        uint32  `json:"char_len,omitempty"`          // 字符长度
-	NumberMin      float64 `json:"number_min,omitempty"`        // 数字的区间左端
-	NumberMax      float64 `json:"number_max,omitempty"`        // 数字的区间右端
+	CharLen          uint32  `json:"char_len,omitempty"`          // 字符长度
+	NumberMin        float64 `json:"number_min,omitempty"`        // 数字的区间左端
+	NumberMax        float64 `json:"number_max,omitempty"`        // 数字的区间右端
 }
 
 // RadioSetting 单选题设置
@@ -137,14 +137,14 @@ type MemberSetting struct {
 
 // FormSetting 收集表设置
 type FormSetting struct {
-	FillOutAuth          uint32              `json:"fill_out_auth,omitempty"`           // 填写权限。0：所有人；1：企业内指定人/部门；4:家校所有范围
-	FillInRange          *FillInRange        `json:"fill_in_range,omitempty"`           // 指定的可填写的人/部门
-	SettingManagerRange  *SettingManagerRange `json:"setting_manager_range,omitempty"`   // 收集表管理员
-	TimedRepeatInfo      *TimedRepeatInfo    `json:"timed_repeat_info,omitempty"`       // 定时重复设置项
-	AllowMultiFill       bool                `json:"allow_multi_fill,omitempty"`        // 是否允许每人提交多份
-	TimedFinish          uint32              `json:"timed_finish,omitempty"`            // 定时关闭
-	CanAnonymous         bool                `json:"can_anonymous,omitempty"`           // 是否支持匿名填写
-	CanNotifySubmit      bool                `json:"can_notify_submit,omitempty"`       // 是否有回复时提醒
+	FillOutAuth         uint32               `json:"fill_out_auth,omitempty"`         // 填写权限。0：所有人；1：企业内指定人/部门；4:家校所有范围
+	FillInRange         *FillInRange         `json:"fill_in_range,omitempty"`         // 指定的可填写的人/部门
+	SettingManagerRange *SettingManagerRange `json:"setting_manager_range,omitempty"` // 收集表管理员
+	TimedRepeatInfo     *TimedRepeatInfo     `json:"timed_repeat_info,omitempty"`     // 定时重复设置项
+	AllowMultiFill      bool                 `json:"allow_multi_fill,omitempty"`      // 是否允许每人提交多份
+	TimedFinish         uint32               `json:"timed_finish,omitempty"`          // 定时关闭
+	CanAnonymous        bool                 `json:"can_anonymous,omitempty"`         // 是否支持匿名填写
+	CanNotifySubmit     bool                 `json:"can_notify_submit,omitempty"`     // 是否有回复时提醒
 }
 
 // FillInRange 可填写的人/部门
@@ -183,7 +183,7 @@ type GetFormInfoRequest struct {
 
 // GetFormInfoResponse 获取收集表信息响应
 type GetFormInfoResponse struct {
-	FormInfo   FormInfoDetail `json:"form_info"`   // 收集表信息
+	FormInfo FormInfoDetail `json:"form_info"` // 收集表信息
 }
 
 // FormInfoDetail 收集表详细信息
@@ -199,8 +199,8 @@ type FormInfoDetail struct {
 
 // ModifyFormRequest 编辑收集表请求
 type ModifyFormRequest struct {
-	Oper     uint32   `json:"oper"`               // 操作类型。1：全量修改问题；2：全量修改设置
-	FormID   string   `json:"formid"`             // 收集表id
+	Oper     uint32   `json:"oper"`                // 操作类型。1：全量修改问题；2：全量修改设置
+	FormID   string   `json:"formid"`              // 收集表id
 	FormInfo FormInfo `json:"form_info,omitempty"` // 收集表信息
 }
 
@@ -222,13 +222,13 @@ type Answer struct {
 
 // AnswerItem 答案项
 type AnswerItem struct {
-	AnswerID          uint64      `json:"answer_id"`                    // 答案id
-	UserName          string      `json:"user_name,omitempty"`          // 用户名
-	UserID            string      `json:"userid,omitempty"`             // 用户id，匿名填写不返回
-	CTime             uint64      `json:"ctime"`                        // 创建时间
-	MTime             uint64      `json:"mtime"`                        // 修改时间
-	Reply             ReplyDetail `json:"reply"`                        // 该用户的答案明细
-	AnswerStatus      uint32      `json:"answer_status"`                // 答案状态 1:正常 3:统计者移除此答案或删除
+	AnswerID          uint64      `json:"answer_id"`                     // 答案id
+	UserName          string      `json:"user_name,omitempty"`           // 用户名
+	UserID            string      `json:"userid,omitempty"`              // 用户id，匿名填写不返回
+	CTime             uint64      `json:"ctime"`                         // 创建时间
+	MTime             uint64      `json:"mtime"`                         // 修改时间
+	Reply             ReplyDetail `json:"reply"`                         // 该用户的答案明细
+	AnswerStatus      uint32      `json:"answer_status"`                 // 答案状态 1:正常 3:统计者移除此答案或删除
 	TmpExternalUserID string      `json:"tmp_external_userid,omitempty"` // 外部用户临时id
 }
 
@@ -239,14 +239,14 @@ type ReplyDetail struct {
 
 // ReplyItem 回答项
 type ReplyItem struct {
-	QuestionID        uint64                 `json:"question_id"`                   // 问题id
-	TextReply         string                 `json:"text_reply,omitempty"`          // 文本答案
-	OptionReply       []uint32               `json:"option_reply,omitempty"`        // 选择题答案
-	OptionExtendReply []OptionExtendReply    `json:"option_extend_reply,omitempty"` // 选择题，其他选项列表
-	FileExtendReply   []FileExtendReply      `json:"file_extend_reply,omitempty"`   // 文件题答案列表
-	DepartmentReply   *DepartmentReply       `json:"department_reply,omitempty"`    // 部门题答案
-	MemberReply       *MemberReply           `json:"member_reply,omitempty"`        // 成员题答案
-	DurationReply     *DurationReply         `json:"duration_reply,omitempty"`      // 时长题答案
+	QuestionID        uint64              `json:"question_id"`                   // 问题id
+	TextReply         string              `json:"text_reply,omitempty"`          // 文本答案
+	OptionReply       []uint32            `json:"option_reply,omitempty"`        // 选择题答案
+	OptionExtendReply []OptionExtendReply `json:"option_extend_reply,omitempty"` // 选择题，其他选项列表
+	FileExtendReply   []FileExtendReply   `json:"file_extend_reply,omitempty"`   // 文件题答案列表
+	DepartmentReply   *DepartmentReply    `json:"department_reply,omitempty"`    // 部门题答案
+	MemberReply       *MemberReply        `json:"member_reply,omitempty"`        // 成员题答案
+	DurationReply     *DurationReply      `json:"duration_reply,omitempty"`      // 时长题答案
 }
 
 // OptionExtendReply 其他选项答案
@@ -283,18 +283,18 @@ type MemberItem struct {
 
 // DurationReply 时长答案
 type DurationReply struct {
-	BeginTime uint32  `json:"begin_time"`        // 开始时间，时间戳
-	EndTime   uint32  `json:"end_time"`          // 结束时间，时间戳
-	TimeScale uint32  `json:"time_scale"`        // 时间刻度。1: 按天 2: 按小时
-	DayRange  uint32  `json:"day_range"`         // 单位换算，多少小时/天
-	Days      float64 `json:"days,omitempty"`    // 天数
-	Hours     float64 `json:"hours,omitempty"`   // 小时数
+	BeginTime uint32  `json:"begin_time"`      // 开始时间，时间戳
+	EndTime   uint32  `json:"end_time"`        // 结束时间，时间戳
+	TimeScale uint32  `json:"time_scale"`      // 时间刻度。1: 按天 2: 按小时
+	DayRange  uint32  `json:"day_range"`       // 单位换算，多少小时/天
+	Days      float64 `json:"days,omitempty"`  // 天数
+	Hours     float64 `json:"hours,omitempty"` // 小时数
 }
 
 // GetFormStatisticRequest 收集表的统计信息查询请求
 type GetFormStatisticRequest struct {
-	RepeatedID string `json:"repeated_id"`       // 收集表的repeated_id
-	ReqType    uint32 `json:"req_type"`          // 请求类型 1:只获取统计结果 2:获取已提交列表 3:获取未提交列表
+	RepeatedID string `json:"repeated_id"`          // 收集表的repeated_id
+	ReqType    uint32 `json:"req_type"`             // 请求类型 1:只获取统计结果 2:获取已提交列表 3:获取未提交列表
 	StartTime  uint64 `json:"start_time,omitempty"` // 筛选开始时间
 	EndTime    uint64 `json:"end_time,omitempty"`   // 筛选结束时间
 	Limit      uint64 `json:"limit,omitempty"`      // 分页拉取时批次大小，最大10000
@@ -303,13 +303,13 @@ type GetFormStatisticRequest struct {
 
 // GetFormStatisticResponse 收集表的统计信息查询响应
 type GetFormStatisticResponse struct {
-	FillCnt        uint64       `json:"fill_cnt"`               // 已填写次数
-	FillUserCnt    uint64       `json:"fill_user_cnt"`          // 已填写人数
-	UnfillUserCnt  uint64       `json:"unfill_user_cnt"`        // 未填写人数
-	SubmitUsers    []SubmitUser `json:"submit_users,omitempty"` // 已填写人列表
-	UnfillUsers    []UnfillUser `json:"unfill_users,omitempty"` // 未填写人列表
-	HasMore        bool         `json:"has_more,omitempty"`     // 是否还有更多
-	Cursor         uint64       `json:"cursor,omitempty"`       // 上次分页拉取返回的cursor
+	FillCnt       uint64       `json:"fill_cnt"`               // 已填写次数
+	FillUserCnt   uint64       `json:"fill_user_cnt"`          // 已填写人数
+	UnfillUserCnt uint64       `json:"unfill_user_cnt"`        // 未填写人数
+	SubmitUsers   []SubmitUser `json:"submit_users,omitempty"` // 已填写人列表
+	UnfillUsers   []UnfillUser `json:"unfill_users,omitempty"` // 未填写人列表
+	HasMore       bool         `json:"has_more,omitempty"`     // 是否还有更多
+	Cursor        uint64       `json:"cursor,omitempty"`       // 上次分页拉取返回的cursor
 }
 
 // SubmitUser 已提交用户

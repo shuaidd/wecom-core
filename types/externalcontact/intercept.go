@@ -52,15 +52,15 @@ type GetInterceptRuleResponse struct {
 
 // UpdateInterceptRuleRequest 修改敏感词规则请求
 type UpdateInterceptRuleRequest struct {
-	RuleID                 string           `json:"rule_id"`
-	RuleName               string           `json:"rule_name,omitempty"`
-	WordList               []string         `json:"word_list,omitempty"`
-	ExtraRule              *struct {
+	RuleID    string   `json:"rule_id"`
+	RuleName  string   `json:"rule_name,omitempty"`
+	WordList  []string `json:"word_list,omitempty"`
+	ExtraRule *struct {
 		SemanticsList []int `json:"semantics_list,omitempty"`
 	} `json:"extra_rule,omitempty"`
-	InterceptType          int              `json:"intercept_type,omitempty"`
-	AddApplicableRange     *ApplicableRange `json:"add_applicable_range,omitempty"`
-	RemoveApplicableRange  *ApplicableRange `json:"remove_applicable_range,omitempty"`
+	InterceptType         int              `json:"intercept_type,omitempty"`
+	AddApplicableRange    *ApplicableRange `json:"add_applicable_range,omitempty"`
+	RemoveApplicableRange *ApplicableRange `json:"remove_applicable_range,omitempty"`
 }
 
 // DelInterceptRuleRequest 删除敏感词规则请求

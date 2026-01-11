@@ -220,9 +220,9 @@ func main() {
 			fmt.Println("\n=== 获取已提交列表 ===")
 			submitList, err := client.Wedoc.GetFormStatistic(ctx, &wedoc.GetFormStatisticRequest{
 				RepeatedID: repeatedID,
-				ReqType:    2,              // 2:获取已提交列表
-				StartTime:  1700000000,     // 示例时间戳
-				EndTime:    1800000000,     // 示例时间戳
+				ReqType:    2,          // 2:获取已提交列表
+				StartTime:  1700000000, // 示例时间戳
+				EndTime:    1800000000, // 示例时间戳
 				Limit:      20,
 			})
 			if err != nil {

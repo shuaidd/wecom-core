@@ -203,4 +203,3 @@ type BatchDeleteUsersRequest struct {
 type BatchDeleteUsersResponse struct {
 	common.Response
 }
-

@@ -59,8 +59,8 @@ type CellData struct {
 
 // CellValue 单元格的数据内容
 type CellValue struct {
-	Text string      `json:"text,omitempty"` // 文本内容
-	Link *CellLink   `json:"link,omitempty"` // 超链接内容
+	Text string    `json:"text,omitempty"` // 文本内容
+	Link *CellLink `json:"link,omitempty"` // 超链接内容
 }
 
 // CellLink 超链接的相关信息
@@ -76,13 +76,13 @@ type CellFormat struct {
 
 // TextFormat 文本样式信息
 type TextFormat struct {
-	Font          string      `json:"font,omitempty"`          // 字体名称
-	FontSize      uint32      `json:"font_size,omitempty"`     // 字体大小，最大72
-	Bold          bool        `json:"bold,omitempty"`          // 字体加粗
-	Italic        bool        `json:"italic,omitempty"`        // 斜体
-	Strikethrough bool        `json:"strikethrough,omitempty"` // 字体删除线
-	Underline     bool        `json:"underline,omitempty"`     // 下划线
-	Color         *Color      `json:"color,omitempty"`         // 字体颜色
+	Font          string `json:"font,omitempty"`          // 字体名称
+	FontSize      uint32 `json:"font_size,omitempty"`     // 字体大小，最大72
+	Bold          bool   `json:"bold,omitempty"`          // 字体加粗
+	Italic        bool   `json:"italic,omitempty"`        // 斜体
+	Strikethrough bool   `json:"strikethrough,omitempty"` // 字体删除线
+	Underline     bool   `json:"underline,omitempty"`     // 下划线
+	Color         *Color `json:"color,omitempty"`         // 字体颜色
 }
 
 // Color 颜色信息，采用 RGBA 表示法
@@ -97,8 +97,8 @@ type Color struct {
 
 // BatchUpdateSpreadsheetRequest 批量编辑表格内容请求
 type BatchUpdateSpreadsheetRequest struct {
-	DocID    string                       `json:"docid"`    // 文档的docid
-	Requests []SpreadsheetUpdateRequest   `json:"requests"` // 更新操作列表
+	DocID    string                     `json:"docid"`    // 文档的docid
+	Requests []SpreadsheetUpdateRequest `json:"requests"` // 更新操作列表
 }
 
 // BatchUpdateSpreadsheetResponse 批量编辑表格内容响应
@@ -113,10 +113,10 @@ type BatchUpdateSpreadsheetData struct {
 
 // SpreadsheetUpdateRequest 更新请求
 type SpreadsheetUpdateRequest struct {
-	AddSheetRequest        *SpreadsheetAddSheetRequest `json:"add_sheet_request,omitempty"`        // 新增工作表
+	AddSheetRequest        *SpreadsheetAddSheetRequest    `json:"add_sheet_request,omitempty"`        // 新增工作表
 	DeleteSheetRequest     *SpreadsheetDeleteSheetRequest `json:"delete_sheet_request,omitempty"`     // 删除工作表
-	UpdateRangeRequest     *UpdateRangeRequest         `json:"update_range_request,omitempty"`     // 更新范围内单元格内容
-	DeleteDimensionRequest *DeleteDimensionRequest     `json:"delete_dimension_request,omitempty"` // 删除表格连续的行或列
+	UpdateRangeRequest     *UpdateRangeRequest            `json:"update_range_request,omitempty"`     // 更新范围内单元格内容
+	DeleteDimensionRequest *DeleteDimensionRequest        `json:"delete_dimension_request,omitempty"` // 删除表格连续的行或列
 }
 
 // SpreadsheetAddSheetRequest 新增工作表
@@ -147,10 +147,10 @@ type DeleteDimensionRequest struct {
 
 // SpreadsheetUpdateResponse 更新操作对应的响应结构体类型
 type SpreadsheetUpdateResponse struct {
-	AddSheetResponse        *SpreadsheetAddSheetResponse `json:"add_sheet_response,omitempty"`        // 新增工作表响应结构体
+	AddSheetResponse        *SpreadsheetAddSheetResponse    `json:"add_sheet_response,omitempty"`        // 新增工作表响应结构体
 	DeleteSheetResponse     *SpreadsheetDeleteSheetResponse `json:"delete_sheet_response,omitempty"`     // 删除工作表响应结构体
-	UpdateRangeResponse     *UpdateRangeResponse         `json:"update_range_response,omitempty"`     // 更新范围内单元格内容响应结构体
-	DeleteDimensionResponse *DeleteDimensionResponse     `json:"delete_dimension_response,omitempty"` // 删除表格连续的行或列响应结构体
+	UpdateRangeResponse     *UpdateRangeResponse            `json:"update_range_response,omitempty"`     // 更新范围内单元格内容响应结构体
+	DeleteDimensionResponse *DeleteDimensionResponse        `json:"delete_dimension_response,omitempty"` // 删除表格连续的行或列响应结构体
 }
 
 // SpreadsheetAddSheetResponse 新增子表操作的请求响应体结构

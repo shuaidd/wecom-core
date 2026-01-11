@@ -87,10 +87,10 @@ type AnswerText struct {
 
 // AnswerAttachment 回答附件
 type AnswerAttachment struct {
-	MsgType    string                 `json:"msgtype"`              // 附件类型: image, video, link, miniprogram
-	Image      *AnswerImageAttachment `json:"image,omitempty"`      // 图片附件
-	Video      *AnswerVideoAttachment `json:"video,omitempty"`      // 视频附件
-	Link       *AnswerLinkAttachment  `json:"link,omitempty"`       // 链接附件
+	MsgType     string                       `json:"msgtype"`               // 附件类型: image, video, link, miniprogram
+	Image       *AnswerImageAttachment       `json:"image,omitempty"`       // 图片附件
+	Video       *AnswerVideoAttachment       `json:"video,omitempty"`       // 视频附件
+	Link        *AnswerLinkAttachment        `json:"link,omitempty"`        // 链接附件
 	MiniProgram *AnswerMiniProgramAttachment `json:"miniprogram,omitempty"` // 小程序附件
 }
 
@@ -108,18 +108,18 @@ type AnswerVideoAttachment struct {
 
 // AnswerLinkAttachment 链接附件
 type AnswerLinkAttachment struct {
-	Title  string `json:"title"`            // 标题
-	Desc   string `json:"desc,omitempty"`   // 描述
-	URL    string `json:"url"`              // 点击后跳转的链接
+	Title  string `json:"title"`             // 标题
+	Desc   string `json:"desc,omitempty"`    // 描述
+	URL    string `json:"url"`               // 点击后跳转的链接
 	PicURL string `json:"pic_url,omitempty"` // 缩略图链接
 }
 
 // AnswerMiniProgramAttachment 小程序附件
 type AnswerMiniProgramAttachment struct {
-	Title        string `json:"title,omitempty"`         // 小程序消息标题。最多64个字节
+	Title        string `json:"title,omitempty"`          // 小程序消息标题。最多64个字节
 	ThumbMediaID string `json:"thumb_media_id,omitempty"` // 小程序消息封面的mediaid（添加/修改时使用）
-	AppID        string `json:"appid"`                   // 小程序appid
-	PagePath     string `json:"pagepath"`                // 点击消息卡片后进入的小程序页面路径
+	AppID        string `json:"appid"`                    // 小程序appid
+	PagePath     string `json:"pagepath"`                 // 点击消息卡片后进入的小程序页面路径
 }
 
 // Answer 回答

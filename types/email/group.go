@@ -63,7 +63,7 @@ type UpdateGroupResponse struct {
 
 // SearchGroupRequest 模糊搜索邮件群组请求(通过URL参数传递)
 type SearchGroupRequest struct {
-	Fuzzy   uint32 `json:"fuzzy"`           // 1:开启模糊搜索 0:获取全部邮件群组(必填)
+	Fuzzy   uint32 `json:"fuzzy"`             // 1:开启模糊搜索 0:获取全部邮件群组(必填)
 	GroupID string `json:"groupid,omitempty"` // 邮件群组ID，邮箱格式
 }
 
@@ -77,7 +77,7 @@ type GroupInfo struct {
 type SearchGroupResponse struct {
 	ErrCode int32        `json:"errcode"`
 	ErrMsg  string       `json:"errmsg"`
-	Count   int          `json:"count"`          // 返回条数
+	Count   int          `json:"count"`            // 返回条数
 	Groups  []*GroupInfo `json:"groups,omitempty"` // 邮件群组列表
 }
 

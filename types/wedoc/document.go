@@ -72,9 +72,9 @@ type NumberProperty struct {
 
 // Spacing 段落间距
 type Spacing struct {
-	Before   float64 `json:"before"`             // 段后间距，单位是像素（px）
-	After    float64 `json:"after"`              // 段前间距，单位是像素（px）
-	Line     float64 `json:"line"`               // 行间距数值，单位是像素（px）
+	Before   float64 `json:"before"`              // 段后间距，单位是像素（px）
+	After    float64 `json:"after"`               // 段前间距，单位是像素（px）
+	Line     float64 `json:"line"`                // 行间距数值，单位是像素（px）
 	LineRule string  `json:"line_rule,omitempty"` // 行间距格式
 }
 
@@ -131,8 +131,8 @@ type TableRowProperty struct {
 
 // TableCellProperty 表格单元属性
 type TableCellProperty struct {
-	TableCellBorders *Borders `json:"table_cell_borders,omitempty"` // 边界属性
-	VerticalAlignment string  `json:"vertical_alignment,omitempty"` // 垂直方向对齐属性
+	TableCellBorders  *Borders `json:"table_cell_borders,omitempty"` // 边界属性
+	VerticalAlignment string   `json:"vertical_alignment,omitempty"` // 垂直方向对齐属性
 }
 
 // Borders 表格单元的边界属性
@@ -207,16 +207,16 @@ type Anchor struct {
 
 // AnchorPicture 锚点图片
 type AnchorPicture struct {
-	URI                string              `json:"uri,omitempty"`                  // 图片URI
-	RelativeRect       *RelativeRect       `json:"relative_rect,omitempty"`        // 裁剪范围
-	Shape              *ShapeProperties    `json:"shape,omitempty"`                // 形状属性
-	PositionHorizontal *PositionHorizontal `json:"position_horizontal,omitempty"`  // 水平位置
-	PositionVertical   *PositionVertical   `json:"position_vertical,omitempty"`    // 竖直位置
-	WrapNone           bool                `json:"wrap_none,omitempty"`            // 非文字包围
-	WrapSquare         *WrapSquare         `json:"wrap_square,omitempty"`          // 四周型环绕
-	WrapTopAndBottom   bool                `json:"wrap_top_and_bottom,omitempty"`  // 上下型环绕
-	BehindDoc          bool                `json:"behind_doc,omitempty"`           // 衬于文字下方
-	AllowOverlap       bool                `json:"allow_overlap,omitempty"`        // 允许重叠
+	URI                string              `json:"uri,omitempty"`                 // 图片URI
+	RelativeRect       *RelativeRect       `json:"relative_rect,omitempty"`       // 裁剪范围
+	Shape              *ShapeProperties    `json:"shape,omitempty"`               // 形状属性
+	PositionHorizontal *PositionHorizontal `json:"position_horizontal,omitempty"` // 水平位置
+	PositionVertical   *PositionVertical   `json:"position_vertical,omitempty"`   // 竖直位置
+	WrapNone           bool                `json:"wrap_none,omitempty"`           // 非文字包围
+	WrapSquare         *WrapSquare         `json:"wrap_square,omitempty"`         // 四周型环绕
+	WrapTopAndBottom   bool                `json:"wrap_top_and_bottom,omitempty"` // 上下型环绕
+	BehindDoc          bool                `json:"behind_doc,omitempty"`          // 衬于文字下方
+	AllowOverlap       bool                `json:"allow_overlap,omitempty"`       // 允许重叠
 }
 
 // PositionHorizontal 水平位置
@@ -287,9 +287,9 @@ type DeleteContent struct {
 
 // InsertImage 插入图片
 type InsertImage struct {
-	ImageID  string   `json:"image_id"`        // 图片url，通过上传图片接口获得
-	Location Location `json:"location"`        // 插入的位置
-	Width    uint32   `json:"width,omitempty"` // 图片的宽，单位是像素（px）
+	ImageID  string   `json:"image_id"`         // 图片url，通过上传图片接口获得
+	Location Location `json:"location"`         // 插入的位置
+	Width    uint32   `json:"width,omitempty"`  // 图片的宽，单位是像素（px）
 	Height   uint32   `json:"height,omitempty"` // 图片的高， 单位是像素（px）
 }
 

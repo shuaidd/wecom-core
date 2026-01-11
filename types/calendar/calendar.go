@@ -4,16 +4,16 @@ import "github.com/shuaidd/wecom-core/internal/client"
 
 // Calendar 日历信息
 type Calendar struct {
-	CalID          string        `json:"cal_id,omitempty"`           // 日历ID
-	Admins         []string      `json:"admins,omitempty"`           // 日历的管理员userid列表
-	SetAsDefault   int           `json:"set_as_default,omitempty"`   // 是否将该日历设置为默认日历。0-否；1-是
-	Summary        string        `json:"summary"`                    // 日历标题。1 ~ 128 字符
-	Color          string        `json:"color"`                      // 日历颜色，RGB颜色编码16进制表示
-	Description    string        `json:"description,omitempty"`      // 日历描述。0 ~ 512 字符
-	IsPublic       int           `json:"is_public,omitempty"`        // 是否公共日历。0-否；1-是
-	PublicRange    *PublicRange  `json:"public_range,omitempty"`     // 公开范围
-	IsCorpCalendar int           `json:"is_corp_calendar,omitempty"` // 是否全员日历。0-否；1-是
-	Shares         []Share       `json:"shares,omitempty"`           // 日历通知范围成员列表
+	CalID          string       `json:"cal_id,omitempty"`           // 日历ID
+	Admins         []string     `json:"admins,omitempty"`           // 日历的管理员userid列表
+	SetAsDefault   int          `json:"set_as_default,omitempty"`   // 是否将该日历设置为默认日历。0-否；1-是
+	Summary        string       `json:"summary"`                    // 日历标题。1 ~ 128 字符
+	Color          string       `json:"color"`                      // 日历颜色，RGB颜色编码16进制表示
+	Description    string       `json:"description,omitempty"`      // 日历描述。0 ~ 512 字符
+	IsPublic       int          `json:"is_public,omitempty"`        // 是否公共日历。0-否；1-是
+	PublicRange    *PublicRange `json:"public_range,omitempty"`     // 公开范围
+	IsCorpCalendar int          `json:"is_corp_calendar,omitempty"` // 是否全员日历。0-否；1-是
+	Shares         []Share      `json:"shares,omitempty"`           // 日历通知范围成员列表
 }
 
 // PublicRange 公开范围
@@ -42,7 +42,7 @@ type FailResult struct {
 
 // CreateCalendarRequest 创建日历请求
 type CreateCalendarRequest struct {
-	Calendar Calendar `json:"calendar"` // 日历信息
+	Calendar Calendar `json:"calendar"`          // 日历信息
 	AgentID  int      `json:"agentid,omitempty"` // 授权方安装的应用agentid
 }
 

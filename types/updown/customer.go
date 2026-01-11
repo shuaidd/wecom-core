@@ -10,9 +10,9 @@ type ExternalUserIDInfo struct {
 
 // UnionIDToExternalUserIDRequest 通过unionid和openid查询external_userid请求
 type UnionIDToExternalUserIDRequest struct {
-	UnionID        string `json:"unionid"`                  // 微信客户的unionid
-	OpenID         string `json:"openid"`                   // 微信客户的openid
-	CorpID         string `json:"corpid,omitempty"`         // 需要换取的企业corpid
+	UnionID        string `json:"unionid"`                    // 微信客户的unionid
+	OpenID         string `json:"openid"`                     // 微信客户的openid
+	CorpID         string `json:"corpid,omitempty"`           // 需要换取的企业corpid
 	MassCallTicket string `json:"mass_call_ticket,omitempty"` // 大批量调用凭据
 }
 
@@ -42,8 +42,8 @@ type PendingIDResult struct {
 
 // ExternalUserIDToPendingIDRequest external_userid查询pending_id请求
 type ExternalUserIDToPendingIDRequest struct {
-	ChatID         string   `json:"chat_id,omitempty"`   // 群id
-	ExternalUserID []string `json:"external_userid"`     // 上游或下游企业外部联系人id，最多同时查询100个
+	ChatID         string   `json:"chat_id,omitempty"` // 群id
+	ExternalUserID []string `json:"external_userid"`   // 上游或下游企业外部联系人id，最多同时查询100个
 }
 
 // ExternalUserIDToPendingIDResponse external_userid查询pending_id响应

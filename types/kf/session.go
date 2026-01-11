@@ -11,7 +11,7 @@ type GetServiceStateRequest struct {
 // GetServiceStateResponse 获取会话状态响应
 type GetServiceStateResponse struct {
 	common.Response
-	ServiceState   int    `json:"service_state"`            // 当前的会话状态,0-未处理,1-由智能助手接待,2-待接入池排队中,3-由人工接待,4-已结束/未开始
+	ServiceState   int    `json:"service_state"`             // 当前的会话状态,0-未处理,1-由智能助手接待,2-待接入池排队中,3-由人工接待,4-已结束/未开始
 	ServicerUserID string `json:"servicer_userid,omitempty"` // 接待人员的userid,仅当state=3时有效
 }
 

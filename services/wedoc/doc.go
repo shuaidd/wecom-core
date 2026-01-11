@@ -8,11 +8,11 @@ import (
 )
 
 const (
-	createDocURL       = "/cgi-bin/wedoc/create_doc"
-	getDocBaseInfoURL  = "/cgi-bin/wedoc/get_doc_base_info"
-	deleteDocURL       = "/cgi-bin/wedoc/del_doc"
-	renameDocURL       = "/cgi-bin/wedoc/rename_doc"
-	shareDocURL        = "/cgi-bin/wedoc/doc_share"
+	createDocURL      = "/cgi-bin/wedoc/create_doc"
+	getDocBaseInfoURL = "/cgi-bin/wedoc/get_doc_base_info"
+	deleteDocURL      = "/cgi-bin/wedoc/del_doc"
+	renameDocURL      = "/cgi-bin/wedoc/rename_doc"
+	shareDocURL       = "/cgi-bin/wedoc/doc_share"
 )
 
 // CreateDoc 新建文档

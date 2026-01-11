@@ -30,18 +30,18 @@ type CommonRecord struct {
 
 // GetRecordsRequest 查询记录请求
 type GetRecordsRequest struct {
-	DocID       string       `json:"docid"`
-	SheetID     string       `json:"sheet_id"`
-	ViewID      string       `json:"view_id,omitempty"`
-	RecordIDs   []string     `json:"record_ids,omitempty"`
-	KeyType     string       `json:"key_type,omitempty"`
-	FieldTitles []string     `json:"field_titles,omitempty"`
-	FieldIDs    []string     `json:"field_ids,omitempty"`
-	Sort        []Sort       `json:"sort,omitempty"`
-	Offset      uint32       `json:"offset,omitempty"`
-	Limit       uint32       `json:"limit,omitempty"`
-	Ver         uint32       `json:"ver,omitempty"`
-	FilterSpec  *FilterSpec  `json:"filter_spec,omitempty"`
+	DocID       string      `json:"docid"`
+	SheetID     string      `json:"sheet_id"`
+	ViewID      string      `json:"view_id,omitempty"`
+	RecordIDs   []string    `json:"record_ids,omitempty"`
+	KeyType     string      `json:"key_type,omitempty"`
+	FieldTitles []string    `json:"field_titles,omitempty"`
+	FieldIDs    []string    `json:"field_ids,omitempty"`
+	Sort        []Sort      `json:"sort,omitempty"`
+	Offset      uint32      `json:"offset,omitempty"`
+	Limit       uint32      `json:"limit,omitempty"`
+	Ver         uint32      `json:"ver,omitempty"`
+	FilterSpec  *FilterSpec `json:"filter_spec,omitempty"`
 }
 
 // GetRecordsResponse 查询记录响应
@@ -117,51 +117,51 @@ type AddFieldsResponse struct {
 
 // AddField 添加字段
 type AddField struct {
-	FieldTitle              string                       `json:"field_title"`
-	FieldType               string                       `json:"field_type"`
-	PropertyNumber          *NumberFieldProperty         `json:"property_number,omitempty"`
-	PropertyCheckbox        *CheckboxFieldProperty       `json:"property_checkbox,omitempty"`
-	PropertyDateTime        *DateTimeFieldProperty       `json:"property_date_time,omitempty"`
-	PropertyAttachment      *AttachmentFieldProperty     `json:"property_attachment,omitempty"`
-	PropertyUser            *UserFieldProperty           `json:"property_user,omitempty"`
-	PropertyURL             *URLFieldProperty            `json:"property_url,omitempty"`
-	PropertySelect          *SelectFieldProperty         `json:"property_select,omitempty"`
-	PropertyCreatedTime     *CreatedTimeFieldProperty    `json:"property_created_time,omitempty"`
-	PropertyModifiedTime    *ModifiedTimeFieldProperty   `json:"property_modified_time,omitempty"`
-	PropertyProgress        *ProgressFieldProperty       `json:"property_progress,omitempty"`
-	PropertySingleSelect    *SingleSelectFieldProperty   `json:"property_single_select,omitempty"`
-	PropertyReference       *ReferenceFieldProperty      `json:"property_reference,omitempty"`
-	PropertyLocation        *LocationFieldProperty       `json:"property_location,omitempty"`
-	PropertyAutoNumber      *AutoNumberFieldProperty     `json:"property_auto_number,omitempty"`
-	PropertyCurrency        *CurrencyFieldProperty       `json:"property_currency,omitempty"`
-	PropertyWWGroup         *WWGroupFieldProperty        `json:"property_ww_group,omitempty"`
-	PropertyPercentage      *PercentageFieldProperty     `json:"property_percentage,omitempty"`
-	PropertyBarcode         *BarcodeFieldProperty        `json:"property_barcode,omitempty"`
+	FieldTitle           string                     `json:"field_title"`
+	FieldType            string                     `json:"field_type"`
+	PropertyNumber       *NumberFieldProperty       `json:"property_number,omitempty"`
+	PropertyCheckbox     *CheckboxFieldProperty     `json:"property_checkbox,omitempty"`
+	PropertyDateTime     *DateTimeFieldProperty     `json:"property_date_time,omitempty"`
+	PropertyAttachment   *AttachmentFieldProperty   `json:"property_attachment,omitempty"`
+	PropertyUser         *UserFieldProperty         `json:"property_user,omitempty"`
+	PropertyURL          *URLFieldProperty          `json:"property_url,omitempty"`
+	PropertySelect       *SelectFieldProperty       `json:"property_select,omitempty"`
+	PropertyCreatedTime  *CreatedTimeFieldProperty  `json:"property_created_time,omitempty"`
+	PropertyModifiedTime *ModifiedTimeFieldProperty `json:"property_modified_time,omitempty"`
+	PropertyProgress     *ProgressFieldProperty     `json:"property_progress,omitempty"`
+	PropertySingleSelect *SingleSelectFieldProperty `json:"property_single_select,omitempty"`
+	PropertyReference    *ReferenceFieldProperty    `json:"property_reference,omitempty"`
+	PropertyLocation     *LocationFieldProperty     `json:"property_location,omitempty"`
+	PropertyAutoNumber   *AutoNumberFieldProperty   `json:"property_auto_number,omitempty"`
+	PropertyCurrency     *CurrencyFieldProperty     `json:"property_currency,omitempty"`
+	PropertyWWGroup      *WWGroupFieldProperty      `json:"property_ww_group,omitempty"`
+	PropertyPercentage   *PercentageFieldProperty   `json:"property_percentage,omitempty"`
+	PropertyBarcode      *BarcodeFieldProperty      `json:"property_barcode,omitempty"`
 }
 
 // Field 字段
 type Field struct {
-	FieldID                 string                       `json:"field_id"`
-	FieldTitle              string                       `json:"field_title"`
-	FieldType               string                       `json:"field_type"`
-	PropertyNumber          *NumberFieldProperty         `json:"property_number,omitempty"`
-	PropertyCheckbox        *CheckboxFieldProperty       `json:"property_checkbox,omitempty"`
-	PropertyDateTime        *DateTimeFieldProperty       `json:"property_date_time,omitempty"`
-	PropertyAttachment      *AttachmentFieldProperty     `json:"property_attachment,omitempty"`
-	PropertyUser            *UserFieldProperty           `json:"property_user,omitempty"`
-	PropertyURL             *URLFieldProperty            `json:"property_url,omitempty"`
-	PropertySelect          *SelectFieldProperty         `json:"property_select,omitempty"`
-	PropertyCreatedTime     *CreatedTimeFieldProperty    `json:"property_created_time,omitempty"`
-	PropertyModifiedTime    *ModifiedTimeFieldProperty   `json:"property_modified_time,omitempty"`
-	PropertyProgress        *ProgressFieldProperty       `json:"property_progress,omitempty"`
-	PropertySingleSelect    *SingleSelectFieldProperty   `json:"property_single_select,omitempty"`
-	PropertyReference       *ReferenceFieldProperty      `json:"property_reference,omitempty"`
-	PropertyLocation        *LocationFieldProperty       `json:"property_location,omitempty"`
-	PropertyAutoNumber      *AutoNumberFieldProperty     `json:"property_auto_number,omitempty"`
-	PropertyCurrency        *CurrencyFieldProperty       `json:"property_currency,omitempty"`
-	PropertyWWGroup         *WWGroupFieldProperty        `json:"property_ww_group,omitempty"`
-	PropertyPercentage      *PercentageFieldProperty     `json:"property_percentage,omitempty"`
-	PropertyBarcode         *BarcodeFieldProperty        `json:"property_barcode,omitempty"`
+	FieldID              string                     `json:"field_id"`
+	FieldTitle           string                     `json:"field_title"`
+	FieldType            string                     `json:"field_type"`
+	PropertyNumber       *NumberFieldProperty       `json:"property_number,omitempty"`
+	PropertyCheckbox     *CheckboxFieldProperty     `json:"property_checkbox,omitempty"`
+	PropertyDateTime     *DateTimeFieldProperty     `json:"property_date_time,omitempty"`
+	PropertyAttachment   *AttachmentFieldProperty   `json:"property_attachment,omitempty"`
+	PropertyUser         *UserFieldProperty         `json:"property_user,omitempty"`
+	PropertyURL          *URLFieldProperty          `json:"property_url,omitempty"`
+	PropertySelect       *SelectFieldProperty       `json:"property_select,omitempty"`
+	PropertyCreatedTime  *CreatedTimeFieldProperty  `json:"property_created_time,omitempty"`
+	PropertyModifiedTime *ModifiedTimeFieldProperty `json:"property_modified_time,omitempty"`
+	PropertyProgress     *ProgressFieldProperty     `json:"property_progress,omitempty"`
+	PropertySingleSelect *SingleSelectFieldProperty `json:"property_single_select,omitempty"`
+	PropertyReference    *ReferenceFieldProperty    `json:"property_reference,omitempty"`
+	PropertyLocation     *LocationFieldProperty     `json:"property_location,omitempty"`
+	PropertyAutoNumber   *AutoNumberFieldProperty   `json:"property_auto_number,omitempty"`
+	PropertyCurrency     *CurrencyFieldProperty     `json:"property_currency,omitempty"`
+	PropertyWWGroup      *WWGroupFieldProperty      `json:"property_ww_group,omitempty"`
+	PropertyPercentage   *PercentageFieldProperty   `json:"property_percentage,omitempty"`
+	PropertyBarcode      *BarcodeFieldProperty      `json:"property_barcode,omitempty"`
 }
 
 // 字段属性类型
@@ -241,9 +241,9 @@ type LocationFieldProperty struct {
 
 // AutoNumberFieldProperty 自动编号字段属性
 type AutoNumberFieldProperty struct {
-	Type                    string       `json:"type,omitempty"` // NUMBER_TYPE_INCR 或 NUMBER_TYPE_CUSTOM
-	Rules                   []NumberRule `json:"rules,omitempty"`
-	ReformatExistingRecord  bool         `json:"reformat_existing_record,omitempty"`
+	Type                   string       `json:"type,omitempty"` // NUMBER_TYPE_INCR 或 NUMBER_TYPE_CUSTOM
+	Rules                  []NumberRule `json:"rules,omitempty"`
+	ReformatExistingRecord bool         `json:"reformat_existing_record,omitempty"`
 }
 
 // NumberRule 自动编号规则
@@ -317,26 +317,26 @@ type UpdateFieldsResponse struct {
 
 // UpdateField 更新字段
 type UpdateField struct {
-	FieldID                 string                       `json:"field_id"`
-	FieldTitle              string                       `json:"field_title,omitempty"`
-	PropertyNumber          *NumberFieldProperty         `json:"property_number,omitempty"`
-	PropertyCheckbox        *CheckboxFieldProperty       `json:"property_checkbox,omitempty"`
-	PropertyDateTime        *DateTimeFieldProperty       `json:"property_date_time,omitempty"`
-	PropertyAttachment      *AttachmentFieldProperty     `json:"property_attachment,omitempty"`
-	PropertyUser            *UserFieldProperty           `json:"property_user,omitempty"`
-	PropertyURL             *URLFieldProperty            `json:"property_url,omitempty"`
-	PropertySelect          *SelectFieldProperty         `json:"property_select,omitempty"`
-	PropertyCreatedTime     *CreatedTimeFieldProperty    `json:"property_created_time,omitempty"`
-	PropertyModifiedTime    *ModifiedTimeFieldProperty   `json:"property_modified_time,omitempty"`
-	PropertyProgress        *ProgressFieldProperty       `json:"property_progress,omitempty"`
-	PropertySingleSelect    *SingleSelectFieldProperty   `json:"property_single_select,omitempty"`
-	PropertyReference       *ReferenceFieldProperty      `json:"property_reference,omitempty"`
-	PropertyLocation        *LocationFieldProperty       `json:"property_location,omitempty"`
-	PropertyAutoNumber      *AutoNumberFieldProperty     `json:"property_auto_number,omitempty"`
-	PropertyCurrency        *CurrencyFieldProperty       `json:"property_currency,omitempty"`
-	PropertyWWGroup         *WWGroupFieldProperty        `json:"property_ww_group,omitempty"`
-	PropertyPercentage      *PercentageFieldProperty     `json:"property_percentage,omitempty"`
-	PropertyBarcode         *BarcodeFieldProperty        `json:"property_barcode,omitempty"`
+	FieldID              string                     `json:"field_id"`
+	FieldTitle           string                     `json:"field_title,omitempty"`
+	PropertyNumber       *NumberFieldProperty       `json:"property_number,omitempty"`
+	PropertyCheckbox     *CheckboxFieldProperty     `json:"property_checkbox,omitempty"`
+	PropertyDateTime     *DateTimeFieldProperty     `json:"property_date_time,omitempty"`
+	PropertyAttachment   *AttachmentFieldProperty   `json:"property_attachment,omitempty"`
+	PropertyUser         *UserFieldProperty         `json:"property_user,omitempty"`
+	PropertyURL          *URLFieldProperty          `json:"property_url,omitempty"`
+	PropertySelect       *SelectFieldProperty       `json:"property_select,omitempty"`
+	PropertyCreatedTime  *CreatedTimeFieldProperty  `json:"property_created_time,omitempty"`
+	PropertyModifiedTime *ModifiedTimeFieldProperty `json:"property_modified_time,omitempty"`
+	PropertyProgress     *ProgressFieldProperty     `json:"property_progress,omitempty"`
+	PropertySingleSelect *SingleSelectFieldProperty `json:"property_single_select,omitempty"`
+	PropertyReference    *ReferenceFieldProperty    `json:"property_reference,omitempty"`
+	PropertyLocation     *LocationFieldProperty     `json:"property_location,omitempty"`
+	PropertyAutoNumber   *AutoNumberFieldProperty   `json:"property_auto_number,omitempty"`
+	PropertyCurrency     *CurrencyFieldProperty     `json:"property_currency,omitempty"`
+	PropertyWWGroup      *WWGroupFieldProperty      `json:"property_ww_group,omitempty"`
+	PropertyPercentage   *PercentageFieldProperty   `json:"property_percentage,omitempty"`
+	PropertyBarcode      *BarcodeFieldProperty      `json:"property_barcode,omitempty"`
 }
 
 // DeleteFieldsRequest 删除字段请求
@@ -353,13 +353,13 @@ type AddViewRequest struct {
 	DocID     string        `json:"docid"`
 	SheetID   string        `json:"sheet_id"`
 	ViewTitle string        `json:"view_title"`
-	ViewType  string        `json:"view_type"`          // VIEW_TYPE_GRID, VIEW_TYPE_KANBAN, VIEW_TYPE_GALLERY, VIEW_TYPE_GANTT
+	ViewType  string        `json:"view_type"` // VIEW_TYPE_GRID, VIEW_TYPE_KANBAN, VIEW_TYPE_GALLERY, VIEW_TYPE_GANTT
 	Property  *ViewProperty `json:"property,omitempty"`
 }
 
 // AddViewResponse 添加视图响应
 type AddViewResponse struct {
-	ErrCode int   `json:"errcode"`
+	ErrCode int    `json:"errcode"`
 	ErrMsg  string `json:"errmsg"`
 	View    *View  `json:"view"`
 }
@@ -374,14 +374,14 @@ type View struct {
 
 // ViewProperty 视图属性
 type ViewProperty struct {
-	AutoSort           bool              `json:"auto_sort,omitempty"`
-	SortSpec           *SortSpec         `json:"sort_spec,omitempty"`
-	GroupSpec          *GroupSpec        `json:"group_spec,omitempty"`
-	FilterSpec         *FilterSpec       `json:"filter_spec,omitempty"`
-	IsFieldStatEnabled bool              `json:"is_field_stat_enabled,omitempty"`
-	FieldVisibility    map[string]bool   `json:"field_visibility,omitempty"` // key为字段ID, value为是否显示
-	FrozenFieldCount   int32             `json:"frozen_field_count,omitempty"`
-	ColorConfig        *ViewColorConfig  `json:"color_config,omitempty"`
+	AutoSort           bool             `json:"auto_sort,omitempty"`
+	SortSpec           *SortSpec        `json:"sort_spec,omitempty"`
+	GroupSpec          *GroupSpec       `json:"group_spec,omitempty"`
+	FilterSpec         *FilterSpec      `json:"filter_spec,omitempty"`
+	IsFieldStatEnabled bool             `json:"is_field_stat_enabled,omitempty"`
+	FieldVisibility    map[string]bool  `json:"field_visibility,omitempty"` // key为字段ID, value为是否显示
+	FrozenFieldCount   int32            `json:"frozen_field_count,omitempty"`
+	ColorConfig        *ViewColorConfig `json:"color_config,omitempty"`
 }
 
 // SortSpec 排序设置
@@ -414,14 +414,14 @@ type FilterSpec struct {
 
 // Condition 过滤条件
 type Condition struct {
-	FieldID       string                 `json:"field_id"`
-	FieldType     string                 `json:"field_type,omitempty"`
-	Operator      string                 `json:"operator"`                 // OPERATOR_IS, OPERATOR_IS_NOT, OPERATOR_CONTAINS 等
-	StringValue   *FilterStringValue     `json:"string_value,omitempty"`
-	NumberValue   *FilterNumberValue     `json:"number_value,omitempty"`
-	BoolValue     *FilterBoolValue       `json:"bool_value,omitempty"`
-	UserValue     *FilterUserValue       `json:"user_value,omitempty"`
-	DateTimeValue *FilterDateTimeValue   `json:"date_time_value,omitempty"`
+	FieldID       string               `json:"field_id"`
+	FieldType     string               `json:"field_type,omitempty"`
+	Operator      string               `json:"operator"` // OPERATOR_IS, OPERATOR_IS_NOT, OPERATOR_CONTAINS 等
+	StringValue   *FilterStringValue   `json:"string_value,omitempty"`
+	NumberValue   *FilterNumberValue   `json:"number_value,omitempty"`
+	BoolValue     *FilterBoolValue     `json:"bool_value,omitempty"`
+	UserValue     *FilterUserValue     `json:"user_value,omitempty"`
+	DateTimeValue *FilterDateTimeValue `json:"date_time_value,omitempty"`
 }
 
 // FilterStringValue 字符串过滤值
@@ -457,9 +457,9 @@ type ViewColorConfig struct {
 
 // ViewColorCondition 填色条件
 type ViewColorCondition struct {
-	ID        string     `json:"id,omitempty"`   // 填色id
-	Type      string     `json:"type"`           // VIEW_COLOR_CONDITION_TYPE_ROW, VIEW_COLOR_CONDITION_TYPE_COLUMN, VIEW_COLOR_CONDITION_TYPE_CELL
-	Color     string     `json:"color"`          // fillColorGray_5, accentBlueLighten_5 等
+	ID        string     `json:"id,omitempty"` // 填色id
+	Type      string     `json:"type"`         // VIEW_COLOR_CONDITION_TYPE_ROW, VIEW_COLOR_CONDITION_TYPE_COLUMN, VIEW_COLOR_CONDITION_TYPE_CELL
+	Color     string     `json:"color"`        // fillColorGray_5, accentBlueLighten_5 等
 	Condition *Condition `json:"condition"`
 }
 
@@ -509,8 +509,8 @@ type DeleteViewRequest struct {
 
 // AddSheetRequest 添加子表请求
 type AddSheetRequest struct {
-	DocID      string          `json:"docid"`
-	Properties *SheetProperty  `json:"properties,omitempty"`
+	DocID      string         `json:"docid"`
+	Properties *SheetProperty `json:"properties,omitempty"`
 }
 
 // AddSheetResponse 添加子表响应
@@ -529,9 +529,9 @@ type SheetProperty struct {
 
 // GetSheetRequest 查询子表请求
 type GetSheetRequest struct {
-	DocID             string `json:"docid"`
-	SheetID           string `json:"sheet_id,omitempty"`
-	NeedAllTypeSheet  bool   `json:"need_all_type_sheet,omitempty"`
+	DocID            string `json:"docid"`
+	SheetID          string `json:"sheet_id,omitempty"`
+	NeedAllTypeSheet bool   `json:"need_all_type_sheet,omitempty"`
 }
 
 // GetSheetResponse 查询子表响应
@@ -641,8 +641,8 @@ type DeleteFieldGroupRequest struct {
 
 // GetSheetPrivRequest 查询智能表格子表权限请求
 type GetSheetPrivRequest struct {
-	DocID      string   `json:"docid"`       // 智能表ID
-	Type       uint32   `json:"type"`        // 权限规则类型，1-全员权限，2-额外权限
+	DocID      string   `json:"docid"`                  // 智能表ID
+	Type       uint32   `json:"type"`                   // 权限规则类型，1-全员权限，2-额外权限
 	RuleIDList []uint32 `json:"rule_id_list,omitempty"` // 需要查询的规则id列表，查询额外权限时填写
 }
 
@@ -653,29 +653,29 @@ type GetSheetPrivResponse struct {
 
 // SheetPrivRule 子表权限规则
 type SheetPrivRule struct {
-	RuleID   uint32           `json:"rule_id"`   // 规则id
-	Type     uint32           `json:"type"`      // 权限规则类型，1-全员权限，2-额外权限
-	Name     string           `json:"name"`      // 权限名称，仅当type为2时有效
-	PrivList []SheetPriv      `json:"priv_list"` // 针对不同子表设置内容权限
+	RuleID   uint32      `json:"rule_id"`   // 规则id
+	Type     uint32      `json:"type"`      // 权限规则类型，1-全员权限，2-额外权限
+	Name     string      `json:"name"`      // 权限名称，仅当type为2时有效
+	PrivList []SheetPriv `json:"priv_list"` // 针对不同子表设置内容权限
 }
 
 // SheetPriv 子表权限配置
 type SheetPriv struct {
-	SheetID                    string      `json:"sheet_id"`                       // 子表ID
-	Priv                       uint32      `json:"priv"`                           // 子表权限: 1-全部权限；2-可编辑；3-仅浏览；4-无权限
-	CanInsertRecord            bool        `json:"can_insert_record"`              // 是否可以新增记录
-	CanDeleteRecord            bool        `json:"can_delete_record"`              // 是否可以删除记录
-	CanCreateModifyDeleteView  bool        `json:"can_create_modify_delete_view"`  // 是否可以增、删、改视图
-	FieldPriv                  *FieldPriv  `json:"field_priv,omitempty"`           // 按字段配置权限
-	RecordPriv                 *RecordPriv `json:"record_priv,omitempty"`          // 按记录配置权限
-	Clear                      bool        `json:"clear"`                          // 清除子表的设置，恢复默认权限
+	SheetID                   string      `json:"sheet_id"`                      // 子表ID
+	Priv                      uint32      `json:"priv"`                          // 子表权限: 1-全部权限；2-可编辑；3-仅浏览；4-无权限
+	CanInsertRecord           bool        `json:"can_insert_record"`             // 是否可以新增记录
+	CanDeleteRecord           bool        `json:"can_delete_record"`             // 是否可以删除记录
+	CanCreateModifyDeleteView bool        `json:"can_create_modify_delete_view"` // 是否可以增、删、改视图
+	FieldPriv                 *FieldPriv  `json:"field_priv,omitempty"`          // 按字段配置权限
+	RecordPriv                *RecordPriv `json:"record_priv,omitempty"`         // 按记录配置权限
+	Clear                     bool        `json:"clear"`                         // 清除子表的设置，恢复默认权限
 }
 
 // FieldPriv 字段权限
 type FieldPriv struct {
-	FieldRangeType   uint32            `json:"field_range_type"`   // 子表权限对所有字段生效还是部分字段生效：1-所有字段；2-部分字段
-	FieldRuleList    []FieldRule       `json:"field_rule_list,omitempty"`    // 按字段分别配置权限
-	FieldDefaultRule *FieldRule        `json:"field_default_rule,omitempty"` // 未指定字段和后续新增字段的默认配置
+	FieldRangeType   uint32      `json:"field_range_type"`             // 子表权限对所有字段生效还是部分字段生效：1-所有字段；2-部分字段
+	FieldRuleList    []FieldRule `json:"field_rule_list,omitempty"`    // 按字段分别配置权限
+	FieldDefaultRule *FieldRule  `json:"field_default_rule,omitempty"` // 未指定字段和后续新增字段的默认配置
 }
 
 // FieldRule 字段权限规则
@@ -689,9 +689,9 @@ type FieldRule struct {
 
 // RecordPriv 记录权限
 type RecordPriv struct {
-	RecordRangeType uint32       `json:"record_range_type"`         // 子表权限对记录生效范围：1-全部记录；2-满足任意条件的记录；3-满足全部条件的记录
+	RecordRangeType uint32       `json:"record_range_type"`          // 子表权限对记录生效范围：1-全部记录；2-满足任意条件的记录；3-满足全部条件的记录
 	RecordRuleList  []RecordRule `json:"record_rule_list,omitempty"` // 记录的条件列表
-	OtherPriv       uint32       `json:"other_priv"`                // 当记录不满足条件的时的权限类型：1-不可编辑 2-不可查看
+	OtherPriv       uint32       `json:"other_priv"`                 // 当记录不满足条件的时的权限类型：1-不可编辑 2-不可查看
 }
 
 // RecordRule 记录权限规则
@@ -704,10 +704,10 @@ type RecordRule struct {
 
 // UpdateSheetPrivRequest 更新智能表格子表权限请求
 type UpdateSheetPrivRequest struct {
-	DocID    string      `json:"docid"`              // 智能表ID
-	Type     uint32      `json:"type"`               // 权限规则类型，1-全员权限，2-额外权限
-	RuleID   uint32      `json:"rule_id,omitempty"`  // 当type为2时必填
-	Name     string      `json:"name,omitempty"`     // 更新权限名称，仅当type为2时有效
+	DocID    string      `json:"docid"`               // 智能表ID
+	Type     uint32      `json:"type"`                // 权限规则类型，1-全员权限，2-额外权限
+	RuleID   uint32      `json:"rule_id,omitempty"`   // 当type为2时必填
+	Name     string      `json:"name,omitempty"`      // 更新权限名称，仅当type为2时有效
 	PrivList []SheetPriv `json:"priv_list,omitempty"` // 针对不同子表设置内容权限
 }
 
@@ -724,8 +724,8 @@ type CreateRuleResponse struct {
 
 // ModRuleMemberRequest 更新智能表格指定成员额外权限请求
 type ModRuleMemberRequest struct {
-	DocID          string       `json:"docid"`                    // 智能表ID
-	RuleID         uint32       `json:"rule_id"`                  // 需要更新的id
+	DocID          string       `json:"docid"`                      // 智能表ID
+	RuleID         uint32       `json:"rule_id"`                    // 需要更新的id
 	AddMemberRange *MemberRange `json:"add_member_range,omitempty"` // 新增成员
 	DelMemberRange *MemberRange `json:"del_member_range,omitempty"` // 删除成员
 }

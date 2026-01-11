@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	getDocumentURL        = "/cgi-bin/wedoc/document/get"
+	getDocumentURL         = "/cgi-bin/wedoc/document/get"
 	batchUpdateDocumentURL = "/cgi-bin/wedoc/document/batch_update"
 )
 

@@ -34,11 +34,11 @@ type StrategyRange struct {
 
 // Strategy 客户联系规则组
 type Strategy struct {
-	StrategyID   int               `json:"strategy_id"`
-	ParentID     int               `json:"parent_id,omitempty"`
-	StrategyName string            `json:"strategy_name"`
-	CreateTime   int64             `json:"create_time,omitempty"`
-	AdminList    []string          `json:"admin_list,omitempty"`
+	StrategyID   int                `json:"strategy_id"`
+	ParentID     int                `json:"parent_id,omitempty"`
+	StrategyName string             `json:"strategy_name"`
+	CreateTime   int64              `json:"create_time,omitempty"`
+	AdminList    []string           `json:"admin_list,omitempty"`
 	Privilege    *StrategyPrivilege `json:"privilege,omitempty"`
 }
 

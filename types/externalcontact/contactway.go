@@ -37,21 +37,21 @@ type ConclusionMiniprogram struct {
 
 // AddContactWayRequest 配置客户联系「联系我」方式请求
 type AddContactWayRequest struct {
-	Type           int          `json:"type"`
-	Scene          int          `json:"scene"`
-	Style          int          `json:"style,omitempty"`
-	Remark         string       `json:"remark,omitempty"`
-	SkipVerify     bool         `json:"skip_verify,omitempty"`
-	State          string       `json:"state,omitempty"`
-	User           []string     `json:"user,omitempty"`
-	Party          []int        `json:"party,omitempty"`
-	IsTemp         bool         `json:"is_temp,omitempty"`
-	ExpiresIn      int          `json:"expires_in,omitempty"`
-	ChatExpiresIn  int          `json:"chat_expires_in,omitempty"`
-	UnionID        string       `json:"unionid,omitempty"`
-	IsExclusive    bool         `json:"is_exclusive,omitempty"`
-	MarkSource     bool         `json:"mark_source,omitempty"`
-	Conclusions    *Conclusions `json:"conclusions,omitempty"`
+	Type          int          `json:"type"`
+	Scene         int          `json:"scene"`
+	Style         int          `json:"style,omitempty"`
+	Remark        string       `json:"remark,omitempty"`
+	SkipVerify    bool         `json:"skip_verify,omitempty"`
+	State         string       `json:"state,omitempty"`
+	User          []string     `json:"user,omitempty"`
+	Party         []int        `json:"party,omitempty"`
+	IsTemp        bool         `json:"is_temp,omitempty"`
+	ExpiresIn     int          `json:"expires_in,omitempty"`
+	ChatExpiresIn int          `json:"chat_expires_in,omitempty"`
+	UnionID       string       `json:"unionid,omitempty"`
+	IsExclusive   bool         `json:"is_exclusive,omitempty"`
+	MarkSource    bool         `json:"mark_source,omitempty"`
+	Conclusions   *Conclusions `json:"conclusions,omitempty"`
 }
 
 // AddContactWayResponse 配置客户联系「联系我」方式响应

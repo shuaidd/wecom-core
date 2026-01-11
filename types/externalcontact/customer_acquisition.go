@@ -2,12 +2,12 @@ package externalcontact
 
 // AcquisitionLink 获客链接信息
 type AcquisitionLink struct {
-	LinkID     string `json:"link_id,omitempty"`      // 获客链接ID
-	LinkName   string `json:"link_name"`              // 获客链接名称
-	URL        string `json:"url,omitempty"`          // 获客链接实际URL
-	CreateTime int64  `json:"create_time,omitempty"`  // 创建时间戳
-	SkipVerify bool   `json:"skip_verify,omitempty"`  // 是否无需验证
-	MarkSource bool   `json:"mark_source,omitempty"`  // 是否标记客户添加来源
+	LinkID     string `json:"link_id,omitempty"`     // 获客链接ID
+	LinkName   string `json:"link_name"`             // 获客链接名称
+	URL        string `json:"url,omitempty"`         // 获客链接实际URL
+	CreateTime int64  `json:"create_time,omitempty"` // 创建时间戳
+	SkipVerify bool   `json:"skip_verify,omitempty"` // 是否无需验证
+	MarkSource bool   `json:"mark_source,omitempty"` // 是否标记客户添加来源
 }
 
 // AcquisitionRange 获客链接使用范围
@@ -41,18 +41,18 @@ type GetAcquisitionLinkRequest struct {
 
 // GetAcquisitionLinkResponse 获取获客链接详情响应
 type GetAcquisitionLinkResponse struct {
-	Link           AcquisitionLink `json:"link"`                      // 获客链接信息
-	Range          AcquisitionRange `json:"range"`                    // 使用范围
+	Link           AcquisitionLink  `json:"link"`                      // 获客链接信息
+	Range          AcquisitionRange `json:"range"`                     // 使用范围
 	PriorityOption *PriorityOption  `json:"priority_option,omitempty"` // 优先分配选项
 }
 
 // CreateAcquisitionLinkRequest 创建获客链接请求
 type CreateAcquisitionLinkRequest struct {
-	LinkName       string          `json:"link_name"`                  // 链接名称,最长30个字符
+	LinkName       string           `json:"link_name"`                 // 链接名称,最长30个字符
 	Range          AcquisitionRange `json:"range"`                     // 使用范围
-	SkipVerify     bool            `json:"skip_verify,omitempty"`      // 是否无需验证
+	SkipVerify     bool             `json:"skip_verify,omitempty"`     // 是否无需验证
 	PriorityOption *PriorityOption  `json:"priority_option,omitempty"` // 优先分配选项
-	MarkSource     bool            `json:"mark_source,omitempty"`      // 是否标记客户添加来源
+	MarkSource     bool             `json:"mark_source,omitempty"`     // 是否标记客户添加来源
 }
 
 // CreateAcquisitionLinkResponse 创建获客链接响应
@@ -62,12 +62,12 @@ type CreateAcquisitionLinkResponse struct {
 
 // UpdateAcquisitionLinkRequest 编辑获客链接请求
 type UpdateAcquisitionLinkRequest struct {
-	LinkID         string          `json:"link_id"`                    // 获客链接ID
-	LinkName       string          `json:"link_name,omitempty"`        // 链接名称,最长30个字符
-	Range          *AcquisitionRange `json:"range,omitempty"`          // 使用范围
-	SkipVerify     bool            `json:"skip_verify,omitempty"`      // 是否无需验证
-	PriorityOption *PriorityOption  `json:"priority_option,omitempty"` // 优先分配选项
-	MarkSource     bool            `json:"mark_source,omitempty"`      // 是否标记客户添加来源
+	LinkID         string            `json:"link_id"`                   // 获客链接ID
+	LinkName       string            `json:"link_name,omitempty"`       // 链接名称,最长30个字符
+	Range          *AcquisitionRange `json:"range,omitempty"`           // 使用范围
+	SkipVerify     bool              `json:"skip_verify,omitempty"`     // 是否无需验证
+	PriorityOption *PriorityOption   `json:"priority_option,omitempty"` // 优先分配选项
+	MarkSource     bool              `json:"mark_source,omitempty"`     // 是否标记客户添加来源
 }
 
 // DeleteAcquisitionLinkRequest 删除获客链接请求
@@ -130,8 +130,8 @@ type AcquisitionCustomer struct {
 
 // ListAcquisitionCustomerRequest 获取获客客户列表请求
 type ListAcquisitionCustomerRequest struct {
-	LinkID string `json:"link_id"`         // 获客链接ID
-	Limit  int    `json:"limit,omitempty"` // 返回的最大记录数，最大值1000
+	LinkID string `json:"link_id"`          // 获客链接ID
+	Limit  int    `json:"limit,omitempty"`  // 返回的最大记录数，最大值1000
 	Cursor string `json:"cursor,omitempty"` // 分页游标
 }
 

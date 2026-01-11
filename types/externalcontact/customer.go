@@ -7,11 +7,11 @@ type ExternalProfile struct {
 
 // ExternalAttr 外部联系人的自定义展示信息属性
 type ExternalAttr struct {
-	Type        int          `json:"type"`
-	Name        string       `json:"name"`
-	Text        *TextAttr    `json:"text,omitempty"`
-	Web         *WebAttr     `json:"web,omitempty"`
-	Miniprogram *MinipAttr   `json:"miniprogram,omitempty"`
+	Type        int        `json:"type"`
+	Name        string     `json:"name"`
+	Text        *TextAttr  `json:"text,omitempty"`
+	Web         *WebAttr   `json:"web,omitempty"`
+	Miniprogram *MinipAttr `json:"miniprogram,omitempty"`
 }
 
 // TextAttr 文本类型的属性
@@ -104,13 +104,13 @@ type GetExternalContactResponse struct {
 
 // UpdateRemarkRequest 修改客户备注信息请求
 type UpdateRemarkRequest struct {
-	UserID            string   `json:"userid"`
-	ExternalUserID    string   `json:"external_userid"`
-	Remark            string   `json:"remark,omitempty"`
-	Description       string   `json:"description,omitempty"`
-	RemarkCompany     string   `json:"remark_company,omitempty"`
-	RemarkMobiles     []string `json:"remark_mobiles,omitempty"`
-	RemarkPicMediaID  string   `json:"remark_pic_mediaid,omitempty"`
+	UserID           string   `json:"userid"`
+	ExternalUserID   string   `json:"external_userid"`
+	Remark           string   `json:"remark,omitempty"`
+	Description      string   `json:"description,omitempty"`
+	RemarkCompany    string   `json:"remark_company,omitempty"`
+	RemarkMobiles    []string `json:"remark_mobiles,omitempty"`
+	RemarkPicMediaID string   `json:"remark_pic_mediaid,omitempty"`
 }
 
 // BatchGetByUserRequest 批量获取客户详情请求

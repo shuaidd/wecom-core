@@ -24,7 +24,7 @@ type Group struct {
 
 // GetChainGroupRequest 获取上下游通讯录分组请求
 type GetChainGroupRequest struct {
-	ChainID string `json:"chain_id"`       // 上下游id
+	ChainID string `json:"chain_id"`          // 上下游id
 	GroupID *int64 `json:"groupid,omitempty"` // 分组id，可选
 }
 
@@ -36,13 +36,13 @@ type GetChainGroupResponse struct {
 
 // GroupCorp 分组下的企业信息
 type GroupCorp struct {
-	GroupID        int64  `json:"groupid"`          // 企业所属上下游的分组id
-	CorpID         string `json:"corpid,omitempty"` // 企业id，已加入的企业返回
-	CorpName       string `json:"corp_name"`        // 企业名称
-	CustomID       string `json:"custom_id"`        // 上下游企业自定义id
-	InviteUserID   string `json:"invite_userid,omitempty"`   // 邀请人的userid
-	PendingCorpID  string `json:"pending_corpid,omitempty"`  // 未加入企业id
-	IsJoined       int    `json:"is_joined"`        // 企业是否已加入
+	GroupID       int64  `json:"groupid"`                  // 企业所属上下游的分组id
+	CorpID        string `json:"corpid,omitempty"`         // 企业id，已加入的企业返回
+	CorpName      string `json:"corp_name"`                // 企业名称
+	CustomID      string `json:"custom_id"`                // 上下游企业自定义id
+	InviteUserID  string `json:"invite_userid,omitempty"`  // 邀请人的userid
+	PendingCorpID string `json:"pending_corpid,omitempty"` // 未加入企业id
+	IsJoined      int    `json:"is_joined"`                // 企业是否已加入
 }
 
 // GetChainCorpInfoListRequest 获取企业上下游通讯录分组下的企业详情列表请求
@@ -72,11 +72,11 @@ type GetChainCorpInfoRequest struct {
 // GetChainCorpInfoResponse 获取企业上下游通讯录下的企业信息响应
 type GetChainCorpInfoResponse struct {
 	common.Response
-	CorpName            string `json:"corp_name"`             // 企业名称
-	QualificationStatus int    `json:"qualification_status"`  // 企业验证状态，1未验证，2已验证，3已认证
-	CustomID            string `json:"custom_id"`             // 上下游企业自定义id
-	GroupID             int64  `json:"groupid"`               // 企业所属上下游的分组id
-	IsJoined            bool   `json:"is_joined"`             // 企业是否已加入
+	CorpName            string `json:"corp_name"`            // 企业名称
+	QualificationStatus int    `json:"qualification_status"` // 企业验证状态，1未验证，2已验证，3已认证
+	CustomID            string `json:"custom_id"`            // 上下游企业自定义id
+	GroupID             int64  `json:"groupid"`              // 企业所属上下游的分组id
+	IsJoined            bool   `json:"is_joined"`            // 企业是否已加入
 }
 
 // RemoveCorpRequest 移除企业请求

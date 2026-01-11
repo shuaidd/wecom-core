@@ -52,17 +52,17 @@ type SendMessageRequest struct {
 	DuplicateCheckInterval *int `json:"duplicate_check_interval,omitempty"`
 
 	// 各种消息类型的具体内容
-	Text                *TextMessage                `json:"text,omitempty"`
-	Image               *MediaMessage               `json:"image,omitempty"`
-	Voice               *MediaMessage               `json:"voice,omitempty"`
-	Video               *VideoMessage               `json:"video,omitempty"`
-	File                *MediaMessage               `json:"file,omitempty"`
-	TextCard            *TextCardMessage            `json:"textcard,omitempty"`
-	News                *NewsMessage                `json:"news,omitempty"`
-	MPNews              *MPNewsMessage              `json:"mpnews,omitempty"`
-	Markdown            *MarkdownMessage            `json:"markdown,omitempty"`
-	MiniProgramNotice   *MiniProgramNoticeMessage   `json:"miniprogram_notice,omitempty"`
-	TemplateCard        *TemplateCardMessage        `json:"template_card,omitempty"`
+	Text              *TextMessage              `json:"text,omitempty"`
+	Image             *MediaMessage             `json:"image,omitempty"`
+	Voice             *MediaMessage             `json:"voice,omitempty"`
+	Video             *VideoMessage             `json:"video,omitempty"`
+	File              *MediaMessage             `json:"file,omitempty"`
+	TextCard          *TextCardMessage          `json:"textcard,omitempty"`
+	News              *NewsMessage              `json:"news,omitempty"`
+	MPNews            *MPNewsMessage            `json:"mpnews,omitempty"`
+	Markdown          *MarkdownMessage          `json:"markdown,omitempty"`
+	MiniProgramNotice *MiniProgramNoticeMessage `json:"miniprogram_notice,omitempty"`
+	TemplateCard      *TemplateCardMessage      `json:"template_card,omitempty"`
 }
 
 // SendMessageResponse 发送消息响应
@@ -486,13 +486,13 @@ type SendSchoolNoticeRequest struct {
 	DuplicateCheckInterval *int `json:"duplicate_check_interval,omitempty"`
 
 	// 各种消息类型的具体内容
-	Text     *TextMessage     `json:"text,omitempty"`
-	Image    *MediaMessage    `json:"image,omitempty"`
-	Voice    *MediaMessage    `json:"voice,omitempty"`
-	Video    *VideoMessage    `json:"video,omitempty"`
-	File     *MediaMessage    `json:"file,omitempty"`
-	News     *NewsMessage     `json:"news,omitempty"`
-	MPNews   *SchoolMPNews    `json:"mpnews,omitempty"`
+	Text        *TextMessage       `json:"text,omitempty"`
+	Image       *MediaMessage      `json:"image,omitempty"`
+	Voice       *MediaMessage      `json:"voice,omitempty"`
+	Video       *VideoMessage      `json:"video,omitempty"`
+	File        *MediaMessage      `json:"file,omitempty"`
+	News        *NewsMessage       `json:"news,omitempty"`
+	MPNews      *SchoolMPNews      `json:"mpnews,omitempty"`
 	MiniProgram *SchoolMiniProgram `json:"miniprogram,omitempty"`
 }
 

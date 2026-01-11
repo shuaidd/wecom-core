@@ -10,18 +10,18 @@ type Attendee struct {
 
 // Reminders 提醒相关信息
 type Reminders struct {
-	IsRemind              int      `json:"is_remind,omitempty"`                // 是否需要提醒。0-否；1-是
-	RemindBeforeEventSecs int      `json:"remind_before_event_secs,omitempty"` // 日程开始前多少秒提醒
-	RemindTimeDiffs       []int    `json:"remind_time_diffs,omitempty"`        // 提醒时间与日程开始时间的差值
-	IsRepeat              int      `json:"is_repeat,omitempty"`                // 是否重复日程。0-否；1-是
-	RepeatType            int      `json:"repeat_type,omitempty"`              // 重复类型。0-每日；1-每周；2-每月；5-每年；7-工作日
-	RepeatUntil           int      `json:"repeat_until,omitempty"`             // 重复结束时刻，Unix时间戳
-	IsCustomRepeat        int      `json:"is_custom_repeat,omitempty"`         // 是否自定义重复。0-否；1-是
-	RepeatInterval        int      `json:"repeat_interval,omitempty"`          // 重复间隔
-	RepeatDayOfWeek       []int    `json:"repeat_day_of_week,omitempty"`       // 每周周几重复
-	RepeatDayOfMonth      []int    `json:"repeat_day_of_month,omitempty"`      // 每月哪几天重复
-	Timezone              int      `json:"timezone,omitempty"`                 // 时区。UTC偏移量表示
-	ExcludeTimeList       []ExcludeTime `json:"exclude_time_list,omitempty"`   // 重复日程不包含的日期列表
+	IsRemind              int           `json:"is_remind,omitempty"`                // 是否需要提醒。0-否；1-是
+	RemindBeforeEventSecs int           `json:"remind_before_event_secs,omitempty"` // 日程开始前多少秒提醒
+	RemindTimeDiffs       []int         `json:"remind_time_diffs,omitempty"`        // 提醒时间与日程开始时间的差值
+	IsRepeat              int           `json:"is_repeat,omitempty"`                // 是否重复日程。0-否；1-是
+	RepeatType            int           `json:"repeat_type,omitempty"`              // 重复类型。0-每日；1-每周；2-每月；5-每年；7-工作日
+	RepeatUntil           int           `json:"repeat_until,omitempty"`             // 重复结束时刻，Unix时间戳
+	IsCustomRepeat        int           `json:"is_custom_repeat,omitempty"`         // 是否自定义重复。0-否；1-是
+	RepeatInterval        int           `json:"repeat_interval,omitempty"`          // 重复间隔
+	RepeatDayOfWeek       []int         `json:"repeat_day_of_week,omitempty"`       // 每周周几重复
+	RepeatDayOfMonth      []int         `json:"repeat_day_of_month,omitempty"`      // 每月哪几天重复
+	Timezone              int           `json:"timezone,omitempty"`                 // 时区。UTC偏移量表示
+	ExcludeTimeList       []ExcludeTime `json:"exclude_time_list,omitempty"`        // 重复日程不包含的日期列表
 }
 
 // ExcludeTime 不包含的日期

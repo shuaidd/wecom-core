@@ -41,15 +41,15 @@ type Schedule struct {
 
 // MeetingOption 会议选项
 type MeetingOption struct {
-	Password              string `json:"password,omitempty"`                 // 入会密码(4-6位纯数字)
-	AutoRecord            int    `json:"auto_record,omitempty"`              // 是否自动录制 0-未开启 1-本地录制 2-云录制
-	EnableWaitingRoom     bool   `json:"enable_waiting_room,omitempty"`      // 是否开启等候室
-	AllowEnterBeforeHost  bool   `json:"allow_enter_before_host,omitempty"`  // 是否允许成员在主持人进会前加入
-	EnterRestraint        int    `json:"enter_restraint,omitempty"`          // 是否限制成员入会 0-所有人 2-仅企业内部
-	EnableScreenWatermark bool   `json:"enable_screen_watermark,omitempty"`  // 是否开启屏幕水印
-	EnableEnterMute       int    `json:"enable_enter_mute,omitempty"`        // 成员入会时是否静音 0-关闭 1-开启 2-超过6人自动开启
-	RemindScope           int    `json:"remind_scope,omitempty"`             // 会议开始时是否提醒 1-不提醒 2-仅主持人 3-所有成员
-	WaterMarkType         int    `json:"water_mark_type,omitempty"`          // 水印类型 0-单排 1-多排
+	Password              string `json:"password,omitempty"`                // 入会密码(4-6位纯数字)
+	AutoRecord            int    `json:"auto_record,omitempty"`             // 是否自动录制 0-未开启 1-本地录制 2-云录制
+	EnableWaitingRoom     bool   `json:"enable_waiting_room,omitempty"`     // 是否开启等候室
+	AllowEnterBeforeHost  bool   `json:"allow_enter_before_host,omitempty"` // 是否允许成员在主持人进会前加入
+	EnterRestraint        int    `json:"enter_restraint,omitempty"`         // 是否限制成员入会 0-所有人 2-仅企业内部
+	EnableScreenWatermark bool   `json:"enable_screen_watermark,omitempty"` // 是否开启屏幕水印
+	EnableEnterMute       int    `json:"enable_enter_mute,omitempty"`       // 成员入会时是否静音 0-关闭 1-开启 2-超过6人自动开启
+	RemindScope           int    `json:"remind_scope,omitempty"`            // 会议开始时是否提醒 1-不提醒 2-仅主持人 3-所有成员
+	WaterMarkType         int    `json:"water_mark_type,omitempty"`         // 水印类型 0-单排 1-多排
 }
 
 // Meeting 会议信息

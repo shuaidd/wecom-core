@@ -11,11 +11,11 @@ type CorpShareInfo struct {
 
 // ListAppShareInfoRequest 获取应用共享信息请求
 type ListAppShareInfoRequest struct {
-	AgentID      int64  `json:"agentid"`                // 上级/上游企业应用agentid
+	AgentID      int64  `json:"agentid"`                 // 上级/上游企业应用agentid
 	BusinessType *int   `json:"business_type,omitempty"` // 填0则为企业互联/局校互联，填1则表示上下游企业
-	CorpID       string `json:"corpid,omitempty"`       // 下级/下游企业corpid
-	Limit        int    `json:"limit,omitempty"`        // 返回的最大记录数，最大值100
-	Cursor       string `json:"cursor,omitempty"`       // 用于分页查询的游标
+	CorpID       string `json:"corpid,omitempty"`        // 下级/下游企业corpid
+	Limit        int    `json:"limit,omitempty"`         // 返回的最大记录数，最大值100
+	Cursor       string `json:"cursor,omitempty"`        // 用于分页查询的游标
 }
 
 // ListAppShareInfoResponse 获取应用共享信息响应

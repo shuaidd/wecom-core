@@ -21,10 +21,10 @@ type LinkAttachment struct {
 
 // MiniprogramAttachment 小程序附件
 type MiniprogramAttachment struct {
-	Title       string `json:"title"`
-	PicMediaID  string `json:"pic_media_id"`
-	AppID       string `json:"appid"`
-	Page        string `json:"page"`
+	Title      string `json:"title"`
+	PicMediaID string `json:"pic_media_id"`
+	AppID      string `json:"appid"`
+	Page       string `json:"page"`
 }
 
 // VideoAttachment 视频附件

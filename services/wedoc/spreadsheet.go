@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	getSheetPropertiesURL   = "/cgi-bin/wedoc/spreadsheet/get_sheet_properties"
-	getSheetRangeDataURL    = "/cgi-bin/wedoc/spreadsheet/get_sheet_range_data"
+	getSheetPropertiesURL     = "/cgi-bin/wedoc/spreadsheet/get_sheet_properties"
+	getSheetRangeDataURL      = "/cgi-bin/wedoc/spreadsheet/get_sheet_range_data"
 	batchUpdateSpreadsheetURL = "/cgi-bin/wedoc/spreadsheet/batch_update"
 )
 

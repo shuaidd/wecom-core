@@ -8,11 +8,11 @@ import (
 )
 
 const (
-	createFormURL        = "/cgi-bin/wedoc/create_form"
-	getFormInfoURL       = "/cgi-bin/wedoc/get_form_info"
-	modifyFormURL        = "/cgi-bin/wedoc/modify_form"
-	getFormAnswerURL     = "/cgi-bin/wedoc/get_form_answer"
-	getFormStatisticURL  = "/cgi-bin/wedoc/get_form_statistic"
+	createFormURL       = "/cgi-bin/wedoc/create_form"
+	getFormInfoURL      = "/cgi-bin/wedoc/get_form_info"
+	modifyFormURL       = "/cgi-bin/wedoc/modify_form"
+	getFormAnswerURL    = "/cgi-bin/wedoc/get_form_answer"
+	getFormStatisticURL = "/cgi-bin/wedoc/get_form_statistic"
 )
 
 // CreateForm 创建收集表

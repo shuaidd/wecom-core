@@ -57,9 +57,9 @@ type VisibleRange struct {
 
 // AddMomentTaskRequest 创建发表任务请求
 type AddMomentTaskRequest struct {
-	Text         *MomentText         `json:"text,omitempty"`
-	Attachments  []MomentAttachment  `json:"attachments,omitempty"`
-	VisibleRange *VisibleRange       `json:"visible_range,omitempty"`
+	Text         *MomentText        `json:"text,omitempty"`
+	Attachments  []MomentAttachment `json:"attachments,omitempty"`
+	VisibleRange *VisibleRange      `json:"visible_range,omitempty"`
 }
 
 // AddMomentTaskResponse 创建发表任务响应
@@ -208,18 +208,18 @@ type CancelMomentTaskRequest struct {
 
 // MomentStrategyPrivilege 规则组权限配置
 type MomentStrategyPrivilege struct {
-	ViewMomentList            bool `json:"view_moment_list,omitempty"`
-	SendMoment                bool `json:"send_moment,omitempty"`
-	ManageMomentCoverAndSign  bool `json:"manage_moment_cover_and_sign,omitempty"`
+	ViewMomentList           bool `json:"view_moment_list,omitempty"`
+	SendMoment               bool `json:"send_moment,omitempty"`
+	ManageMomentCoverAndSign bool `json:"manage_moment_cover_and_sign,omitempty"`
 }
 
 // MomentStrategy 客户朋友圈规则组
 type MomentStrategy struct {
-	StrategyID   int                     `json:"strategy_id"`
-	ParentID     int                     `json:"parent_id,omitempty"`
-	StrategyName string                  `json:"strategy_name"`
-	CreateTime   int64                   `json:"create_time,omitempty"`
-	AdminList    []string                `json:"admin_list,omitempty"`
+	StrategyID   int                      `json:"strategy_id"`
+	ParentID     int                      `json:"parent_id,omitempty"`
+	StrategyName string                   `json:"strategy_name"`
+	CreateTime   int64                    `json:"create_time,omitempty"`
+	AdminList    []string                 `json:"admin_list,omitempty"`
 	Privilege    *MomentStrategyPrivilege `json:"privilege,omitempty"`
 }
 

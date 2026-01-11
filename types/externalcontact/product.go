@@ -2,8 +2,8 @@ package externalcontact
 
 // ProductAttachment 商品图册附件
 type ProductAttachment struct {
-	Type  string               `json:"type"`
-	Image *ImageAttachment     `json:"image,omitempty"`
+	Type  string           `json:"type"`
+	Image *ImageAttachment `json:"image,omitempty"`
 }
 
 // Product 商品信息

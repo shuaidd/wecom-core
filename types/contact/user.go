@@ -34,9 +34,9 @@ type MiniProgram struct {
 
 // ExternalProfile 对外属性
 type ExternalProfile struct {
-	ExternalCorpName string       `json:"external_corp_name,omitempty"`
-	WechatChannels   *WechatChan  `json:"wechat_channels,omitempty"`
-	ExternalAttr     []Attr       `json:"external_attr,omitempty"`
+	ExternalCorpName string      `json:"external_corp_name,omitempty"`
+	WechatChannels   *WechatChan `json:"wechat_channels,omitempty"`
+	ExternalAttr     []Attr      `json:"external_attr,omitempty"`
 }
 
 // WechatChan 视频号

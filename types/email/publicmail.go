@@ -17,42 +17,42 @@ type AuthCodeInfo struct {
 
 // CreatePublicMailRequest 创建公共邮箱请求
 type CreatePublicMailRequest struct {
-	Email          string        `json:"email"`                     // 公共邮箱地址(必填)
-	Name           string        `json:"name"`                      // 公共邮箱名称(必填)
-	UserIDList     *StringList   `json:"userid_list,omitempty"`     // 有权限使用的成员UserID列表
-	DepartmentList *IDList       `json:"department_list,omitempty"` // 有权限使用的部门ID列表
-	TagList        *IDList       `json:"tag_list,omitempty"`        // 有权限使用的标签ID列表
-	CreateAuthCode uint32        `json:"create_auth_code,omitempty"`// 是否创建客户端专用密码 0-否 1-是
-	AuthCodeInfo   *AuthCodeInfo `json:"auth_code_info,omitempty"`  // 客户端专用密码信息
+	Email          string        `json:"email"`                      // 公共邮箱地址(必填)
+	Name           string        `json:"name"`                       // 公共邮箱名称(必填)
+	UserIDList     *StringList   `json:"userid_list,omitempty"`      // 有权限使用的成员UserID列表
+	DepartmentList *IDList       `json:"department_list,omitempty"`  // 有权限使用的部门ID列表
+	TagList        *IDList       `json:"tag_list,omitempty"`         // 有权限使用的标签ID列表
+	CreateAuthCode uint32        `json:"create_auth_code,omitempty"` // 是否创建客户端专用密码 0-否 1-是
+	AuthCodeInfo   *AuthCodeInfo `json:"auth_code_info,omitempty"`   // 客户端专用密码信息
 }
 
 // CreatePublicMailResponse 创建公共邮箱响应
 type CreatePublicMailResponse struct {
 	ErrCode    int32  `json:"errcode"`
 	ErrMsg     string `json:"errmsg"`
-	ID         uint32 `json:"id"`                    // 公共邮箱ID
-	AuthCodeID uint32 `json:"auth_code_id,omitempty"`// 客户端专用密码ID
-	AuthCode   string `json:"auth_code,omitempty"`   // 客户端专用密码
+	ID         uint32 `json:"id"`                     // 公共邮箱ID
+	AuthCodeID uint32 `json:"auth_code_id,omitempty"` // 客户端专用密码ID
+	AuthCode   string `json:"auth_code,omitempty"`    // 客户端专用密码
 }
 
 // UpdatePublicMailRequest 更新公共邮箱请求
 type UpdatePublicMailRequest struct {
-	ID             uint32        `json:"id"`                        // 公共邮箱ID(必填)
-	Name           string        `json:"name,omitempty"`            // 公共邮箱名称
-	UserIDList     *StringList   `json:"userid_list,omitempty"`     // 有权限使用的成员UserID列表
-	DepartmentList *IDList       `json:"department_list,omitempty"` // 有权限使用的部门ID列表
-	TagList        *IDList       `json:"tag_list,omitempty"`        // 有权限使用的标签ID列表
-	AliasList      *StringList   `json:"alias_list,omitempty"`      // 邮箱别名列表
-	CreateAuthCode uint32        `json:"create_auth_code,omitempty"`// 是否创建客户端专用密码 0-否 1-是
-	AuthCodeInfo   *AuthCodeInfo `json:"auth_code_info,omitempty"`  // 客户端专用密码信息
+	ID             uint32        `json:"id"`                         // 公共邮箱ID(必填)
+	Name           string        `json:"name,omitempty"`             // 公共邮箱名称
+	UserIDList     *StringList   `json:"userid_list,omitempty"`      // 有权限使用的成员UserID列表
+	DepartmentList *IDList       `json:"department_list,omitempty"`  // 有权限使用的部门ID列表
+	TagList        *IDList       `json:"tag_list,omitempty"`         // 有权限使用的标签ID列表
+	AliasList      *StringList   `json:"alias_list,omitempty"`       // 邮箱别名列表
+	CreateAuthCode uint32        `json:"create_auth_code,omitempty"` // 是否创建客户端专用密码 0-否 1-是
+	AuthCodeInfo   *AuthCodeInfo `json:"auth_code_info,omitempty"`   // 客户端专用密码信息
 }
 
 // UpdatePublicMailResponse 更新公共邮箱响应
 type UpdatePublicMailResponse struct {
 	ErrCode    int32  `json:"errcode"`
 	ErrMsg     string `json:"errmsg"`
-	AuthCodeID uint32 `json:"auth_code_id,omitempty"`// 客户端专用密码ID
-	AuthCode   string `json:"auth_code,omitempty"`   // 客户端专用密码
+	AuthCodeID uint32 `json:"auth_code_id,omitempty"` // 客户端专用密码ID
+	AuthCode   string `json:"auth_code,omitempty"`    // 客户端专用密码
 }
 
 // DeletePublicMailRequest 删除公共邮箱请求
@@ -116,10 +116,10 @@ type GetAuthCodeListRequest struct {
 
 // AuthCodeDetail 客户端专用密码详情
 type AuthCodeDetail struct {
-	AuthCodeID  uint32 `json:"auth_code_id"`   // 客户端专用密码ID
-	CreateTime  uint32 `json:"create_time"`    // 创建时间戳
-	LastUseTime uint32 `json:"last_use_time"`  // 最后使用时间(未使用过返回0)
-	Remark      string `json:"remark"`         // 备注
+	AuthCodeID  uint32 `json:"auth_code_id"`  // 客户端专用密码ID
+	CreateTime  uint32 `json:"create_time"`   // 创建时间戳
+	LastUseTime uint32 `json:"last_use_time"` // 最后使用时间(未使用过返回0)
+	Remark      string `json:"remark"`        // 备注
 }
 
 // GetAuthCodeListResponse 获取客户端专用密码列表响应
@@ -131,8 +131,8 @@ type GetAuthCodeListResponse struct {
 
 // DeleteAuthCodeRequest 删除客户端专用密码请求
 type DeleteAuthCodeRequest struct {
-	ID         uint32 `json:"id"`          // 公共邮箱ID(必填)
-	AuthCodeID uint32 `json:"auth_code_id"`// 客户端专用密码ID(必填)
+	ID         uint32 `json:"id"`           // 公共邮箱ID(必填)
+	AuthCodeID uint32 `json:"auth_code_id"` // 客户端专用密码ID(必填)
 }
 
 // DeleteAuthCodeResponse 删除客户端专用密码响应

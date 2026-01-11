@@ -33,11 +33,11 @@ type GetCorpTagListResponse struct {
 
 // AddCorpTagRequest 添加企业客户标签请求
 type AddCorpTagRequest struct {
-	GroupID   string              `json:"group_id,omitempty"`
-	GroupName string              `json:"group_name,omitempty"`
-	Order     uint32              `json:"order,omitempty"`
-	Tag       []AddCorpTagItem    `json:"tag"`
-	AgentID   int                 `json:"agentid,omitempty"`
+	GroupID   string           `json:"group_id,omitempty"`
+	GroupName string           `json:"group_name,omitempty"`
+	Order     uint32           `json:"order,omitempty"`
+	Tag       []AddCorpTagItem `json:"tag"`
+	AgentID   int              `json:"agentid,omitempty"`
 }
 
 // AddCorpTagItem 添加标签项
@@ -88,11 +88,11 @@ type GetStrategyTagListResponse struct {
 
 // AddStrategyTagRequest 为指定规则组创建企业客户标签请求
 type AddStrategyTagRequest struct {
-	StrategyID int                 `json:"strategy_id"`
-	GroupID    string              `json:"group_id,omitempty"`
-	GroupName  string              `json:"group_name,omitempty"`
-	Order      uint32              `json:"order,omitempty"`
-	Tag        []AddCorpTagItem    `json:"tag"`
+	StrategyID int              `json:"strategy_id"`
+	GroupID    string           `json:"group_id,omitempty"`
+	GroupName  string           `json:"group_name,omitempty"`
+	Order      uint32           `json:"order,omitempty"`
+	Tag        []AddCorpTagItem `json:"tag"`
 }
 
 // AddStrategyTagResponse 为指定规则组创建企业客户标签响应

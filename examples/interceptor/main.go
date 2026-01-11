@@ -78,7 +78,7 @@ func main() {
 
 	// 示例1：获取部门列表
 	fmt.Println("\n=== 示例1：获取部门列表 ===")
-	departments, err := client.Contact.ListDepartments(context.Background(),1)
+	departments, err := client.Contact.ListDepartments(context.Background(), 1)
 	if err != nil {
 		log.Fatalf("获取部门列表失败: %v", err)
 	}
@@ -111,7 +111,7 @@ func main() {
 
 	// 发送多个请求测试限流
 	for i := 0; i < 3; i++ {
-		_, err := rateLimitedClient.Contact.ListDepartments(context.Background(),1)
+		_, err := rateLimitedClient.Contact.ListDepartments(context.Background(), 1)
 		if err != nil {
 			fmt.Printf("请求 %d 失败: %v\n", i+1, err)
 		} else {
