@@ -10,6 +10,7 @@ import (
 	"github.com/shuaidd/wecom-core/pkg/interceptor"
 	"github.com/shuaidd/wecom-core/services/agent"
 	"github.com/shuaidd/wecom-core/services/calendar"
+	"github.com/shuaidd/wecom-core/services/checkin"
 	"github.com/shuaidd/wecom-core/services/contact"
 	"github.com/shuaidd/wecom-core/services/corpgroup"
 	"github.com/shuaidd/wecom-core/services/email"
@@ -28,6 +29,7 @@ import (
 	"github.com/shuaidd/wecom-core/services/webinar"
 	"github.com/shuaidd/wecom-core/services/wedoc"
 	"github.com/shuaidd/wecom-core/services/wedrive"
+	"github.com/shuaidd/wecom-core/services/approval"
 )
 
 // 暴露给用户的类型别名，用于自定义 API 调用
@@ -80,6 +82,8 @@ type Client struct {
 	ExternalContact *externalcontact.Service
 	// Media 素材管理服务
 	Media *media.Service
+	// Checkin 打卡服务
+	Checkin *checkin.Service
 	// Invoice 电子发票服务
 	Invoice *invoice.Service
 	// KF 微信客服服务
@@ -96,6 +100,8 @@ type Client struct {
 	ReserveMeeting *reserve_meeting.Service
 	// Webinar 网络研讨会服务
 	Webinar *webinar.Service
+	// Approval 审批服务
+	Approval *approval.Service
 
 	// 内部组件(不对外暴露)
 	config       *config.Config
@@ -178,6 +184,7 @@ func New(opts ...config.Option) (*Client, error) {
 		Message:         message.NewService(httpClient),
 		ExternalContact: externalcontact.NewService(httpClient),
 		Media:           media.NewService(httpClient),
+		Checkin:         checkin.NewService(httpClient),
 		Invoice:         invoice.NewService(httpClient),
 		KF:              kf.NewService(httpClient),
 		Email:           email.NewService(httpClient),
@@ -186,6 +193,7 @@ func New(opts ...config.Option) (*Client, error) {
 		Meeting:         meeting.NewService(httpClient),
 		ReserveMeeting:  reserve_meeting.NewService(httpClient),
 		Webinar:         webinar.NewService(httpClient),
+		Approval:        approval.New(httpClient),
 	}
 
 	return c, nil
