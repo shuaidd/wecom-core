@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/shuaidd/wecom-core/internal/client"
+	"github.com/shuaidd/wecom-core/types/common"
 	"github.com/shuaidd/wecom-core/types/wedoc"
 )
 
@@ -63,7 +64,7 @@ func (s *Service) UpdateRecords(ctx context.Context, req *wedoc.UpdateRecordsReq
 // DeleteRecords 删除记录
 // 本接口用于删除 Smartsheet 的某个子表中的一行或多行记录
 func (s *Service) DeleteRecords(ctx context.Context, req *wedoc.DeleteRecordsRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, deleteRecordsURL, req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, deleteRecordsURL, req)
 	return err
 }
 
@@ -90,7 +91,7 @@ func (s *Service) UpdateFields(ctx context.Context, req *wedoc.UpdateFieldsReque
 // DeleteFields 删除字段
 // 本接口用于删除智能表中某个子表里的字段
 func (s *Service) DeleteFields(ctx context.Context, req *wedoc.DeleteFieldsRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, deleteFieldsURL, req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, deleteFieldsURL, req)
 	return err
 }
 
@@ -117,7 +118,7 @@ func (s *Service) UpdateView(ctx context.Context, req *wedoc.UpdateViewRequest) 
 // DeleteView 删除视图
 // 本接口用于删除 Smartsheet 中的某个视图
 func (s *Service) DeleteView(ctx context.Context, req *wedoc.DeleteViewRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, deleteViewURL, req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, deleteViewURL, req)
 	return err
 }
 
@@ -144,7 +145,7 @@ func (s *Service) UpdateSheet(ctx context.Context, req *wedoc.UpdateSheetRequest
 // DeleteSheet 删除子表
 // 本接口用于删除智能表中的某个子表
 func (s *Service) DeleteSheet(ctx context.Context, req *wedoc.DeleteSheetRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, deleteSheetURL, req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, deleteSheetURL, req)
 	return err
 }
 
@@ -171,6 +172,6 @@ func (s *Service) UpdateFieldGroup(ctx context.Context, req *wedoc.UpdateFieldGr
 // DeleteFieldGroup 删除编组
 // 本接口用于删除智能表中某个子表里的编组
 func (s *Service) DeleteFieldGroup(ctx context.Context, req *wedoc.DeleteFieldGroupRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, deleteFieldGroupURL, req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, deleteFieldGroupURL, req)
 	return err
 }

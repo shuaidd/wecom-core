@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/shuaidd/wecom-core/internal/client"
+	"github.com/shuaidd/wecom-core/types/common"
 	"github.com/shuaidd/wecom-core/types/webinar"
 )
 
@@ -16,7 +17,7 @@ func NewService(c *client.Client) *Service {
 }
 
 func (s *Service) Update(ctx context.Context, req *webinar.UpdateWebinarRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/meeting/webinar/update", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/meeting/webinar/update", req)
 	return err
 }
 
@@ -32,7 +33,7 @@ func (s *Service) Cancel(ctx context.Context, meetingID string) error {
 	req := &webinar.CancelWebinarRequest{
 		MeetingID: meetingID,
 	}
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/meeting/webinar/cancel", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/meeting/webinar/cancel", req)
 	return err
 }
 
@@ -41,7 +42,7 @@ func (s *Service) ApproveEnroll(ctx context.Context, req *webinar.ApproveWebinar
 }
 
 func (s *Service) UpdateWarmUp(ctx context.Context, req *webinar.UpdateWebinarWarmUpRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/meeting/webinar/update_warm_up", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/meeting/webinar/update_warm_up", req)
 	return err
 }
 

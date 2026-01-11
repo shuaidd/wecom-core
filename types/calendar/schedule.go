@@ -1,6 +1,6 @@
 package calendar
 
-import "github.com/shuaidd/wecom-core/internal/client"
+import "github.com/shuaidd/wecom-core/types/common"
 
 // Attendee 日程参与者
 type Attendee struct {
@@ -54,7 +54,7 @@ type CreateScheduleRequest struct {
 
 // CreateScheduleResponse 创建日程响应
 type CreateScheduleResponse struct {
-	client.CommonResponse
+	common.Response
 	ScheduleID string `json:"schedule_id"` // 日程ID
 }
 
@@ -65,7 +65,7 @@ type GetScheduleRequest struct {
 
 // GetScheduleResponse 获取日程详情响应
 type GetScheduleResponse struct {
-	client.CommonResponse
+	common.Response
 	ScheduleList []Schedule `json:"schedule_list"` // 日程列表
 }
 
@@ -79,7 +79,7 @@ type UpdateScheduleRequest struct {
 
 // UpdateScheduleResponse 更新日程响应
 type UpdateScheduleResponse struct {
-	client.CommonResponse
+	common.Response
 	ScheduleID string `json:"schedule_id,omitempty"` // 修改重复日程新产生的日程ID
 }
 
@@ -111,6 +111,6 @@ type GetScheduleByCalendarRequest struct {
 
 // GetScheduleByCalendarResponse 获取日历下的日程列表响应
 type GetScheduleByCalendarResponse struct {
-	client.CommonResponse
+	common.Response
 	ScheduleList []Schedule `json:"schedule_list"` // 日程列表
 }

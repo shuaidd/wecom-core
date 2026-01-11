@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/shuaidd/wecom-core/internal/client"
+	"github.com/shuaidd/wecom-core/types/common"
 	"github.com/shuaidd/wecom-core/types/meeting"
 )
 
@@ -16,21 +17,21 @@ func (s *Service) CreatePollTheme(ctx context.Context, req *meeting.CreatePollTh
 // UpdatePollTheme 修改会议投票主题
 // 文档: https://developer.work.weixin.qq.com/document/path/...
 func (s *Service) UpdatePollTheme(ctx context.Context, req *meeting.UpdatePollThemeRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/meeting/poll/update_theme", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/meeting/poll/update_theme", req)
 	return err
 }
 
 // DeletePoll 删除会议投票
 // 文档: https://developer.work.weixin.qq.com/document/path/...
 func (s *Service) DeletePoll(ctx context.Context, req *meeting.DeletePollRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/meeting/poll/delete", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/meeting/poll/delete", req)
 	return err
 }
 
 // FinishPoll 结束会议投票
 // 文档: https://developer.work.weixin.qq.com/document/path/...
 func (s *Service) FinishPoll(ctx context.Context, req *meeting.FinishPollRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/meeting/poll/finish", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/meeting/poll/finish", req)
 	return err
 }
 

@@ -5,6 +5,7 @@ import (
 
 	"github.com/shuaidd/wecom-core/internal/client"
 	"github.com/shuaidd/wecom-core/types/calendar"
+	"github.com/shuaidd/wecom-core/types/common"
 )
 
 const (
@@ -39,7 +40,7 @@ func (s *Service) UpdateSchedule(ctx context.Context, req *calendar.UpdateSchedu
 // DeleteSchedule 取消日程
 // 该接口用于取消指定的日程
 func (s *Service) DeleteSchedule(ctx context.Context, req *calendar.DeleteScheduleRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, deleteScheduleURL, req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, deleteScheduleURL, req)
 	return err
 }
 
@@ -47,7 +48,7 @@ func (s *Service) DeleteSchedule(ctx context.Context, req *calendar.DeleteSchedu
 // 该接口用于在日历中更新指定的日程参与者列表
 // 注意，该接口是增量式
 func (s *Service) AddAttendees(ctx context.Context, req *calendar.AddAttendeesRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, addAttendeesURL, req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, addAttendeesURL, req)
 	return err
 }
 
@@ -55,7 +56,7 @@ func (s *Service) AddAttendees(ctx context.Context, req *calendar.AddAttendeesRe
 // 该接口用于在日历中更新指定的日程参与者列表
 // 注意，该接口是增量式
 func (s *Service) DeleteAttendees(ctx context.Context, req *calendar.DeleteAttendeesRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, deleteAttendeesURL, req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, deleteAttendeesURL, req)
 	return err
 }
 

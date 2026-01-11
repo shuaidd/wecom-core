@@ -3,7 +3,7 @@ package approval
 import (
 	"encoding/json"
 
-	"github.com/shuaidd/wecom-core/internal/client"
+	"github.com/shuaidd/wecom-core/types/common"
 )
 
 // SetUserVacationQuotaRequest 修改成员假期余额请求
@@ -23,7 +23,7 @@ type CreateTemplateRequest struct {
 
 // CreateTemplateResponse 创建审批模板响应
 type CreateTemplateResponse struct {
-	client.CommonResponse
+	common.Response
 	TemplateID string `json:"template_id,omitempty"`
 }
 
@@ -41,7 +41,7 @@ type GetTemplateDetailRequest struct {
 
 // GetTemplateDetailResponse 获取审批模板详情响应（template_content 以原始 JSON 返回）
 type GetTemplateDetailResponse struct {
-	client.CommonResponse
+	common.Response
 	TemplateNames   []LangText      `json:"template_names,omitempty"`
 	TemplateContent json.RawMessage `json:"template_content,omitempty"`
 }
@@ -59,7 +59,7 @@ type ApplyEventRequest struct {
 
 // ApplyEventResponse 提交审批申请响应
 type ApplyEventResponse struct {
-	client.CommonResponse
+	common.Response
 	SpNo string `json:"sp_no,omitempty"`
 }
 
@@ -80,14 +80,14 @@ type ApprovalFilter struct {
 
 // GetApprovalInfoResponse 批量获取审批单号响应
 type GetApprovalInfoResponse struct {
-	client.CommonResponse
+	common.Response
 	SpNoList      []string `json:"sp_no_list,omitempty"`
 	NewNextCursor string   `json:"new_next_cursor,omitempty"`
 }
 
 // GetCorpVacConfigResponse 获取企业假期管理配置响应
 type GetCorpVacConfigResponse struct {
-	client.CommonResponse
+	common.Response
 	Lists []VacationConf `json:"lists,omitempty"`
 }
 
@@ -109,7 +109,7 @@ type GetUserVacationQuotaRequest struct {
 
 // GetUserVacationQuotaResponse 获取成员假期余额响应
 type GetUserVacationQuotaResponse struct {
-	client.CommonResponse
+	common.Response
 	Lists []UserVacationQuota `json:"lists,omitempty"`
 }
 
@@ -131,7 +131,7 @@ type GetApprovalDetailRequest struct {
 // GetApprovalDetailResponse 获取审批申请详情响应
 // 由于审批详情结构较复杂，这里将 info 字段保留为原始 JSON，调用方可以自行解析
 type GetApprovalDetailResponse struct {
-	client.CommonResponse
+	common.Response
 	Info json.RawMessage `json:"info,omitempty"`
 }
 
@@ -144,7 +144,7 @@ type GetApprovalDataOldRequest struct {
 
 // GetApprovalDataOldResponse 旧接口返回（data 字段原样返回）
 type GetApprovalDataOldResponse struct {
-	client.CommonResponse
+	common.Response
 	Count     int             `json:"count,omitempty"`
 	Total     int             `json:"total,omitempty"`
 	NextSpNum json.RawMessage `json:"next_spnum,omitempty"`
@@ -158,7 +158,7 @@ type GetOpenApprovalDataRequest struct {
 
 // GetOpenApprovalDataResponse 自建应用查询响应（data 原始）
 type GetOpenApprovalDataResponse struct {
-	client.CommonResponse
+	common.Response
 	Data json.RawMessage `json:"data,omitempty"`
 }
 

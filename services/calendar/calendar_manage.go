@@ -5,6 +5,7 @@ import (
 
 	"github.com/shuaidd/wecom-core/internal/client"
 	"github.com/shuaidd/wecom-core/types/calendar"
+	"github.com/shuaidd/wecom-core/types/common"
 )
 
 const (
@@ -36,6 +37,6 @@ func (s *Service) UpdateCalendar(ctx context.Context, req *calendar.UpdateCalend
 // DeleteCalendar 删除日历
 // 该接口用于删除指定日历
 func (s *Service) DeleteCalendar(ctx context.Context, req *calendar.DeleteCalendarRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, deleteCalendarURL, req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, deleteCalendarURL, req)
 	return err
 }

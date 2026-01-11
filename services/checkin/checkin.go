@@ -5,6 +5,7 @@ import (
 
 	"github.com/shuaidd/wecom-core/internal/client"
 	"github.com/shuaidd/wecom-core/types/checkin"
+	"github.com/shuaidd/wecom-core/types/common"
 )
 
 // Service 打卡相关接口服务
@@ -26,49 +27,49 @@ func NewService(c *client.Client) *Service {
 
 // SetCheckinScheduleList 为打卡人员排班
 func (s *Service) SetCheckinScheduleList(ctx context.Context, req *checkin.SetCheckinScheduleListRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/checkin/setcheckinschedulist", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/checkin/setcheckinschedulist", req)
 	return err
 }
 
 // PunchCorrection 为打卡人员补卡
 func (s *Service) PunchCorrection(ctx context.Context, req *checkin.PunchCorrectionRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/checkin/punch_correction", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/checkin/punch_correction", req)
 	return err
 }
 
 // AddCheckinUserFace 录入人脸信息
 func (s *Service) AddCheckinUserFace(ctx context.Context, req *checkin.AddCheckinUserFaceRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/checkin/addcheckinuserface", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/checkin/addcheckinuserface", req)
 	return err
 }
 
 // AddCheckinRecord 添加打卡记录
 func (s *Service) AddCheckinRecord(ctx context.Context, req *checkin.AddCheckinRecordRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/checkin/add_checkin_record", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/checkin/add_checkin_record", req)
 	return err
 }
 
 // AddCheckinOption 创建打卡规则
 func (s *Service) AddCheckinOption(ctx context.Context, req *checkin.AddCheckinOptionRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/checkin/add_checkin_option", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/checkin/add_checkin_option", req)
 	return err
 }
 
 // UpdateCheckinOption 修改打卡规则
 func (s *Service) UpdateCheckinOption(ctx context.Context, req *checkin.UpdateCheckinOptionRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/checkin/update_checkin_option", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/checkin/update_checkin_option", req)
 	return err
 }
 
 // ClearCheckinOptionArrayField 清空打卡规则数组元素
 func (s *Service) ClearCheckinOptionArrayField(ctx context.Context, req *checkin.ClearCheckinOptionArrayFieldRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/checkin/clear_checkin_option_array_field", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/checkin/clear_checkin_option_array_field", req)
 	return err
 }
 
 // DeleteCheckinOption 删除打卡规则
 func (s *Service) DeleteCheckinOption(ctx context.Context, req *checkin.DeleteCheckinOptionRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/checkin/del_checkin_option", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/checkin/del_checkin_option", req)
 	return err
 }
 

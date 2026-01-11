@@ -30,6 +30,7 @@ import (
 	"github.com/shuaidd/wecom-core/services/wedoc"
 	"github.com/shuaidd/wecom-core/services/wedrive"
 	"github.com/shuaidd/wecom-core/services/approval"
+	"github.com/shuaidd/wecom-core/types/common"
 )
 
 // 暴露给用户的类型别名，用于自定义 API 调用
@@ -42,7 +43,7 @@ type Response = client.Response
 
 // CommonResponse 企业微信API通用响应字段
 // 用户自定义响应类型时应该嵌入此类型
-type CommonResponse = client.CommonResponse
+type CommonResponse = common.Response
 
 // RequestInterceptor 请求拦截器
 type RequestInterceptor = interceptor.RequestInterceptor

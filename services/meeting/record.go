@@ -4,13 +4,14 @@ import (
 	"context"
 
 	"github.com/shuaidd/wecom-core/internal/client"
+	"github.com/shuaidd/wecom-core/types/common"
 	"github.com/shuaidd/wecom-core/types/meeting"
 )
 
 // UpdateSharingConfig 根据会议录制 ID 修改共享等配置
 // 文档: docs/录制管理/修改会议录制共享设置.md
 func (s *Service) UpdateSharingConfig(ctx context.Context, req *meeting.UpdateSharingConfigRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/meeting/record/update_sharing_config", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/meeting/record/update_sharing_config", req)
 	return err
 }
 
@@ -47,14 +48,14 @@ func (s *Service) GetVIPList(ctx context.Context, req *meeting.GetVIPListRequest
 // DeleteMeetingRecord 删除会议录制（删除会议的所有录制文件）
 // 文档: docs/录制管理/删除会议录制.md
 func (s *Service) DeleteMeetingRecord(ctx context.Context, req *meeting.DeleteMeetingRecordRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/meeting/record/delete", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/meeting/record/delete", req)
 	return err
 }
 
 // DeleteRecordFile 删除单个录制文件
 // 文档: docs/录制管理/删除单个录制文件.md
 func (s *Service) DeleteRecordFile(ctx context.Context, req *meeting.DeleteRecordFileRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/meeting/record/delete_file", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/meeting/record/delete_file", req)
 	return err
 }
 

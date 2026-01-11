@@ -1,6 +1,6 @@
 package contact
 
-import "github.com/shuaidd/wecom-core/internal/client"
+import "github.com/shuaidd/wecom-core/types/common"
 
 // ListUserIDsRequest 获取成员ID列表请求
 type ListUserIDsRequest struct {
@@ -20,7 +20,7 @@ type DeptUser struct {
 
 // ListUserIDsResponse 获取成员ID列表响应
 type ListUserIDsResponse struct {
-	client.CommonResponse
+	common.Response
 	// NextCursor 分页游标，下次请求时填写以获取之后分页的记录。如果该字段返回空则表示已没有更多数据
 	NextCursor string `json:"next_cursor,omitempty"`
 	// DeptUser 用户-部门关系列表
@@ -47,14 +47,14 @@ type ExportTagUserRequest struct {
 
 // ExportResponse 导出响应
 type ExportResponse struct {
-	client.CommonResponse
+	common.Response
 	// JobID 任务ID，可通过获取导出结果接口查询任务结果
 	JobID string `json:"jobid"`
 }
 
 // GetExportResultResponse 获取导出结果响应
 type GetExportResultResponse struct {
-	client.CommonResponse
+	common.Response
 	// Status 任务状态：0-未处理，1-处理中，2-完成，3-异常失败
 	Status int `json:"status"`
 	// DataList 数据文件列表

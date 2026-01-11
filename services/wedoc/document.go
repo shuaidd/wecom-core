@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/shuaidd/wecom-core/internal/client"
+	"github.com/shuaidd/wecom-core/types/common"
 	"github.com/shuaidd/wecom-core/types/wedoc"
 )
 
@@ -21,6 +22,6 @@ func (s *Service) GetDocument(ctx context.Context, req *wedoc.GetDocumentRequest
 // BatchUpdateDocument 批量编辑文档内容
 // 该接口可以对一个在线文档批量执行多个更新操作
 func (s *Service) BatchUpdateDocument(ctx context.Context, req *wedoc.BatchUpdateDocumentRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, batchUpdateDocumentURL, req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, batchUpdateDocumentURL, req)
 	return err
 }

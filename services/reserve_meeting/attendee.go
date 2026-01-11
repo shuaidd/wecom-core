@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/shuaidd/wecom-core/internal/client"
+	"github.com/shuaidd/wecom-core/types/common"
 	"github.com/shuaidd/wecom-core/types/reserve_meeting"
 )
 
@@ -29,7 +30,7 @@ func (s *Service) GetInviteesWithCursor(ctx context.Context, meetingID, cursor s
 // SetInvitees 更新会议受邀成员列表
 // 文档: https://developer.work.weixin.qq.com/document/path/94050
 func (s *Service) SetInvitees(ctx context.Context, req *reserve_meeting.SetInviteesRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/meeting/set_invitees", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/meeting/set_invitees", req)
 	return err
 }
 
@@ -45,7 +46,7 @@ func (s *Service) GetGuests(ctx context.Context, meetingID string) (*reserve_mee
 // SetGuests 更新会议嘉宾列表
 // 文档: https://developer.work.weixin.qq.com/document/path/94137
 func (s *Service) SetGuests(ctx context.Context, req *reserve_meeting.SetGuestsRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/meeting/set_guests", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/meeting/set_guests", req)
 	return err
 }
 

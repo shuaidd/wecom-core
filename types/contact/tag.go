@@ -1,6 +1,6 @@
 package contact
 
-import "github.com/shuaidd/wecom-core/internal/client"
+import "github.com/shuaidd/wecom-core/types/common"
 
 // Tag 标签信息
 type Tag struct {
@@ -20,31 +20,31 @@ type TagUser struct {
 
 // CreateTagResponse 创建标签响应
 type CreateTagResponse struct {
-	client.CommonResponse
+	common.Response
 	// TagID 标签id
 	TagID int `json:"tagid"`
 }
 
 // UpdateTagResponse 更新标签响应
 type UpdateTagResponse struct {
-	client.CommonResponse
+	common.Response
 }
 
 // DeleteTagResponse 删除标签响应
 type DeleteTagResponse struct {
-	client.CommonResponse
+	common.Response
 }
 
 // ListTagsResponse 获取标签列表响应
 type ListTagsResponse struct {
-	client.CommonResponse
+	common.Response
 	// TagList 标签列表
 	TagList []Tag `json:"taglist"`
 }
 
 // GetTagResponse 获取标签成员响应
 type GetTagResponse struct {
-	client.CommonResponse
+	common.Response
 	// TagName 标签名
 	TagName string `json:"tagname"`
 	// UserList 标签中包含的成员列表
@@ -55,7 +55,7 @@ type GetTagResponse struct {
 
 // AddTagUsersResponse 增加标签成员响应
 type AddTagUsersResponse struct {
-	client.CommonResponse
+	common.Response
 	// InvalidList 非法的成员帐号列表
 	InvalidList string `json:"invalidlist,omitempty"`
 	// InvalidParty 非法的部门id列表
@@ -64,7 +64,7 @@ type AddTagUsersResponse struct {
 
 // DeleteTagUsersResponse 删除标签成员响应
 type DeleteTagUsersResponse struct {
-	client.CommonResponse
+	common.Response
 	// InvalidList 非法的成员帐号列表
 	InvalidList string `json:"invalidlist,omitempty"`
 	// InvalidParty 非法的部门id列表

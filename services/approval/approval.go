@@ -6,6 +6,7 @@ import (
 
 	"github.com/shuaidd/wecom-core/internal/client"
 	"github.com/shuaidd/wecom-core/types/approval"
+	"github.com/shuaidd/wecom-core/types/common"
 )
 
 // API endpoints
@@ -35,7 +36,7 @@ func New(c *client.Client) *Service {
 
 // SetUserVacationQuota 修改成员假期余额
 func (s *Service) SetUserVacationQuota(ctx context.Context, req *approval.SetUserVacationQuotaRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, setUserVacationQuotaURL, req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, setUserVacationQuotaURL, req)
 	return err
 }
 
@@ -46,7 +47,7 @@ func (s *Service) CreateTemplate(ctx context.Context, req *approval.CreateTempla
 
 // UpdateTemplate 更新审批模板
 func (s *Service) UpdateTemplate(ctx context.Context, req *approval.UpdateTemplateRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, updateTemplateURL, req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, updateTemplateURL, req)
 	return err
 }
 

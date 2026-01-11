@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/shuaidd/wecom-core/internal/client"
+	"github.com/shuaidd/wecom-core/types/common"
 	"github.com/shuaidd/wecom-core/types/meeting"
 )
 
@@ -58,7 +59,7 @@ func (s *Service) BookRooms(ctx context.Context, req *meeting.BookRoomsRequest) 
 // ReleaseRooms 通过会议 ID 释放 Rooms 会议室
 // 文档: docs/释放Rooms会议室.md
 func (s *Service) ReleaseRooms(ctx context.Context, req *meeting.ReleaseRoomsRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/meeting/rooms/release", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/meeting/rooms/release", req)
 	return err
 }
 
@@ -71,7 +72,7 @@ func (s *Service) CallRoom(ctx context.Context, req *meeting.CallRoomRequest) (*
 // CancelCall 取消呼叫 Rooms 会议室
 // 文档: docs/取消呼叫Rooms会议室.md
 func (s *Service) CancelCall(ctx context.Context, req *meeting.CancelCallRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/meeting/rooms/cancel_call", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/meeting/rooms/cancel_call", req)
 	return err
 }
 

@@ -1,7 +1,5 @@
 package meeting
 
-import "github.com/shuaidd/wecom-core/types/common"
-
 // OperatedUser 被操作成员信息
 type OperatedUser struct {
 	// TmpOpenID 被操作者的会中临时ID
@@ -118,9 +116,4 @@ type CloseScreenShareRequest struct {
 	MeetingID string `json:"meetingid"`
 	// OperatedUser 被操作对象
 	OperatedUser OperatedUser `json:"operated_user"`
-}
-
-// CommonResponse 通用响应，仅包含errcode和errmsg
-type CommonResponse struct {
-	common.Response
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/shuaidd/wecom-core/internal/client"
+	"github.com/shuaidd/wecom-core/types/common"
 	"github.com/shuaidd/wecom-core/types/wedoc"
 )
 
@@ -30,14 +31,14 @@ func (s *Service) GetDocBaseInfo(ctx context.Context, req *wedoc.GetDocBaseInfoR
 // DeleteDoc 删除文档
 // 该接口用于删除指定文档、表格、智能表格及收集表
 func (s *Service) DeleteDoc(ctx context.Context, req *wedoc.DeleteDocRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, deleteDocURL, req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, deleteDocURL, req)
 	return err
 }
 
 // RenameDoc 重命名文档
 // 该接口用于对指定文档、表格、智能表格及收集表进行重命名
 func (s *Service) RenameDoc(ctx context.Context, req *wedoc.RenameDocRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, renameDocURL, req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, renameDocURL, req)
 	return err
 }
 

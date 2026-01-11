@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/shuaidd/wecom-core/internal/errors"
+	"github.com/shuaidd/wecom-core/types/common"
 )
 
 func TestParseResponse_Success(t *testing.T) {
@@ -127,7 +128,7 @@ func TestResponse_IsSuccess(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			resp := &Response{
-				CommonResponse: CommonResponse{
+				Response: common.Response{
 					ErrCode: tt.errcode,
 				},
 			}

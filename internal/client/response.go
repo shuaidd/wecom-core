@@ -7,22 +7,15 @@ import (
 	"net/http"
 
 	"github.com/shuaidd/wecom-core/internal/errors"
+	"github.com/shuaidd/wecom-core/types/common"
 )
-
-// CommonResponse 企业微信API通用响应
-type CommonResponse struct {
-	// ErrCode 错误码，0表示成功
-	ErrCode int `json:"errcode"`
-	// ErrMsg 错误消息
-	ErrMsg string `json:"errmsg"`
-}
 
 // Response 表示一个HTTP响应
 type Response struct {
 	// HTTPResponse 原始HTTP响应
 	HTTPResponse *http.Response
 	// CommonResponse 通用响应字段
-	CommonResponse
+	common.Response
 	// Body 响应体（原始字节）
 	Body []byte
 }
@@ -41,7 +34,7 @@ func ParseResponse(httpResp *http.Response) (*Response, error) {
 	resp.Body = body
 
 	// 解析通用响应字段
-	if err := json.Unmarshal(body, &resp.CommonResponse); err != nil {
+	if err := json.Unmarshal(body, &resp.Response); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 

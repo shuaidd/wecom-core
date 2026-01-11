@@ -1,6 +1,6 @@
 package calendar
 
-import "github.com/shuaidd/wecom-core/internal/client"
+import "github.com/shuaidd/wecom-core/types/common"
 
 // Calendar 日历信息
 type Calendar struct {
@@ -48,7 +48,7 @@ type CreateCalendarRequest struct {
 
 // CreateCalendarResponse 创建日历响应
 type CreateCalendarResponse struct {
-	client.CommonResponse
+	common.Response
 	CalID      string     `json:"cal_id"`                // 日历ID
 	FailResult FailResult `json:"fail_result,omitempty"` // 无效的输入内容
 }
@@ -60,7 +60,7 @@ type GetCalendarRequest struct {
 
 // GetCalendarResponse 获取日历详情响应
 type GetCalendarResponse struct {
-	client.CommonResponse
+	common.Response
 	CalendarList []Calendar `json:"calendar_list"` // 日历列表
 }
 
@@ -72,7 +72,7 @@ type UpdateCalendarRequest struct {
 
 // UpdateCalendarResponse 更新日历响应
 type UpdateCalendarResponse struct {
-	client.CommonResponse
+	common.Response
 	FailResult FailResult `json:"fail_result,omitempty"` // 无效的输入内容
 }
 

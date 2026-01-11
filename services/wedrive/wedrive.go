@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/shuaidd/wecom-core/internal/client"
+	"github.com/shuaidd/wecom-core/types/common"
 	"github.com/shuaidd/wecom-core/types/wedrive"
 )
 
@@ -59,7 +60,7 @@ func (s *Service) ListFiles(ctx context.Context, req *wedrive.FileListRequest) (
 
 // DeleteFiles 删除文件
 func (s *Service) DeleteFiles(ctx context.Context, req *wedrive.FileDeleteRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/wedrive/file_delete", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/wedrive/file_delete", req)
 	return err
 }
 
@@ -80,25 +81,25 @@ func (s *Service) ShareFile(ctx context.Context, req *wedrive.FileShareRequest) 
 
 // SetFileSetting 修改文件分享设置
 func (s *Service) SetFileSetting(ctx context.Context, req *wedrive.FileSettingRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/wedrive/file_setting", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/wedrive/file_setting", req)
 	return err
 }
 
 // SetFileSecureSetting 修改文件安全设置（水印等）
 func (s *Service) SetFileSecureSetting(ctx context.Context, req *wedrive.FileSecureSettingRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/wedrive/file_secure_setting", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/wedrive/file_secure_setting", req)
 	return err
 }
 
 // AddFileMembers 新增文件成员
 func (s *Service) AddFileMembers(ctx context.Context, req *wedrive.FileACLAddRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/wedrive/file_acl_add", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/wedrive/file_acl_add", req)
 	return err
 }
 
 // RemoveFileMembers 删除文件成员
 func (s *Service) RemoveFileMembers(ctx context.Context, req *wedrive.FileACLDelRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/wedrive/file_acl_del", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/wedrive/file_acl_del", req)
 	return err
 }
 
@@ -124,19 +125,19 @@ func (s *Service) ShareSpace(ctx context.Context, req *wedrive.SpaceShareRequest
 
 // RenameSpace 重命名空间
 func (s *Service) RenameSpace(ctx context.Context, req *wedrive.SpaceRenameRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/wedrive/space_rename", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/wedrive/space_rename", req)
 	return err
 }
 
 // DismissSpace 解散空间
 func (s *Service) DismissSpace(ctx context.Context, req *wedrive.SpaceDismissRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/wedrive/space_dismiss", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/wedrive/space_dismiss", req)
 	return err
 }
 
 // SetSpaceSetting 修改空间安全设置
 func (s *Service) SetSpaceSetting(ctx context.Context, req *wedrive.SpaceSettingRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/wedrive/space_setting", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/wedrive/space_setting", req)
 	return err
 }
 
@@ -149,6 +150,6 @@ func (s *Service) AddSpaceMembers(ctx context.Context, req *wedrive.SpaceCreateR
 // RemoveSpaceMembers 在空间中移除成员/部门
 func (s *Service) RemoveSpaceMembers(ctx context.Context, req *wedrive.SpaceInfoRequest) error {
 	// use space_acl_del endpoint payload; here using a generic request type from types if needed
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/wedrive/space_acl_del", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/wedrive/space_acl_del", req)
 	return err
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/shuaidd/wecom-core/internal/client"
+	"github.com/shuaidd/wecom-core/types/common"
 	"github.com/shuaidd/wecom-core/types/wedoc"
 )
 
@@ -30,7 +31,7 @@ func (s *Service) GetFormInfo(ctx context.Context, req *wedoc.GetFormInfoRequest
 // ModifyForm 编辑收集表
 // 该接口用于编辑收集表
 func (s *Service) ModifyForm(ctx context.Context, req *wedoc.ModifyFormRequest) error {
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, modifyFormURL, req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, modifyFormURL, req)
 	return err
 }
 

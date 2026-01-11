@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/shuaidd/wecom-core/internal/client"
+	"github.com/shuaidd/wecom-core/types/common"
 	"github.com/shuaidd/wecom-core/types/reserve_meeting"
 )
 
@@ -36,7 +37,7 @@ func (s *Service) Cancel(ctx context.Context, meetingID string) error {
 	req := &reserve_meeting.CancelMeetingRequest{
 		MeetingID: meetingID,
 	}
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/meeting/cancel", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/meeting/cancel", req)
 	return err
 }
 
@@ -47,7 +48,7 @@ func (s *Service) CancelWithSubMeeting(ctx context.Context, meetingID, subMeetin
 		MeetingID:    meetingID,
 		SubMeetingID: subMeetingID,
 	}
-	_, err := client.PostAndUnmarshal[client.CommonResponse](s.client, ctx, "/cgi-bin/meeting/cancel", req)
+	_, err := client.PostAndUnmarshal[common.Response](s.client, ctx, "/cgi-bin/meeting/cancel", req)
 	return err
 }
 
