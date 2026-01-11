@@ -143,11 +143,11 @@ When implementing new WeCom API modules:
    - Token management: client handles automatically, don't manually manage
    - **Always use `client.PostAndUnmarshal` or `client.GetAndUnmarshal`** - never call `s.client.Post` or `s.client.Get` directly
 
-5. **Update documentation**:
+<!-- 5. **Update documentation**:
    - **IMPORTANT**: After completing API integration, MUST update `README.md` to document the new service and its usage
    - Add the new module to the feature list
    - Provide usage examples for the key APIs
-   - Update the "Current Implementation Status" section in this file (CLAUDE.md)
+   - Update the "Current Implementation Status" section in this file (CLAUDE.md) -->
 
 ## Configuration and Extensibility
 
